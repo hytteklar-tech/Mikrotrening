@@ -2,7 +2,7 @@
   "projectName": "Sommerkropp",
   "createdAt": "2026-04-01T07:00:00Z",
   "lastModified": "2026-04-04T00:00:00Z",
-  "currentPhase": 4,
+  "currentPhase": 7,
 
   "classification": {
     "downtimeTolerance": "irriterende",
@@ -28,22 +28,20 @@
     "phase1": { "status": "completed", "completedSteps": ["vision", "personas", "go-no-go", "modulregister"] },
     "phase2": { "status": "completed", "completedSteps": ["tech-stack", "datamodell", "mvp-scope", "user-stories", "prd", "sikkerhetskrav"] },
     "phase3": { "status": "completed", "completedSteps": ["arkitektur", "mappestruktur", "auth-flyt", "rls-design"] },
-    "phase4": { "status": "in_progress", "completedSteps": ["supabase-klienter", "migrasjoner", "auth-email", "dashboard", "workouts", "leaderboard", "gruppe", "innstillinger", "statistikk", "kalender", "streak-fix", "rls-rekursjon-fix", "multi-dag-prep", "mikrotrening-side", "test-feature"] },
-    "phase5": { "status": "not_started", "completedSteps": [] },
-    "phase6": { "status": "not_started", "completedSteps": [] },
-    "phase7": { "status": "not_started", "completedSteps": [] }
+    "phase4": { "status": "completed", "completedSteps": ["supabase-klienter", "migrasjoner", "auth-email", "dashboard", "workouts", "leaderboard", "gruppe", "innstillinger", "statistikk", "kalender", "streak-fix", "rls-rekursjon-fix", "multi-dag-prep", "mikrotrening-side", "test-feature"] },
+    "phase5": { "status": "skipped", "completedSteps": [] },
+    "phase6": { "status": "completed", "completedSteps": ["feilsider", "pwa-manifest", "slett-konto", "appnavn-mikrotrening"] },
+    "phase7": { "status": "completed", "completedSteps": ["github-repo", "vercel-deploy", "supabase-redirect-url", "live"] }
   },
 
-  "pendingTasks": [
-    "Kjøre migrasjon 004_test_feature.sql i Supabase"
-  ],
+  "pendingTasks": [],
   "completedTasks": [],
 
   "session": {
-    "status": "active",
+    "status": "completed",
     "startedAt": "2026-04-05T00:00:00Z",
     "sessionId": "sess-sommerkropp-008",
-    "lastSignificantAction": "test-feature, motivasjonsmelding, mikrotrening-side, hydration-fix"
+    "lastSignificantAction": "live-deploy til Vercel, Supabase redirect-URL oppdatert"
   },
 
   "dataTypes": {

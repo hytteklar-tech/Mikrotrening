@@ -1,35 +1,49 @@
-# SESSION-HANDOFF — Sommerkropp
-**Lagret:** 2026-04-04
-**Fase:** 4 (MVP-bygging) — in_progress
+# SESSION-HANDOFF — Mikrotrening
+**Lagret:** 2026-04-05
+**Fase:** 7 — FULLFØRT ✅
+**URL:** https://mikrotrening-phi.vercel.app
+
+## Appen er live!
+
+Alle faser fullført. Appen kjører i produksjon på Vercel.
 
 ## Hva ble gjort denne økten
 
-### Ny funksjonalitet
-- **Test-feature**: Ny `/test`-side med 6 ferdiglagde tester (push-ups, sit-ups, knebøy, planken, burpees, pull-ups) + egendefinerte tester. Registrer resultat med dato + notat. SVG sparkline-graf med tooltip på hover/tap. Slett-knapp per resultat.
-- **Tester i stats**: Ny "Tester"-fane i `/statistikk` ved siden av "Trening". Viser beste, første, siste + sparkline + full historikk per test.
-- **BottomNav**: "Topp" (leaderboard) erstattet med "Tester 📏". Toppliste-lenke lagt til i Gruppe-siden.
-- **Motivasjonsmelding**: Vises på hjem etter hver 5. registrering (milestone). 20 one-liners. Lukkes med ×, huskes i localStorage. Knyttet til "Motivasjonsmeldinger"-toggle i innstillinger.
-- **Mikrotrening-side**: `/mikrotrening` med forskningstekst + lenke fra "Meg"-siden.
-- **Info-ikon på test-%**: Forklarer hva prosenten betyr.
+### Badges
+- Nye streak-badges: Gnisten (7d) → Legenden (365d)
+- Nye volum-badges: Første steg (10 økt) → Tusenkunstner (1000 økt)
+- Info-ikon på begge badge-typer i StreakCard — viser full liste med opptjente/fremtidige
+- Topp 3 streak-perioder med datoperiode og badge-navn på statistikk-siden
 
 ### Bugs fikset
-- **Test % feil retning**: `typeResults` manglet eksplisitt sort — la inn `.sort()` direkte på filtered array.
-- **Hydration error**: `localStorage` i useState-initializer → flyttet til useEffect.
-- **Rate limit e-post**: Supabase gratis-tier har maks 2 e-poster/time. Bruker må øke i dashboard eller vente.
+- Nested `<button>` i TestClient (hydration-feil) — ytre header gjort om til `<div role="button">`
+- Gruppe-innmelding feilet stille (upsert → insert med feilhåndtering)
+- RLS blokkerte lesing av andre gruppemedlemmers display_name → migrasjon 005
 
-## Neste steg (ikke startet)
-- Teste gruppe-funksjonalitet (venter på rate limit reset)
-- Verifisere motivasjonsmelding vises korrekt (test ved å slette localStorage-nøkkel i DevTools)
-- Fase 5 eller fase 6 (kvalitetssjekk/publisering)?
+### Fase 6 (kvalitet)
+- 404-side og error-side opprettet
+- PWA manifest.json
+- Slett konto med dobbel bekreftelse (GDPR)
+- App omdøpt til "Mikrotrening" i alle brukerflater
+
+### Fase 7 (publisering)
+- GitHub repo: github.com/hytteklar-tech/Mikrotrening
+- Vercel: mikrotrening-phi.vercel.app
+- Supabase redirect-URL oppdatert til produksjons-URL
+- Miljøvariabler satt i Vercel
 
 ## Viktige filer
-- `src/components/features/TestClient.tsx` — test-side med sparkline + tooltip
-- `src/components/features/TestStatsView.tsx` — stats for tester
-- `src/components/features/DashboardClient.tsx` — motivasjonsmelding + milestone-logikk
-- `src/app/(app)/mikrotrening/page.tsx` — forskningsside
-- `supabase/migrations/004_test_feature.sql` — kjørt i Supabase ✅
+- `src/components/features/StreakCard.tsx` — badges med info
+- `src/components/features/StatsView.tsx` — topp 3 streak-perioder
+- `src/components/features/GroupManager.tsx` — gruppe-innmelding
+- `supabase/migrations/005_users_group_read.sql` — RLS-fix for gruppe
+- `src/app/layout.tsx` — PWA-metadata
+- `src/components/ui/Logo.tsx` — M-logo
 
-## Teknisk stack
-- Next.js 16.2.2 (Turbopack), `src/proxy.ts`
-- Supabase (auth: email magic link, DB: PostgreSQL med RLS)
-- Tailwind CSS, dark theme
+## Hvis du kommer tilbake
+- Fikse noe: rediger fil → `git add . && git commit -m "beskrivelse" && git push` → Vercel deployer automatisk
+- Supabase rate limit: maks 2 e-poster/time på gratisplan
+- Legge til funksjoner: start ny sesjon, si "Bygge", fortsett fra fase 7
+
+## Tech stack
+- Next.js (Turbopack), Supabase (auth: email magic link, DB: PostgreSQL + RLS), Tailwind CSS, Vercel
