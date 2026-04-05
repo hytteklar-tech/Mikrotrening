@@ -1,0 +1,69 @@
+FEATURE DOKUMENTASJON OPPRETTET
+================================
+
+Dato: 2026-02-17
+Antall filer: 5
+Format: Markdown med standardisert struktur
+
+FASER-FOLDER (3 filer)
+======================
+
+1. de-7-fasene.md
+   - Beskriver Kit CCs 7-fase prosess
+   - Hvordan klassifisering tilpasser tempo
+   - Fase-gater og fase-agenter
+   - Eksempel: e-handels-system
+
+2. feature-loop.md
+   - Fase 5 og loop-strukturen
+   - Bygg → Test → Fiks → Godkjenn → Loop
+   - Modulregisteret og prioritering
+   - Avhengigheter og rekkefølge
+   - Eksempel: blogg-app
+
+3. modulregistrering.md
+   - Hvordan funksjoner organiseres som moduler
+   - MODUL-SPEC filer og metadata
+   - Status-tracking og avhengigheter
+   - Akseptansekriterier
+   - Eksempel: e-handels-app
+
+AUTONOMI-FOLDER (2 filer)
+=========================
+
+4. tre-byggemodus.md
+   - "AI bestemmer" (raskest)
+   - "Samarbeid" (balansert)
+   - "Detaljstyrt" (fullkontroll)
+   - Tabell: hvilke beslutninger som håndteres hvordan
+   - Eksempel: 3 personer med ulike preferanser
+
+5. beslutningsklassifisering.md
+   - Tekniske beslutninger (framework, database)
+   - Funksjonelle beslutninger (features, UX)
+   - Operasjonelle beslutninger (deploy, miljø)
+   - Matriks: klassifisering vs byggemodus
+   - Eksempel: blogg-app med 3 beslutninger
+
+ALLE FILER
+==========
+
+✓ Skrevet på norsk (brukervenlig språk)
+✓ Følger standardformat med:
+  - Kort beskrivelse (1 setning)
+  - "Hva gjør den?" (2-3 avsnitt)
+  - "Hvorfor er det nyttig?" (verdien)
+  - "Hvordan fungerer det?" (teknisk)
+  - "Eksempel" (konkret use case)
+  - "Relaterte features" (kryss-referencer)
+  - Filsti og kategori i footer
+
+✓ Inneholder:
+  - Klare overskrifter
+  - Bullet points for lesbarhet
+  - Eksempler fra virkeligheten
+  - Tabeller for sammenligning
+  - Tydelig struktur
+
+TOTAL STØRRELSE: ~19 KB (5 filer)
+

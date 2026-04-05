@@ -1,0 +1,60 @@
+{
+  "projectName": "Sommerkropp",
+  "createdAt": "2026-04-01T07:00:00Z",
+  "lastModified": "2026-04-04T00:00:00Z",
+  "currentPhase": 4,
+
+  "classification": {
+    "downtimeTolerance": "irriterende",
+    "regulatoryRequirements": "gdpr-light",
+    "integrationComplexity": "enkel",
+    "score": 10,
+    "intensityLevel": "forenklet",
+    "confidenceScore": 88,
+    "classifiedAt": "2026-04-01T07:10:00Z",
+    "classifiedBy": "AUTO-CLASSIFIER",
+    "userLevel": "erfaren-vibecoder"
+  },
+
+  "builderMode": "samarbeid",
+
+  "integrations": {
+    "detected": ["auth-email-magic-link", "database"],
+    "confirmed": ["supabase", "next.js", "vercel"],
+    "setup": ["supabase", "email-magic-link"]
+  },
+
+  "phaseProgress": {
+    "phase1": { "status": "completed", "completedSteps": ["vision", "personas", "go-no-go", "modulregister"] },
+    "phase2": { "status": "completed", "completedSteps": ["tech-stack", "datamodell", "mvp-scope", "user-stories", "prd", "sikkerhetskrav"] },
+    "phase3": { "status": "completed", "completedSteps": ["arkitektur", "mappestruktur", "auth-flyt", "rls-design"] },
+    "phase4": { "status": "in_progress", "completedSteps": ["supabase-klienter", "migrasjoner", "auth-email", "dashboard", "workouts", "leaderboard", "gruppe", "innstillinger", "statistikk", "kalender", "streak-fix", "rls-rekursjon-fix", "multi-dag-prep", "mikrotrening-side", "test-feature"] },
+    "phase5": { "status": "not_started", "completedSteps": [] },
+    "phase6": { "status": "not_started", "completedSteps": [] },
+    "phase7": { "status": "not_started", "completedSteps": [] }
+  },
+
+  "pendingTasks": [
+    "Kjøre migrasjon 004_test_feature.sql i Supabase"
+  ],
+  "completedTasks": [],
+
+  "session": {
+    "status": "active",
+    "startedAt": "2026-04-05T00:00:00Z",
+    "sessionId": "sess-sommerkropp-008",
+    "lastSignificantAction": "test-feature, motivasjonsmelding, mikrotrening-side, hydration-fix"
+  },
+
+  "dataTypes": {
+    "sensitive": ["mobilnummer", "email"]
+  },
+
+  "overlay": {
+    "port": 4864
+  },
+
+  "metadata": {
+    "agentSystemVersion": "3.5.0"
+  }
+}

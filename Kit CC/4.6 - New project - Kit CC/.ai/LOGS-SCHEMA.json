@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kitcc.dev/schemas/log-entry-v1.json",
+  "title": "Kit CC Log Entry",
+  "description": "Schema for structured logging in Kit CC (JSON Lines format)",
+  "type": "object",
+  "required": [
+    "timestamp",
+    "level",
+    "agent",
+    "message"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 timestamp with timezone"
+    },
+    "level": {
+      "type": "string",
+      "enum": ["DEBUG", "INFO", "WARN", "ERROR", "CRITICAL"],
+      "description": "Log severity level"
+    },
+    "agent": {
+      "type": "string",
+      "description": "Agent name (e.g., ORCHESTRATOR, BYGGER, AUTO-CLASSIFIER)",
+      "examples": ["ORCHESTRATOR", "BYGGER", "KRAV-agent"]
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable log message",
+      "minLength": 1,
+      "maxLength": 500
+    },
+    "eventType": {
+      "type": "string",
+      "description": "Event type for categorization",
+      "examples": [
+        "SESSION_START",
+        "AGENT_ACTIVATED",
+        "WRITE_ACCESS_GRANTED",
+        "TASK_COMPLETED",
+        "ERROR"
+      ]
+    },
+    "context": {
+      "type": "object",
+      "description": "Contextual information about the event",
+      "properties": {
+        "sessionId": {
+          "type": "string",
+          "description": "Current session ID"
+        },
+        "currentPhase": {
+          "type": "integer",
+          "description": "Current phase (0-7)",
+          "minimum": 0,
+          "maximum": 7
+        },
+        "projectName": {
+          "type": "string",
+          "description": "Project name"
+        },
+        "taskId": {
+          "type": "string",
+          "description": "Task identifier"
+        },
+        "file": {
+          "type": "string",
+          "description": "File being operated on"
+        },
+        "activeWriter": {
+          "type": "string",
+          "description": "Agent with current write access"
+        }
+      }
+    },
+    "data": {
+      "type": "object",
+      "description": "Additional structured data",
+      "additionalProperties": true
+    },
+    "duration": {
+      "type": "number",
+      "description": "Duration in milliseconds (for completed operations)",
+      "minimum": 0
+    },
+    "error": {
+      "type": "object",
+      "description": "Error details (for ERROR and CRITICAL levels)",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Error type",
+          "examples": ["ValidationError", "TimeoutError", "WriteConflict"]
+        },
+        "code": {
+          "type": "string",
+          "description": "Error code",
+          "examples": ["ERR_WRITE_BUSY", "ERR_STATE_CORRUPT"]
+        },
+        "stack": {
+          "type": "string",
+          "description": "Stack trace (for debugging)"
+        }
+      }
+    },
+    "tags": {
+      "type": "array",
+      "description": "Tags for filtering and searching",
+      "items": {
+        "type": "string"
+      },
+      "examples": [["write-access", "performance"], ["security", "critical"]]
+    }
+  },
+  "examples": [
+    {
+      "timestamp": "2026-02-04T14:30:00.123Z",
+      "level": "INFO",
+      "agent": "ORCHESTRATOR",
+      "message": "Session started",
+      "eventType": "SESSION_START",
+      "context": {
+        "sessionId": "sess-abc123",
+        "currentPhase": 0,
+        "projectName": "TodoApp"
+      }
+    },
+    {
+      "timestamp": "2026-02-04T14:30:05.456Z",
+      "level": "INFO",
+      "agent": "ORCHESTRATOR",
+      "message": "Write access granted to BYGGER for src/app.py",
+      "eventType": "WRITE_ACCESS_GRANTED",
+      "context": {
+        "sessionId": "sess-abc123",
+        "currentPhase": 4,
+        "file": "src/app.py",
+        "activeWriter": "BYGGER"
+      },
+      "tags": ["write-access"]
+    },
+    {
+      "timestamp": "2026-02-04T14:35:00.789Z",
+      "level": "INFO",
+      "agent": "ORCHESTRATOR",
+      "message": "Write access transferred from BYGGER to DEBUGGER",
+      "eventType": "WRITE_ACCESS_TRANSFERRED",
+      "context": {
+        "sessionId": "sess-abc123",
+        "file": "src/app.py",
+        "activeWriter": "DEBUGGER"
+      },
+      "data": {
+        "previousWriter": "BYGGER",
+        "reason": "TASK_COMPLETE"
+      },
+      "tags": ["write-access"]
+    }
+  ]
+}

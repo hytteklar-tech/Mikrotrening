@@ -1,0 +1,24 @@
+# .ai/.gitignore
+# Generert av Kit CC
+
+# ═══ SIKKERHET — ALDRI COMMIT DISSE ═══
+# API-nøkkel og sensitive konfigurasjoner
+config.json
+
+# Database med brukerdata
+backlog.db
+backlog.db-wal
+backlog.db-shm
+
+# ═══ Logger — blir for store for Git ═══
+LOGS.jsonl
+*.log
+
+# ═══ Midlertidige filer ═══
+*.tmp
+*.temp
+.DS_Store
+
+# Store checkpoints (valgfritt - kommenter ut hvis du vil commite)
+# CHECKPOINT-HISTORY/*.json
+# CHECKPOINT-ARCHIVE/

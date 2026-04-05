@@ -1,0 +1,116 @@
+{
+  "projectName": "Sommerkropp",
+  "createdAt": "2026-04-01T07:00:00Z",
+  "lastModified": "2026-04-01T07:10:00Z",
+  "currentPhase": 4,
+
+  "classification": {
+    "downtimeTolerance": "irriterende",
+    "regulatoryRequirements": "gdpr-light",
+    "integrationComplexity": "enkel",
+    "score": 10,
+    "intensityLevel": "forenklet",
+    "confidenceScore": 88,
+    "confidenceBreakdown": {
+      "clarity": 90,
+      "consistency": 87,
+      "pattern": 87
+    },
+    "classifiedAt": "2026-04-01T07:10:00Z",
+    "classifiedBy": "AUTO-CLASSIFIER",
+    "userLevel": "erfaren-vibecoder"
+  },
+
+  "builderMode": "samarbeid",
+
+  "imageStrategy": null,
+
+  "integrations": {
+    "detected": ["auth-sms", "database"],
+    "confirmed": [],
+    "setup": []
+  },
+
+  "devServer": null,
+
+  "brownfield": null,
+
+  "phaseProgress": {
+    "phase1": { "status": "completed", "completedSteps": ["vision", "personas", "go-no-go", "modulregister"] },
+    "phase2": { "status": "completed", "completedSteps": ["tech-stack", "datamodell", "mvp-scope", "user-stories", "prd", "sikkerhetskrav"] },
+    "phase3": { "status": "completed", "completedSteps": ["arkitektur", "mappestruktur", "auth-flyt", "rls-design"] },
+    "phase4": { "status": "in_progress", "completedSteps": [] },
+    "phase5": { "status": "not_started", "completedSteps": [] },
+    "phase6": { "status": "not_started", "completedSteps": [] },
+    "phase7": { "status": "not_started", "completedSteps": [] }
+  },
+
+  "pendingTasks": [],
+  "completedTasks": [],
+
+  "session": {
+    "status": "active",
+    "startedAt": "2026-04-02T00:00:00Z",
+    "sessionId": "sess-sommerkropp-002",
+    "lastSignificantAction": "resume",
+    "crashRecovery": null
+  },
+
+  "dataTypes": {
+    "sensitive": ["mobilnummer"]
+  },
+
+  "overlay": {
+    "port": 4864
+  },
+
+  "history": {
+    "events": [
+      {
+        "id": "evt-boot-001",
+        "timestamp": "2026-04-01T07:00:00Z",
+        "type": "SESSION_START",
+        "phase": 0,
+        "agent": "CLA",
+        "data": {
+          "action": "bootstrap",
+          "projectName": "Sommerkropp"
+        }
+      },
+      {
+        "id": "evt-class-001",
+        "timestamp": "2026-04-01T07:00:00Z",
+        "type": "CLASSIFICATION",
+        "phase": 0,
+        "agent": "CLA",
+        "data": {
+          "previousLevel": null,
+          "newLevel": "minimal",
+          "score": 7,
+          "confidenceScore": 91,
+          "reason": "Initial classification",
+          "userAccepted": true
+        }
+      },
+      {
+        "id": "evt-class-002",
+        "timestamp": "2026-04-01T07:10:00Z",
+        "type": "RECLASSIFICATION",
+        "phase": 1,
+        "agent": "CLA",
+        "data": {
+          "previousLevel": "minimal",
+          "newLevel": "forenklet",
+          "score": 10,
+          "confidenceScore": 88,
+          "reason": "Bruker ønsker innlogging (mobilnummer) og datalagring. Krever backend + auth.",
+          "userAccepted": true
+        }
+      }
+    ]
+  },
+
+  "metadata": {
+    "agentSystemVersion": "3.5.0"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "version": "3.0.0",
+  "projectName": "",
+  "projectType": "",
+  "createdAt": "",
+  "lastModified": "",
+  "classification": {
+    "intensityLevel": "MINIMAL",
+    "score": 0,
+    "factors": {
+      "teamSize": 0,
+      "userBase": 0,
+      "dataComplexity": 0,
+      "integrationComplexity": 0,
+      "regulatoryRequirements": 0,
+      "deploymentComplexity": 0,
+      "timeConstraints": 0
+    },
+    "classifiedAt": "",
+    "classifiedBy": "AUTO-CLASSIFIER",
+    "userLevel": null
+  },
+  "currentPhase": 0,
+  "phaseProgress": {
+    "phase0": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase1": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase2": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase3": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase4": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase5": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase6": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    },
+    "phase7": {
+      "status": "not_started",
+      "mode": "standard",
+      "completedSteps": [],
+      "skippedSteps": [],
+      "blockedTasks": [],
+      "gatesPassed": false,
+      "startedAt": null,
+      "completedAt": null
+    }
+  },
+  "pendingTasks": [],
+  "completedTasks": [],
+  "lastCheckpoint": {
+    "timestamp": null,
+    "agent": null,
+    "summary": null
+  },
+  "pendingDecisions": [],
+  "session": {
+    "status": "completed",
+    "startedAt": null,
+    "lastHeartbeat": null,
+    "sessionId": null
+  },
+  "history": {
+    "events": [],
+    "latestByType": {
+      "CHECKPOINT": null,
+      "GATE_RESULT": null,
+      "CLASSIFICATION": null,
+      "SESSION_START": null,
+      "SESSION_END": null,
+      "ERROR": null,
+      "USER_OVERRIDE": null,
+      "REGRESSION": null
+    }
+  },
+  "metadata": {
+    "kitCCVersion": "1.0.0",
+    "schemaVersion": "3.0.0",
+    "notes": "Initial state - awaiting AUTO-CLASSIFIER"
+  },
+  "designSystem": null,
+  "builderMode": null,
+  "imageStrategy": {
+    "type": []
+  },
+  "overlay": {
+    "mode": "proxy",
+    "port": 4864,
+    "devServerPort": 3000
+  },
+  "checkpoints": []
+}
