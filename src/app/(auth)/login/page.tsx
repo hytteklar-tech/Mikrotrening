@@ -19,7 +19,7 @@ export default function LoginPage() {
       options: { emailRedirectTo: `${location.origin}/auth/callback` },
     })
     if (error) {
-      setError('Kunne ikke sende lenke. Sjekk e-postadressen og prøv igjen.')
+      setError(error.message)
     } else {
       setSent(true)
     }
