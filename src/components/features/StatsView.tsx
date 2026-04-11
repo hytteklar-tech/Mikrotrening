@@ -275,6 +275,11 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           <p className="text-gray-400 text-xs mb-1">Lengste streak</p>
           <p className="text-3xl font-bold text-yellow-400">{longestStreak} 🏆</p>
           <p className="text-gray-500 text-xs mt-1">dager på rad</p>
+          {topStreaks[0] && (
+            <p className="text-gray-600 text-xs mt-1">
+              {formatDate(topStreaks[0].start)} – {formatDate(topStreaks[0].end)}
+            </p>
+          )}
         </div>
       </div>
 
