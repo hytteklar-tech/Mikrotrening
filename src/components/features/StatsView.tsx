@@ -227,7 +227,10 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         </div>
         <div className="bg-gray-800 rounded-2xl p-4">
           <p className="text-gray-400 text-xs mb-1">Reps</p>
-          <p className="text-3xl font-bold text-white">{periodReps.toLocaleString('nb-NO')}</p>
+          <p className="text-2xl font-bold text-white">{periodReps.toLocaleString('nb-NO')}</p>
+          <p className="text-orange-400 font-bold text-lg leading-tight">
+            {trainedDays > 0 ? Math.round(periodReps / trainedDays) : 0} /dag
+          </p>
           <p className="text-gray-500 text-xs mt-1">{periodLabel}</p>
         </div>
       </div>
