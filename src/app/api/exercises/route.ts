@@ -23,7 +23,10 @@ export async function GET(request: NextRequest) {
     next: { revalidate: 3600 },
   })
 
-  if (!res.ok) return NextResponse.json({ error: 'api_error' }, { status: res.status })
+  if (!res.ok) {
+    const body = await res.text()
+    return NextResponse.json({ error: 'api_error', status: res.status, detail: body }, { status: res.status })
+  }
   const data = await res.json()
   return NextResponse.json(data)
 }
