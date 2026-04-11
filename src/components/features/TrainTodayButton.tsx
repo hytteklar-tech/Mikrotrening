@@ -1,9 +1,15 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import CalendarView from './CalendarView'
 import type { DayLog } from './DashboardClient'
+
+function formatDuration(seconds: number) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
+}
 
 type Package = { id: string; name: string }
 
@@ -25,7 +31,28 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(packages[0] ?? null)
   const [loading, setLoading] = useState(false)
   const [deletingId, setDeletingId] = useState<string | null>(null)
+  const [timerRunning, setTimerRunning] = useState(false)
+  const [timerSeconds, setTimerSeconds] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const supabase = createClient()
+
+  useEffect(() => {
+    if (timerRunning) {
+      intervalRef.current = setInterval(() => setTimerSeconds(s => s + 1), 1000)
+    } else {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
+  }, [timerRunning])
+
+  function startTimer() {
+    setTimerSeconds(0)
+    setTimerRunning(true)
+  }
+
+  function stopTimer() {
+    setTimerRunning(false)
+  }
 
   const isToday = selectedDate === today
   const isFuture = selectedDate > today
@@ -44,15 +71,18 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
         weekday: 'long', day: 'numeric', month: 'long',
       })
 
-  async function addLog() {
+  async function addLog(withTimer = false) {
     if (!activePackage || isFuture) return
     setLoading(true)
+    const duration = withTimer && timerSeconds > 0 ? timerSeconds : null
+    if (withTimer) stopTimer()
 
     const optimisticLog: DayLog = {
       id: `optimistic-${Date.now()}`,
       date: selectedDate,
       packageId: activePackage.id,
       packageName: activePackage.name,
+      durationSeconds: duration,
     }
     onLogChange([...dayLogs, optimisticLog])
 
@@ -60,17 +90,23 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       user_id: userId,
       package_id: activePackage.id,
       logged_date: selectedDate,
+      ...(duration !== null && { duration_seconds: duration }),
     }).select('id').single()
 
     if (error) {
       console.error('[TrainTodayButton] Insert error:', error)
       onLogChange(dayLogs)
     } else if (data) {
-      // Replace optimistic entry with real id
       onLogChange([...dayLogs, { ...optimisticLog, id: data.id as string }])
     }
 
     setLoading(false)
+  }
+
+  function handleDateChange(date: string) {
+    if (timerRunning) stopTimer()
+    setTimerSeconds(0)
+    setSelectedDate(date)
   }
 
   async function deleteLog(log: DayLog) {
@@ -95,7 +131,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       <CalendarView
         dayCounts={dayCounts}
         selectedDate={selectedDate}
-        onSelectDate={setSelectedDate}
+        onSelectDate={handleDateChange}
       />
 
       <p className="text-center text-sm text-gray-400 capitalize">{labelDate}</p>
@@ -118,6 +154,9 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   <div className="flex items-center gap-2">
                     <span className="text-green-400">✓</span>
                     <span className="text-sm text-white font-medium">{log.packageName}</span>
+                    {log.durationSeconds != null && (
+                      <span className="text-xs text-orange-400">⏱ {formatDuration(log.durationSeconds)}</span>
+                    )}
                   </div>
                   <button
                     onClick={() => deleteLog(log)}
@@ -152,17 +191,47 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                 </div>
               )}
 
-              <button
-                onClick={addLog}
-                disabled={loading || !activePackage}
-                className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-lg rounded-xl py-4 transition"
-              >
-                {loading
-                  ? 'Registrerer...'
-                  : logsForDay.length > 0
-                  ? `➕ Legg til — ${activePackage?.name}`
-                  : `💪 Registrer — ${activePackage?.name}`}
-              </button>
+              {timerRunning ? (
+                <div className="space-y-2">
+                  <div className="text-center py-2">
+                    <p className="text-4xl font-mono font-bold text-orange-400">{formatDuration(timerSeconds)}</p>
+                    <p className="text-gray-500 text-xs mt-1">tidtaker kjører</p>
+                  </div>
+                  <button
+                    onClick={() => addLog(true)}
+                    disabled={loading || !activePackage}
+                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-lg rounded-xl py-4 transition"
+                  >
+                    {loading ? 'Registrerer...' : `■ Ferdig og registrer — ${activePackage?.name}`}
+                  </button>
+                  <button
+                    onClick={stopTimer}
+                    className="w-full text-gray-500 text-sm py-1 hover:text-white transition"
+                  >
+                    Avbryt tidtaker
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <button
+                    onClick={() => addLog(false)}
+                    disabled={loading || !activePackage}
+                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-lg rounded-xl py-4 transition"
+                  >
+                    {loading
+                      ? 'Registrerer...'
+                      : logsForDay.length > 0
+                      ? `➕ Legg til — ${activePackage?.name}`
+                      : `💪 Registrer — ${activePackage?.name}`}
+                  </button>
+                  <button
+                    onClick={startTimer}
+                    className="w-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 rounded-xl py-2 text-sm transition"
+                  >
+                    ⏱ Start med tidtaker
+                  </button>
+                </div>
+              )}
             </>
           )}
 

@@ -21,7 +21,7 @@ export default async function DashboardPage() {
   const [{ data: logs }, { data: packages }] = await Promise.all([
     supabase
       .from('daily_logs')
-      .select('id, logged_date, package_id, workout_packages(name)')
+      .select('id, logged_date, package_id, duration_seconds, workout_packages(name)')
       .eq('user_id', user.id)
       .order('logged_date', { ascending: false }),
     supabase
@@ -37,6 +37,7 @@ export default async function DashboardPage() {
     date: row.logged_date as string,
     packageId: row.package_id as string,
     packageName: ((row.workout_packages as any)?.name ?? 'Ukjent') as string,
+    durationSeconds: row.duration_seconds as number | null,
   }))
 
   return (

@@ -30,7 +30,7 @@ const ONELINERS = [
 
 type Package = { id: string; name: string }
 
-export type DayLog = { id: string; date: string; packageId: string; packageName: string }
+export type DayLog = { id: string; date: string; packageId: string; packageName: string; durationSeconds?: number | null }
 
 type Props = {
   initialDayLogs: DayLog[]
