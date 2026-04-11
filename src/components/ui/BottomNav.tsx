@@ -22,7 +22,7 @@ export default function BottomNav() {
           <Link
             key={link.href}
             href={link.href}
-            className={`flex-1 flex flex-col items-center py-3 text-xs transition ${
+            className={`flex-1 flex flex-col items-center py-3 text-xs transition touch-manipulation ${
               pathname === link.href ? 'text-orange-500' : 'text-gray-500 hover:text-gray-300'
             }`}
           >
