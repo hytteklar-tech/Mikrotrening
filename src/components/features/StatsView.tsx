@@ -313,19 +313,82 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         </div>
       )}
 
-      {/* Totaler */}
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
-        <div className="flex justify-between items-center">
-          <span className="text-gray-300 text-sm">Antall treninger</span>
-          <span className="text-white font-bold">{totalTrainings}</span>
-        </div>
-        <div className="h-px bg-gray-700" />
-        <div className="flex justify-between items-center">
-          <span className="text-gray-300 text-sm">Totale reps</span>
-          <span className="text-white font-bold">{totalReps.toLocaleString('nb-NO')}</span>
-        </div>
-      </div>
+      {/* Totaler — kumulativ kurve */}
+      {(() => {
+        const allDates = [...new Set(logs.map(l => l.logged_date))].sort()
+        if (allDates.length < 2) return (
+          <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
+            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
+            <p className="text-white font-bold">{totalTrainings} treninger · {totalReps.toLocaleString('nb-NO')} reps</p>
+          </div>
+        )
+
+        const W = 320
+        const H = 120
+        const pL = 8, pR = 8, pT = 16, pB = 24
+        const cW = W - pL - pR
+        const cH = H - pT - pB
+
+        const startMs = new Date(allDates[0] + 'T12:00:00').getTime()
+        const endMs = new Date(allDates[allDates.length - 1] + 'T12:00:00').getTime()
+        const spanMs = endMs - startMs || 1
+
+        const points = allDates.map((d, i) => {
+          const ms = new Date(d + 'T12:00:00').getTime()
+          const x = pL + ((ms - startMs) / spanMs) * cW
+          const y = pT + (1 - (i + 1) / allDates.length) * cH
+          return [x, y] as [number, number]
+        })
+
+        const polyline = points.map(([x, y]) => `${x},${y}`).join(' ')
+        const area = `${points[0][0]},${pT + cH} ` + polyline + ` ${points[points.length - 1][0]},${pT + cH}`
+
+        // Månedsetiketter
+        const monthLabels: { x: number; label: string }[] = []
+        const seen = new Set<string>()
+        for (const d of allDates) {
+          const key = d.slice(0, 7)
+          if (!seen.has(key)) {
+            seen.add(key)
+            const ms = new Date(d + 'T12:00:00').getTime()
+            const x = pL + ((ms - startMs) / spanMs) * cW
+            const label = new Date(d + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' })
+            monthLabels.push({ x, label })
+          }
+        }
+        // Vis maks 6 etiketter for å unngå overlapp
+        const step = Math.ceil(monthLabels.length / 6)
+        const visibleLabels = monthLabels.filter((_, i) => i % step === 0)
+
+        const last = points[points.length - 1]
+
+        return (
+          <div className="bg-gray-800 rounded-2xl p-4">
+            <div className="flex justify-between items-baseline mb-3">
+              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
+              <p className="text-white text-sm font-bold">{totalTrainings} treninger · {totalReps.toLocaleString('nb-NO')} reps</p>
+            </div>
+            <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 120 }}>
+              <defs>
+                <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="#f97316" stopOpacity="0.4" />
+                  <stop offset="100%" stopColor="#f97316" stopOpacity="0.02" />
+                </linearGradient>
+              </defs>
+              {/* Fyllt område */}
+              <polygon points={area} fill="url(#areaGrad)" />
+              {/* Kurve */}
+              <polyline points={polyline} fill="none" stroke="#f97316" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+              {/* Siste punkt */}
+              <circle cx={last[0]} cy={last[1]} r="3.5" fill="#f97316" />
+              {/* Månedsetiketter */}
+              {visibleLabels.map(({ x, label }) => (
+                <text key={label} x={x} y={H - 4} textAnchor="middle" fontSize="9" fill="#6b7280">{label}</text>
+              ))}
+            </svg>
+          </div>
+        )
+      })()}
 
       {/* Per treningspakke */}
       <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
