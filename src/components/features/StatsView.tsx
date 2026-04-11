@@ -243,11 +243,8 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
             const isEmpty = bar.value === 0
             return (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <span className="text-xs text-white leading-none" style={{ visibility: isEmpty ? 'hidden' : 'visible' }}>
-                  {bar.value}
-                </span>
                 <div
-                  className={`w-full rounded-t-md transition-all ${
+                  className={`w-full rounded-t-md transition-all flex items-center justify-center ${
                     isEmpty
                       ? 'bg-gray-700'
                       : bar.isToday
@@ -255,7 +252,11 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                       : 'bg-orange-400/70'
                   }`}
                   style={{ height: `${barHeight}px` }}
-                />
+                >
+                  {!isEmpty && barHeight >= 16 && (
+                    <span className="text-white text-xs font-semibold leading-none">{bar.value}</span>
+                  )}
+                </div>
                 <span className="text-gray-500 text-xs leading-none">{bar.label}</span>
               </div>
             )
