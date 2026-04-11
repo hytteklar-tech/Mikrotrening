@@ -52,6 +52,7 @@ function isoWeek(date: Date): string {
 
 export default function StatsView({ logs, currentStreak, longestStreak, topStreaks }: Props) {
   const [tab, setTab] = useState<Tab>('mnd')
+  const [infoOpen, setInfoOpen] = useState(false)
 
   const today = new Date()
   today.setHours(12, 0, 0, 0)
@@ -112,15 +113,47 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
     return days.reduce((sum, d) => sum + (dateMap.get(d)?.reps ?? 0), 0)
   }
 
-  // Aggregerte tall for valgt periode
+  // Aggregerte tall for valgt periode (graf)
   const periodDays = tab === 'uke'
     ? weekDays
     : tab === 'mnd'
     ? monthWeeks.flatMap(w => w.days)
     : yearMonths.flatMap(m => m.days)
 
-  const periodTrainings = countTrainings(periodDays)
-  const periodReps = sumReps(periodDays)
+  // Kalenderbasert periode for kortene
+  const calendarDays: string[] = []
+  if (tab === 'uke') {
+    const d = new Date(getWeekStart(today))
+    while (toLocalDateStr(d) <= toLocalDateStr(today)) {
+      calendarDays.push(toLocalDateStr(d))
+      d.setDate(d.getDate() + 1)
+    }
+  } else if (tab === 'mnd') {
+    const d = new Date(today.getFullYear(), today.getMonth(), 1)
+    while (toLocalDateStr(d) <= toLocalDateStr(today)) {
+      calendarDays.push(toLocalDateStr(d))
+      d.setDate(d.getDate() + 1)
+    }
+  } else {
+    const d = new Date(today.getFullYear(), 0, 1)
+    while (toLocalDateStr(d) <= toLocalDateStr(today)) {
+      calendarDays.push(toLocalDateStr(d))
+      d.setDate(d.getDate() + 1)
+    }
+  }
+
+  const possibleDays = calendarDays.length
+  const trainedDays = calendarDays.filter(d => dateMap.has(d)).length
+  const trainedPct = possibleDays === 0 ? 0 : Math.round((trainedDays / possibleDays) * 100)
+  const periodReps = sumReps(calendarDays)
+
+  const periodLabel = tab === 'uke' ? 'denne uken' : tab === 'mnd' ? 'denne måneden' : 'i år'
+  const infoText = tab === 'uke'
+    ? 'Dager du har trent av mulige dager denne uken (man–i dag). Flere økter samme dag teller som én dag.'
+    : tab === 'mnd'
+    ? 'Dager du har trent av mulige dager denne måneden. Flere økter samme dag teller som én dag.'
+    : 'Dager du har trent av mulige dager i år. Flere økter samme dag teller som én dag.'
+
   const totalTrainings = logs.length
   const totalReps = logs.reduce((s, l) => s + l.reps, 0)
 
@@ -173,14 +206,29 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       {/* Periode-kort */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-800 rounded-2xl p-4">
-          <p className="text-gray-400 text-xs mb-1">Treninger</p>
-          <p className="text-3xl font-bold text-white">{periodTrainings}</p>
-          <p className="text-gray-500 text-xs mt-1">denne perioden</p>
+          <div className="flex justify-between items-start mb-1">
+            <p className="text-gray-400 text-xs">Treninger</p>
+            <button
+              onClick={() => setInfoOpen(v => !v)}
+              className="text-gray-500 hover:text-white text-xs leading-none"
+            >
+              {infoOpen ? '✕' : 'ⓘ'}
+            </button>
+          </div>
+          {infoOpen ? (
+            <p className="text-gray-300 text-xs leading-relaxed">{infoText}</p>
+          ) : (
+            <>
+              <p className="text-2xl font-bold text-white">{trainedDays} av {possibleDays}</p>
+              <p className="text-orange-400 font-bold text-lg leading-tight">{trainedPct}%</p>
+              <p className="text-gray-500 text-xs mt-1">{periodLabel}</p>
+            </>
+          )}
         </div>
         <div className="bg-gray-800 rounded-2xl p-4">
           <p className="text-gray-400 text-xs mb-1">Reps</p>
           <p className="text-3xl font-bold text-white">{periodReps.toLocaleString('nb-NO')}</p>
-          <p className="text-gray-500 text-xs mt-1">denne perioden</p>
+          <p className="text-gray-500 text-xs mt-1">{periodLabel}</p>
         </div>
       </div>
 
