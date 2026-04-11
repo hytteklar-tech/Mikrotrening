@@ -434,7 +434,6 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
 
       {/* Per treningspakke */}
       <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
-        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Per treningspakke — {periodLabel2}</p>
         {(() => {
           const byPackage = periodLogs.reduce<Record<string, { count: number; reps: number }>>((acc, l) => {
             if (!acc[l.packageName]) acc[l.packageName] = { count: 0, reps: 0 }
@@ -444,20 +443,37 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           }, {})
           const entries = Object.entries(byPackage).sort((a, b) => b[1].count - a[1].count)
           const maxCount = entries[0]?.[1].count ?? 1
-          return entries.map(([name, stats]) => (
-            <div key={name} className="space-y-1">
-              <div className="flex justify-between items-baseline">
-                <span className="text-white text-sm font-medium">{name}</span>
-                <span className="text-gray-400 text-xs">{stats.count} treninger · {stats.reps.toLocaleString('nb-NO')} reps</span>
+          const totalPeriodTrainings = periodLogs.length
+          const totalPeriodReps = periodLogs.reduce((s, l) => s + l.reps, 0)
+          return (
+            <>
+              <div className="flex justify-between items-center">
+                <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Per treningspakke — {periodLabel2}</p>
+                <div className="flex items-center gap-1.5">
+                  <span className="border border-orange-500 rounded-full px-2 py-0.5 text-orange-400 text-xs font-semibold leading-none">
+                    {totalPeriodTrainings} tr
+                  </span>
+                  <span className="border border-orange-500 rounded-full px-2 py-0.5 text-orange-400 text-xs font-semibold leading-none">
+                    {totalPeriodReps.toLocaleString('nb-NO')} reps
+                  </span>
+                </div>
               </div>
-              <div className="w-full bg-gray-700 rounded-full h-2">
-                <div
-                  className="bg-orange-500 h-2 rounded-full transition-all"
-                  style={{ width: `${(stats.count / maxCount) * 100}%` }}
-                />
-              </div>
-            </div>
-          ))
+              {entries.map(([name, stats]) => (
+                <div key={name} className="space-y-1">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-white text-sm font-medium">{name}</span>
+                    <span className="text-gray-400 text-xs">{stats.count} tr · {stats.reps.toLocaleString('nb-NO')} reps</span>
+                  </div>
+                  <div className="w-full bg-gray-700 rounded-full h-2">
+                    <div
+                      className="bg-orange-500 h-2 rounded-full transition-all"
+                      style={{ width: `${(stats.count / maxCount) * 100}%` }}
+                    />
+                  </div>
+                </div>
+              ))}
+            </>
+          )
         })()}
       </div>
     </div>
