@@ -38,7 +38,7 @@ export default function TestExercisesPage() {
     const res = await fetch(`/api/exercises?${params}`)
     if (!res.ok) {
       const data = await res.json()
-      setError('Klarte ikke hente øvelser')
+      setError(data.error === 'no_key' ? 'Mangler RAPIDAPI_KEY' : `Feil ${data.status}: ${data.detail ?? 'Klarte ikke hente øvelser'}`)
       setLoading(false)
       return
     }
