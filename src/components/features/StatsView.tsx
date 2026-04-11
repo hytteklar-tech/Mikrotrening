@@ -157,6 +157,15 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
   const totalTrainings = logs.length
   const totalReps = logs.reduce((s, l) => s + l.reps, 0)
 
+  // Nåværende streak — start/slutt dato
+  const allUniqueDates = [...new Set(logs.map(l => l.logged_date))]
+  const currentStreakEnd = allUniqueDates.includes(toLocalDateStr(today))
+    ? toLocalDateStr(today)
+    : (() => { const d = new Date(today); d.setDate(d.getDate() - 1); return toLocalDateStr(d) })()
+  const currentStreakStartD = new Date(currentStreakEnd + 'T12:00:00')
+  currentStreakStartD.setDate(currentStreakStartD.getDate() - (currentStreak - 1))
+  const currentStreakStart = currentStreak > 0 ? toLocalDateStr(currentStreakStartD) : ''
+
   // Bar chart data
   type Bar = { label: string; value: number; max: number; isToday?: boolean }
   let bars: Bar[] = []
@@ -273,16 +282,17 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           <p className="text-gray-400 text-xs mb-1">Nåværende streak</p>
           <p className="text-3xl font-bold text-orange-400">{currentStreak} 🔥</p>
           <p className="text-gray-500 text-xs mt-1">dager på rad</p>
+          <p className="text-gray-600 text-xs mt-1">
+            {currentStreak > 0 ? `${formatDate(currentStreakStart)} – ${formatDate(currentStreakEnd)}` : '–'}
+          </p>
         </div>
         <div className="bg-gray-800 rounded-2xl p-4">
           <p className="text-gray-400 text-xs mb-1">Lengste streak</p>
           <p className="text-3xl font-bold text-yellow-400">{longestStreak} 🏆</p>
           <p className="text-gray-500 text-xs mt-1">dager på rad</p>
-          {topStreaks[0] && (
-            <p className="text-gray-600 text-xs mt-1">
-              {formatDate(topStreaks[0].start)} – {formatDate(topStreaks[0].end)}
-            </p>
-          )}
+          <p className="text-gray-600 text-xs mt-1">
+            {topStreaks[0] ? `${formatDate(topStreaks[0].start)} – ${formatDate(topStreaks[0].end)}` : '–'}
+          </p>
         </div>
       </div>
 
