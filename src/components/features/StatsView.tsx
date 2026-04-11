@@ -356,17 +356,15 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         const polyline = points.map(([x, y]) => `${x},${y}`).join(' ')
         const area = `${points[0][0]},${pT + cH} ` + polyline + ` ${points[points.length - 1][0]},${pT + cH}`
 
-        // Månedsetiketter
-        const monthLabels: { x: number; label: string }[] = []
+        // Månedspunkter med x, y og etikett
+        const monthLabels: { x: number; y: number; label: string }[] = []
         const seen = new Set<string>()
-        for (const d of allDates) {
+        for (let i = 0; i < allDates.length; i++) {
+          const d = allDates[i]
           const key = d.slice(0, 7)
           if (!seen.has(key)) {
             seen.add(key)
-            const ms = new Date(d + 'T12:00:00').getTime()
-            const x = pL + ((ms - startMs) / spanMs) * cW
-            const label = new Date(d + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' })
-            monthLabels.push({ x, label })
+            monthLabels.push({ x: points[i][0], y: points[i][1], label: new Date(d + 'T12:00:00').toLocaleDateString('nb-NO', { month: 'short' }) })
           }
         }
         // Vis maks 6 etiketter for å unngå overlapp
@@ -392,6 +390,10 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
               <polygon points={area} fill="url(#areaGrad)" />
               {/* Kurve */}
               <polyline points={polyline} fill="none" stroke="#f97316" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+              {/* Månedsprikker */}
+              {visibleLabels.map(({ x, y, label }) => (
+                <circle key={label} cx={x} cy={y} r="2.5" fill="white" />
+              ))}
               {/* Siste punkt */}
               <circle cx={last[0]} cy={last[1]} r="3.5" fill="#f97316" />
               {/* Månedsetiketter */}
