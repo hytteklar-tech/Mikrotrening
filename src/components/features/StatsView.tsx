@@ -157,6 +157,33 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
   const totalTrainings = logs.length
   const totalReps = logs.reduce((s, l) => s + l.reps, 0)
 
+  // Periodefiltrerte data for de to nederste seksjonene
+  const calendarDaySet = new Set(calendarDays)
+  const periodLogs = logs.filter(l => calendarDaySet.has(l.logged_date))
+
+  function calcPeriodTopStreaks(dates: string[]) {
+    if (!dates.length) return []
+    const sorted = [...new Set(dates)].sort()
+    const streaks: { days: number; start: string; end: string }[] = []
+    let start = sorted[0], end = sorted[0], count = 1
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = new Date(sorted[i - 1] + 'T12:00:00')
+      prev.setDate(prev.getDate() + 1)
+      if (prev.toDateString() === new Date(sorted[i] + 'T12:00:00').toDateString()) {
+        end = sorted[i]; count++
+      } else {
+        streaks.push({ days: count, start, end })
+        start = sorted[i]; end = sorted[i]; count = 1
+      }
+    }
+    streaks.push({ days: count, start, end })
+    return streaks.sort((a, b) => b.days - a.days).slice(0, 3)
+  }
+
+  const periodUniqueDates = [...new Set(periodLogs.map(l => l.logged_date))]
+  const periodTopStreaks = calcPeriodTopStreaks(periodUniqueDates)
+  const periodLabel2 = tab === 'uke' ? 'denne uken' : tab === 'mnd' ? 'denne måneden' : 'i år'
+
   // Nåværende streak — start/slutt dato
   const allUniqueDates = [...new Set(logs.map(l => l.logged_date))]
   const currentStreakEnd = allUniqueDates.includes(toLocalDateStr(today))
@@ -297,10 +324,10 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       </div>
 
       {/* Topp 3 streak-badges */}
-      {topStreaks.length > 0 && (
+      {periodTopStreaks.length > 0 && (
         <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Beste streak-perioder</p>
-          {topStreaks.map((s, i) => {
+          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Beste streaks {periodLabel2}</p>
+          {periodTopStreaks.map((s, i) => {
             const badge = [...STREAK_BADGES].reverse().find(b => s.days >= b.days)
             const rank = ['#1', '#2', '#3'][i]
             return (
@@ -407,9 +434,9 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
 
       {/* Per treningspakke */}
       <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
-        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Per treningspakke</p>
+        <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Per treningspakke — {periodLabel2}</p>
         {(() => {
-          const byPackage = logs.reduce<Record<string, { count: number; reps: number }>>((acc, l) => {
+          const byPackage = periodLogs.reduce<Record<string, { count: number; reps: number }>>((acc, l) => {
             if (!acc[l.packageName]) acc[l.packageName] = { count: 0, reps: 0 }
             acc[l.packageName].count++
             acc[l.packageName].reps += l.reps
