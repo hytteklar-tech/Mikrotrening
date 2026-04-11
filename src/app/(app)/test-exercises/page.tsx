@@ -12,11 +12,11 @@ type Exercise = {
   instructions: string[]
 }
 
-const BODY_PARTS = ['all', 'back', 'chest', 'lower arms', 'lower legs', 'neck', 'shoulders', 'upper arms', 'upper legs', 'waist']
+const BODY_PARTS = ['all', 'chest', 'back', 'shoulders', 'upper arms', 'upper legs', 'lower legs', 'waist', 'cardio']
 const LABELS: Record<string, string> = {
-  all: 'Alle', back: 'Rygg', chest: 'Bryst', 'lower arms': 'Underarmer',
-  'lower legs': 'Legg', neck: 'Nakke', shoulders: 'Skuldre',
-  'upper arms': 'Overarmer', 'upper legs': 'Lår', waist: 'Mage/hofte',
+  all: 'Alle', chest: 'Bryst', back: 'Rygg', shoulders: 'Skuldre',
+  'upper arms': 'Armer', 'upper legs': 'Lår', 'lower legs': 'Legg',
+  waist: 'Mage', cardio: 'Cardio',
 }
 
 export default function TestExercisesPage() {
@@ -38,7 +38,7 @@ export default function TestExercisesPage() {
     const res = await fetch(`/api/exercises?${params}`)
     if (!res.ok) {
       const data = await res.json()
-      setError(data.error === 'no_key' ? 'Mangler RAPIDAPI_KEY' : `Feil ${data.status}: ${data.detail ?? 'Klarte ikke hente øvelser'}`)
+      setError('Klarte ikke hente øvelser')
       setLoading(false)
       return
     }
