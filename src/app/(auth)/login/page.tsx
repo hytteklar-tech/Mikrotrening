@@ -1,14 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Logo from '@/components/ui/Logo'
 
-export default function LoginPage() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const searchParams = useSearchParams()
+  const authError = searchParams.get('error') === 'auth'
   const supabase = createClient()
 
   async function sendMagicLink() {
@@ -36,6 +39,12 @@ export default function LoginPage() {
           <h1 className="text-3xl font-bold text-white">Mikrotrening</h1>
           <p className="text-gray-400 mt-2">Mikrotrening hver dag</p>
         </div>
+
+        {authError && (
+          <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm text-center">
+            Innloggingslenken er utløpt eller ugyldig. Send en ny nedenfor.
+          </div>
+        )}
 
         <div className="bg-gray-900 rounded-2xl p-6 space-y-4">
           {sent ? (
@@ -78,5 +87,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginForm />
+    </Suspense>
   )
 }

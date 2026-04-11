@@ -189,24 +189,25 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         <p className="text-gray-400 text-xs mb-4">
           {tab === 'uke' ? 'Siste 7 dager' : tab === 'mnd' ? 'Siste 8 uker' : 'Siste 12 måneder'}
         </p>
-        <div className="flex items-end gap-1 h-24">
+        <div className="flex items-end gap-1">
           {bars.map((bar, i) => {
-            const heightPct = bar.max === 0 ? 0 : (bar.value / bar.max) * 100
+            const barHeight = bar.max === 0 ? 4 : Math.max((bar.value / bar.max) * 64, bar.value > 0 ? 8 : 4)
             const isEmpty = bar.value === 0
             return (
               <div key={i} className="flex-1 flex flex-col items-center gap-1">
-                <div className="w-full flex items-end" style={{ height: '80px' }}>
-                  <div
-                    className={`w-full rounded-t-md transition-all ${
-                      isEmpty
-                        ? 'bg-gray-700'
-                        : bar.isToday
-                        ? 'bg-orange-500'
-                        : 'bg-orange-400/70'
-                    }`}
-                    style={{ height: isEmpty ? '4px' : `${Math.max(heightPct, 8)}%` }}
-                  />
-                </div>
+                <span className="text-xs text-white leading-none" style={{ visibility: isEmpty ? 'hidden' : 'visible' }}>
+                  {bar.value}
+                </span>
+                <div
+                  className={`w-full rounded-t-md transition-all ${
+                    isEmpty
+                      ? 'bg-gray-700'
+                      : bar.isToday
+                      ? 'bg-orange-500'
+                      : 'bg-orange-400/70'
+                  }`}
+                  style={{ height: `${barHeight}px` }}
+                />
                 <span className="text-gray-500 text-xs leading-none">{bar.label}</span>
               </div>
             )
