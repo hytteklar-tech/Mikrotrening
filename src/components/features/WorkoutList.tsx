@@ -6,8 +6,15 @@ import { useRouter } from 'next/navigation'
 
 type Exercise = { id: string; name: string; reps: number; order: number }
 type Package = { id: string; name: string; is_active: boolean; exercises: Exercise[] }
+type DurationStat = { avgSeconds: number; timedCount: number; untimedCount: number }
 
-export default function WorkoutList({ packages, userId }: { packages: Package[]; userId: string }) {
+function formatDuration(seconds: number) {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}:${String(s).padStart(2, '0')}`
+}
+
+export default function WorkoutList({ packages, userId, durationStats }: { packages: Package[]; userId: string; durationStats: Record<string, DurationStat> }) {
   const [showNew, setShowNew] = useState(false)
   const [newName, setNewName] = useState('')
   const [exercises, setExercises] = useState([{ name: '', reps: '' }])
@@ -71,6 +78,16 @@ export default function WorkoutList({ packages, userId }: { packages: Package[];
     setShowNew(false)
     setNewName('')
     setExercises([{ name: '', reps: '' }])
+    router.refresh()
+  }
+
+  async function backfillDuration(packageId: string, avgSeconds: number) {
+    await supabase
+      .from('daily_logs')
+      .update({ duration_seconds: avgSeconds })
+      .eq('user_id', userId)
+      .eq('package_id', packageId)
+      .is('duration_seconds', null)
     router.refresh()
   }
 
@@ -182,6 +199,26 @@ export default function WorkoutList({ packages, userId }: { packages: Package[];
                     </div>
                   ))}
               </div>
+              {(() => {
+                const stat = durationStats[pkg.id]
+                if (!stat || stat.timedCount === 0) return null
+                return (
+                  <div className="mt-3 pt-3 border-t border-gray-700 space-y-2">
+                    <p className="text-xs text-gray-400">
+                      ⏱ Snitt: <span className="text-orange-400 font-semibold">{formatDuration(stat.avgSeconds)}</span>
+                      <span className="text-gray-600"> · basert på {stat.timedCount} {stat.timedCount === 1 ? 'økt' : 'økter'}</span>
+                    </p>
+                    {stat.untimedCount > 0 && (
+                      <button
+                        onClick={() => backfillDuration(pkg.id, stat.avgSeconds)}
+                        className="text-xs text-orange-500 hover:text-orange-400 transition"
+                      >
+                        Fyll inn tid for {stat.untimedCount} tidligere {stat.untimedCount === 1 ? 'økt' : 'økter'} →
+                      </button>
+                    )}
+                  </div>
+                )
+              })()}
             </>
           )}
         </div>

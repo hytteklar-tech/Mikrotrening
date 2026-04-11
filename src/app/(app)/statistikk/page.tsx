@@ -90,7 +90,7 @@ export default function StatistikkPage() {
       const [logsRes, typesRes, resultsRes] = await Promise.all([
         supabase
           .from('daily_logs')
-          .select('logged_date, workout_packages ( name, exercises ( reps ) )')
+          .select('logged_date, duration_seconds, workout_packages ( name, exercises ( reps ) )')
           .eq('user_id', session.user.id)
           .order('logged_date', { ascending: true }),
         supabase
@@ -109,7 +109,7 @@ export default function StatistikkPage() {
         const pkg = row.workout_packages as any
         const exercises = pkg?.exercises ?? []
         const reps = exercises.reduce((sum: number, e: { reps: number }) => sum + e.reps, 0)
-        return { logged_date: row.logged_date as string, reps, packageName: (pkg?.name ?? 'Ukjent') as string }
+        return { logged_date: row.logged_date as string, reps, packageName: (pkg?.name ?? 'Ukjent') as string, durationSeconds: row.duration_seconds as number | null }
       })
       setLogs(mappedLogs)
 

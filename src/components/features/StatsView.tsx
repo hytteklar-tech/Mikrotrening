@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 
-type LogEntry = { logged_date: string; reps: number; packageName: string }
+type LogEntry = { logged_date: string; reps: number; packageName: string; durationSeconds?: number | null }
 
 const STREAK_BADGES = [
   { days: 7,   emoji: '🥉', name: 'Gnisten' },
@@ -445,6 +445,19 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           const maxCount = entries[0]?.[1].count ?? 1
           const totalPeriodTrainings = periodLogs.length
           const totalPeriodReps = periodLogs.reduce((s, l) => s + l.reps, 0)
+          // Snitt-tid per pakke
+          const avgByPackage: Record<string, number | null> = {}
+          for (const [name] of entries) {
+            const timed = periodLogs.filter(l => l.packageName === name && l.durationSeconds != null)
+            avgByPackage[name] = timed.length > 0
+              ? Math.round(timed.reduce((s, l) => s + (l.durationSeconds ?? 0), 0) / timed.length)
+              : null
+          }
+
+          function fmtSec(s: number) {
+            return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`
+          }
+
           return (
             <>
               <div className="flex justify-between items-center">
@@ -462,7 +475,12 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                 <div key={name} className="space-y-1">
                   <div className="flex justify-between items-baseline">
                     <span className="text-white text-sm font-medium">{name}</span>
-                    <span className="text-gray-400 text-xs">{stats.count} tr · {stats.reps.toLocaleString('nb-NO')} reps</span>
+                    <span className="text-gray-400 text-xs">
+                      {stats.count} tr · {stats.reps.toLocaleString('nb-NO')} reps
+                      {avgByPackage[name] != null && (
+                        <span className="text-orange-400"> · ⏱ {fmtSec(avgByPackage[name]!)}</span>
+                      )}
+                    </span>
                   </div>
                   <div className="w-full bg-gray-700 rounded-full h-2">
                     <div
