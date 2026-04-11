@@ -5,14 +5,15 @@ import { useState, useEffect, useCallback } from 'react'
 type Exercise = {
   id: string
   name: string
-  gifUrl: string
+  gifUrl: string | null
   bodyPart: string
   target: string
   equipment: string
   instructions: string[]
+  level?: string
 }
 
-const BODY_PARTS = ['all', 'chest', 'back', 'shoulders', 'upper arms', 'upper legs', 'lower legs', 'waist', 'cardio']
+const BODY_PARTS = ['all', 'waist', 'chest', 'back', 'shoulders', 'upper arms', 'upper legs', 'lower legs', 'cardio']
 const LABELS: Record<string, string> = {
   all: 'Alle', chest: 'Bryst', back: 'Rygg', shoulders: 'Skuldre',
   'upper arms': 'Armer', 'upper legs': 'Lår', 'lower legs': 'Legg',
@@ -38,7 +39,7 @@ export default function TestExercisesPage() {
     const res = await fetch(`/api/exercises?${params}`)
     if (!res.ok) {
       const data = await res.json()
-      setError(data.error === 'no_key' ? 'Mangler RAPIDAPI_KEY' : `Feil ${data.status}: ${data.detail ?? 'Klarte ikke hente øvelser'}`)
+      setError(`Feil: klarte ikke hente øvelser`)
       setLoading(false)
       return
     }
@@ -54,11 +55,17 @@ export default function TestExercisesPage() {
     setSearch(searchInput)
   }
 
+  const LEVEL_COLORS: Record<string, string> = {
+    beginner: 'text-green-400',
+    intermediate: 'text-yellow-400',
+    expert: 'text-red-400',
+  }
+
   return (
     <div className="p-4 space-y-4 pb-28">
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Øvelsesbibliotek</h1>
-        <p className="text-gray-400 text-sm mt-1">Test — velg øvelse for detaljer</p>
+        <p className="text-gray-400 text-sm mt-1">Test — trykk på øvelse for detaljer</p>
       </div>
 
       {/* Søk */}
@@ -97,14 +104,12 @@ export default function TestExercisesPage() {
         </div>
       )}
 
-      {/* Feil */}
       {error && (
         <div className="bg-red-900/40 border border-red-700 rounded-xl p-4 text-red-300 text-sm">
           {error}
         </div>
       )}
 
-      {/* Loading */}
       {loading && (
         <div className="flex justify-center py-12">
           <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
@@ -120,12 +125,18 @@ export default function TestExercisesPage() {
               onClick={() => setSelected(ex)}
               className="bg-gray-800 rounded-2xl overflow-hidden text-left hover:ring-2 hover:ring-orange-500 transition"
             >
-              <img
-                src={ex.gifUrl}
-                alt={ex.name}
-                className="w-full aspect-square object-cover bg-gray-700"
-                loading="lazy"
-              />
+              {ex.gifUrl ? (
+                <img
+                  src={ex.gifUrl}
+                  alt={ex.name}
+                  className="w-full aspect-square object-cover bg-gray-700"
+                  loading="lazy"
+                />
+              ) : (
+                <div className="w-full aspect-square bg-gray-700 flex items-center justify-center">
+                  <span className="text-gray-500 text-xs">Ingen bilde</span>
+                </div>
+              )}
               <div className="p-2">
                 <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
                 <p className="text-gray-500 text-xs capitalize mt-0.5">{ex.target}</p>
@@ -133,6 +144,10 @@ export default function TestExercisesPage() {
             </button>
           ))}
         </div>
+      )}
+
+      {!loading && !error && exercises.length === 0 && (
+        <p className="text-gray-500 text-center py-12 text-sm">Ingen øvelser funnet</p>
       )}
 
       {/* Detalj-modal */}
@@ -143,12 +158,19 @@ export default function TestExercisesPage() {
               <h2 className="text-white font-bold capitalize">{selected.name}</h2>
               <button onClick={() => setSelected(null)} className="text-gray-400 text-xl">✕</button>
             </div>
-            <img src={selected.gifUrl} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
+            {selected.gifUrl && (
+              <img src={selected.gifUrl} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
+            )}
             <div className="px-4 pb-4 space-y-3">
               <div className="flex gap-2 flex-wrap">
                 <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full capitalize">{selected.target}</span>
                 <span className="bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded-full capitalize">{selected.bodyPart}</span>
                 <span className="bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded-full capitalize">{selected.equipment}</span>
+                {selected.level && (
+                  <span className={`bg-gray-800 text-xs px-2 py-1 rounded-full capitalize ${LEVEL_COLORS[selected.level] ?? 'text-gray-400'}`}>
+                    {selected.level === 'beginner' ? 'Nybegynner' : selected.level === 'intermediate' ? 'Middels' : selected.level === 'expert' ? 'Ekspert' : selected.level}
+                  </span>
+                )}
               </div>
               {selected.instructions.length > 0 && (
                 <div className="space-y-2">
