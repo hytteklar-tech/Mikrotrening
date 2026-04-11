@@ -9,7 +9,7 @@ export default async function WorkoutsPage() {
 
   const { data: packages } = await supabase
     .from('workout_packages')
-    .select('id, name, exercises(id, name, reps, order)')
+    .select('id, name, is_active, exercises(id, name, reps, order)')
     .eq('user_id', user.id)
     .order('created_at', { ascending: false })
 

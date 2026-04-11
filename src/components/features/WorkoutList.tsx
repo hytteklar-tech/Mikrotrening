@@ -5,7 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 type Exercise = { id: string; name: string; reps: number; order: number }
-type Package = { id: string; name: string; exercises: Exercise[] }
+type Package = { id: string; name: string; is_active: boolean; exercises: Exercise[] }
 
 export default function WorkoutList({ packages, userId }: { packages: Package[]; userId: string }) {
   const [showNew, setShowNew] = useState(false)
@@ -74,15 +74,22 @@ export default function WorkoutList({ packages, userId }: { packages: Package[];
     router.refresh()
   }
 
+  async function toggleActive(id: string, current: boolean) {
+    await supabase.from('workout_packages').update({ is_active: !current }).eq('id', id)
+    router.refresh()
+  }
+
   async function deletePackage(id: string) {
     await supabase.from('workout_packages').delete().eq('id', id)
     router.refresh()
   }
 
-  return (
-    <div className="space-y-3">
-      {packages.map(pkg => (
-        <div key={pkg.id} className="bg-gray-800 rounded-2xl p-4">
+  const activePackages = packages.filter(p => p.is_active)
+  const inactivePackages = packages.filter(p => !p.is_active)
+
+  function renderPackage(pkg: Package) {
+    return (
+        <div key={pkg.id} className={`bg-gray-800 rounded-2xl p-4 ${!pkg.is_active ? 'opacity-50' : ''}`}>
           {editingId === pkg.id ? (
             <div className="space-y-3">
               <input
@@ -144,10 +151,21 @@ export default function WorkoutList({ packages, userId }: { packages: Package[];
           ) : (
             <>
               <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-lg">{pkg.name}</h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold text-lg">{pkg.name}</h3>
+                  {!pkg.is_active && <span className="text-xs bg-gray-700 text-gray-400 px-2 py-0.5 rounded-full">Inaktiv</span>}
+                </div>
                 <div className="flex gap-3">
-                  <button onClick={() => startEdit(pkg)} className="text-gray-400 hover:text-white text-sm">
-                    Rediger
+                  {pkg.is_active && (
+                    <button onClick={() => startEdit(pkg)} className="text-gray-400 hover:text-white text-sm">
+                      Rediger
+                    </button>
+                  )}
+                  <button
+                    onClick={() => toggleActive(pkg.id, pkg.is_active)}
+                    className={`text-sm ${pkg.is_active ? 'text-gray-500 hover:text-yellow-400' : 'text-orange-500 hover:text-orange-400'}`}
+                  >
+                    {pkg.is_active ? 'Deaktiver' : 'Aktiver'}
                   </button>
                   <button onClick={() => deletePackage(pkg.id)} className="text-gray-500 hover:text-red-400 text-sm">
                     Slett
@@ -167,7 +185,19 @@ export default function WorkoutList({ packages, userId }: { packages: Package[];
             </>
           )}
         </div>
-      ))}
+    )
+  }
+
+  return (
+    <div className="space-y-3">
+      {activePackages.map(pkg => renderPackage(pkg))}
+
+      {inactivePackages.length > 0 && (
+        <>
+          <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide pt-2">Inaktive</p>
+          {inactivePackages.map(pkg => renderPackage(pkg))}
+        </>
+      )}
 
       {showNew ? (
         <div className="bg-gray-800 rounded-2xl p-4 space-y-3">

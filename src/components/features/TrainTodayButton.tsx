@@ -31,16 +31,12 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const isFuture = selectedDate > today
 
   const logsForDay = dayLogs.filter(l => l.date === selectedDate)
-  const loggedPackageIds = new Set(logsForDay.map(l => l.packageId))
+  const availablePackages = packages
+  const canAdd = !isFuture && packages.length > 0
 
-  // Which packages can still be added today (not yet logged)
-  const availablePackages = packages.filter(p => !loggedPackageIds.has(p.id))
-  const canAdd = !isFuture && availablePackages.length > 0
-
-  // Ensure selectedPackage is always one that can be added
-  const activePackage = selectedPackage && availablePackages.find(p => p.id === selectedPackage.id)
+  const activePackage = selectedPackage && packages.find(p => p.id === selectedPackage.id)
     ? selectedPackage
-    : availablePackages[0] ?? null
+    : packages[0] ?? null
 
   const labelDate = isToday
     ? 'I dag'
@@ -60,11 +56,11 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
     }
     onLogChange([...dayLogs, optimisticLog])
 
-    const { data, error } = await supabase.from('daily_logs').upsert({
+    const { data, error } = await supabase.from('daily_logs').insert({
       user_id: userId,
       package_id: activePackage.id,
       logged_date: selectedDate,
-    }, { onConflict: 'user_id,logged_date,package_id' }).select('id').single()
+    }).select('id').single()
 
     if (error) {
       console.error('[TrainTodayButton] Insert error:', error)
@@ -177,12 +173,6 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
             </p>
           )}
 
-          {/* All packages logged for the day */}
-          {!canAdd && !isFuture && logsForDay.length > 0 && availablePackages.length === 0 && (
-            <p className="text-center text-gray-500 text-sm py-1">
-              Alle pakker registrert for denne dagen 🎉
-            </p>
-          )}
 
           {/* Nothing logged, past day */}
           {logsForDay.length === 0 && !isFuture && !isToday && (
