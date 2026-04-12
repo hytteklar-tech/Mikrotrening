@@ -1,71 +1,45 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState } from 'react'
+import { exercises, MUSCLE_GROUP_LABELS } from '@/data/exercises'
+import type { Exercise } from '@/data/exercises'
 
-type Exercise = {
-  id: string
-  name: string
-  gifUrl: string | null
-  bodyPart: string
-  target: string
-  equipment: string
-  instructions: string[]
-  level?: string
+const MUSCLE_GROUPS = ['alle', 'bryst', 'ben'] as const
+const LABELS: Record<string, string> = { alle: 'Alle', ...MUSCLE_GROUP_LABELS }
+
+const LEVEL_COLORS: Record<string, string> = {
+  beginner: 'text-green-400',
+  intermediate: 'text-yellow-400',
+  expert: 'text-red-400',
 }
-
-const BODY_PARTS = ['all', 'waist', 'chest', 'back', 'shoulders', 'upper arms', 'upper legs', 'lower legs', 'cardio']
-const LABELS: Record<string, string> = {
-  all: 'Alle', chest: 'Bryst', back: 'Rygg', shoulders: 'Skuldre',
-  'upper arms': 'Armer', 'upper legs': 'Lår', 'lower legs': 'Legg',
-  waist: 'Mage', cardio: 'Cardio',
+const LEVEL_LABELS: Record<string, string> = {
+  beginner: 'Nybegynner',
+  intermediate: 'Middels',
+  expert: 'Ekspert',
 }
 
 export default function TestExercisesPage() {
-  const [exercises, setExercises] = useState<Exercise[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [bodyPart, setBodyPart] = useState('waist')
+  const [muscleGroup, setMuscleGroup] = useState<string>('alle')
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [selected, setSelected] = useState<Exercise | null>(null)
 
-  const fetchExercises = useCallback(async () => {
-    setLoading(true)
-    setError('')
-    const params = new URLSearchParams({ limit: '20' })
-    if (search) params.set('name', search)
-    else if (bodyPart !== 'all') params.set('bodyPart', bodyPart)
-
-    const res = await fetch(`/api/exercises?${params}`)
-    if (!res.ok) {
-      const data = await res.json()
-      setError(`Feil: klarte ikke hente øvelser`)
-      setLoading(false)
-      return
-    }
-    const data = await res.json()
-    setExercises(Array.isArray(data) ? data : [])
-    setLoading(false)
-  }, [bodyPart, search])
-
-  useEffect(() => { fetchExercises() }, [fetchExercises])
+  const filtered = exercises.filter(ex => {
+    const matchGroup = muscleGroup === 'alle' || ex.muscleGroup === muscleGroup
+    const matchSearch = !search || ex.name.toLowerCase().includes(search.toLowerCase())
+    return matchGroup && matchSearch
+  })
 
   function handleSearch(e: React.FormEvent) {
     e.preventDefault()
     setSearch(searchInput)
   }
 
-  const LEVEL_COLORS: Record<string, string> = {
-    beginner: 'text-green-400',
-    intermediate: 'text-yellow-400',
-    expert: 'text-red-400',
-  }
-
   return (
     <div className="p-4 space-y-4 pb-28">
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Øvelsesbibliotek</h1>
-        <p className="text-gray-400 text-sm mt-1">Test — trykk på øvelse for detaljer</p>
+        <p className="text-gray-400 text-sm mt-1">{exercises.length} øvelser — trykk for detaljer</p>
       </div>
 
       {/* Søk */}
@@ -87,66 +61,46 @@ export default function TestExercisesPage() {
         )}
       </form>
 
-      {/* Kroppsdel-filter */}
+      {/* Muskelgruppe-filter */}
       {!search && (
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
-          {BODY_PARTS.map(bp => (
+          {MUSCLE_GROUPS.map(mg => (
             <button
-              key={bp}
-              onClick={() => setBodyPart(bp)}
+              key={mg}
+              onClick={() => setMuscleGroup(mg)}
               className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${
-                bodyPart === bp ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
+                muscleGroup === mg ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'
               }`}
             >
-              {LABELS[bp]}
+              {LABELS[mg]}
             </button>
           ))}
-        </div>
-      )}
-
-      {error && (
-        <div className="bg-red-900/40 border border-red-700 rounded-xl p-4 text-red-300 text-sm">
-          {error}
-        </div>
-      )}
-
-      {loading && (
-        <div className="flex justify-center py-12">
-          <div className="w-8 h-8 border-2 border-orange-500 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
 
       {/* Grid */}
-      {!loading && !error && (
-        <div className="grid grid-cols-2 gap-3">
-          {exercises.map(ex => (
-            <button
-              key={ex.id}
-              onClick={() => setSelected(ex)}
-              className="bg-gray-800 rounded-2xl overflow-hidden text-left hover:ring-2 hover:ring-orange-500 transition"
-            >
-              {ex.gifUrl ? (
-                <img
-                  src={ex.gifUrl}
-                  alt={ex.name}
-                  className="w-full aspect-square object-cover bg-gray-700"
-                  loading="lazy"
-                />
-              ) : (
-                <div className="w-full aspect-square bg-gray-700 flex items-center justify-center">
-                  <span className="text-gray-500 text-xs">Ingen bilde</span>
-                </div>
-              )}
-              <div className="p-2">
-                <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
-                <p className="text-gray-500 text-xs capitalize mt-0.5">{ex.target}</p>
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
+      <div className="grid grid-cols-2 gap-3">
+        {filtered.map(ex => (
+          <button
+            key={ex.id}
+            onClick={() => setSelected(ex)}
+            className="bg-gray-800 rounded-2xl overflow-hidden text-left hover:ring-2 hover:ring-orange-500 transition"
+          >
+            <img
+              src={ex.image}
+              alt={ex.name}
+              className="w-full aspect-square object-cover bg-gray-700"
+              loading="lazy"
+            />
+            <div className="p-2">
+              <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
+              <p className="text-gray-500 text-xs capitalize mt-0.5">{LABELS[ex.muscleGroup] ?? ex.muscleGroup}</p>
+            </div>
+          </button>
+        ))}
+      </div>
 
-      {!loading && !error && exercises.length === 0 && (
+      {filtered.length === 0 && (
         <p className="text-gray-500 text-center py-12 text-sm">Ingen øvelser funnet</p>
       )}
 
@@ -158,30 +112,27 @@ export default function TestExercisesPage() {
               <h2 className="text-white font-bold capitalize">{selected.name}</h2>
               <button onClick={() => setSelected(null)} className="text-gray-400 text-xl">✕</button>
             </div>
-            {selected.gifUrl && (
-              <img src={selected.gifUrl} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
-            )}
-            <div className="px-4 pb-4 space-y-3">
+            <img src={selected.image} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
+            <div className="px-4 pb-4 space-y-2">
               <div className="flex gap-2 flex-wrap">
-                <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full capitalize">{selected.target}</span>
-                <span className="bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded-full capitalize">{selected.bodyPart}</span>
-                <span className="bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded-full capitalize">{selected.equipment}</span>
+                <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full capitalize">
+                  {LABELS[selected.muscleGroup] ?? selected.muscleGroup}
+                </span>
+                {selected.equipment && (
+                  <span className="bg-gray-800 text-gray-400 text-xs px-2 py-1 rounded-full capitalize">
+                    {selected.equipment}
+                  </span>
+                )}
                 {selected.level && (
                   <span className={`bg-gray-800 text-xs px-2 py-1 rounded-full capitalize ${LEVEL_COLORS[selected.level] ?? 'text-gray-400'}`}>
-                    {selected.level === 'beginner' ? 'Nybegynner' : selected.level === 'intermediate' ? 'Middels' : selected.level === 'expert' ? 'Ekspert' : selected.level}
+                    {LEVEL_LABELS[selected.level] ?? selected.level}
                   </span>
                 )}
               </div>
-              {selected.instructions.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Slik gjør du det</p>
-                  {selected.instructions.map((step, i) => (
-                    <div key={i} className="flex gap-2">
-                      <span className="text-orange-500 text-xs font-bold mt-0.5">{i + 1}.</span>
-                      <p className="text-gray-300 text-sm">{step}</p>
-                    </div>
-                  ))}
-                </div>
+              {selected.primaryMuscles.length > 0 && (
+                <p className="text-gray-500 text-xs capitalize">
+                  Primærmuskel: {selected.primaryMuscles.join(', ')}
+                </p>
               )}
             </div>
           </div>
