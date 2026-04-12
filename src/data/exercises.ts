@@ -16,6 +16,33 @@ export type Exercise = {
 
 export const exercises: Exercise[] = [
   {
+    "id": "archer-push-up",
+    "name": "Archer Push-Up",
+    "muscleGroup": "bryst",
+    "image": "/exercises/archer-push-up.gif",
+    "equipment": "body only",
+    "level": "intermediate",
+    "primaryMuscles": ["chest"]
+  },
+  {
+    "id": "bird-dog-push-up",
+    "name": "Bird Dog Push-Up",
+    "muscleGroup": "bryst",
+    "image": "/exercises/bird-dog-push-up.gif",
+    "equipment": "body only",
+    "level": "intermediate",
+    "primaryMuscles": ["chest"]
+  },
+  {
+    "id": "bent-side-knee-push-up",
+    "name": "Bent Side Knee Push-Up",
+    "muscleGroup": "bryst",
+    "image": "/exercises/bent-side-knee-push-up.gif",
+    "equipment": "body only",
+    "level": "beginner",
+    "primaryMuscles": ["chest"]
+  },
+  {
     "id": "alternating-floor-press",
     "name": "Alternating Floor Press",
     "muscleGroup": "bryst",
