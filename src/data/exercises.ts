@@ -12,6 +12,7 @@ export type Exercise = {
   equipment: string | null
   level: string
   primaryMuscles: string[]
+  description?: string[]
 }
 
 export const exercises: Exercise[] = [
@@ -22,7 +23,13 @@ export const exercises: Exercise[] = [
     "image": "/exercises/archer-push-up.gif",
     "equipment": "body only",
     "level": "intermediate",
-    "primaryMuscles": ["chest"]
+    "primaryMuscles": ["chest"],
+    "description": [
+      "Start i vanlig push-up posisjon med hendene litt bredere enn skulderbredde.",
+      "Senk deg ned mot én hånd mens den andre armen strekkes rett ut til siden.",
+      "Skyv deg opp igjen til startposisjon.",
+      "Gjenta på andre side. Fokus på bryst og skulder på arbeidssiden."
+    ]
   },
   {
     "id": "bird-dog-push-up",
@@ -31,7 +38,13 @@ export const exercises: Exercise[] = [
     "image": "/exercises/bird-dog-push-up.gif",
     "equipment": "body only",
     "level": "intermediate",
-    "primaryMuscles": ["chest"]
+    "primaryMuscles": ["chest"],
+    "description": [
+      "Start i push-up posisjon med rett kropp fra hode til hæl.",
+      "Gjør én push-up ned og opp.",
+      "Løft venstre arm og høyre ben samtidig — strekk dem ut og hold 1 sekund.",
+      "Senk tilbake og gjenta med motsatt arm og ben. Trener bryst, core og balanse."
+    ]
   },
   {
     "id": "bent-side-knee-push-up",
@@ -40,7 +53,13 @@ export const exercises: Exercise[] = [
     "image": "/exercises/bent-side-knee-push-up.gif",
     "equipment": "body only",
     "level": "beginner",
-    "primaryMuscles": ["chest"]
+    "primaryMuscles": ["chest"],
+    "description": [
+      "Start på knærne i push-up posisjon med hendene skulderbredde fra hverandre.",
+      "Plasser ett kne ute til siden for balanse.",
+      "Senk brystet kontrollert mot gulvet.",
+      "Skyv deg opp igjen. Bra for nybegynnere eller som oppvarming."
+    ]
   },
   {
     "id": "alternating-floor-press",

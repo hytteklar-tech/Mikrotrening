@@ -134,6 +134,17 @@ export default function TestExercisesPage() {
                   Primærmuskel: {selected.primaryMuscles.join(', ')}
                 </p>
               )}
+              {selected.description && selected.description.length > 0 && (
+                <div className="space-y-2 pt-2">
+                  <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Slik gjør du det</p>
+                  {selected.description.map((step, i) => (
+                    <div key={i} className="flex gap-2">
+                      <span className="text-orange-500 text-xs font-bold mt-0.5 shrink-0">{i + 1}.</span>
+                      <p className="text-gray-300 text-sm">{step}</p>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>
