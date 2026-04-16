@@ -11,6 +11,48 @@ function formatDuration(seconds: number) {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`
 }
 
+const RADIUS = 68
+const CIRCUMFERENCE = 2 * Math.PI * RADIUS
+
+function TimerRing({ seconds, average }: { seconds: number; average: number | null }) {
+  const progress = average ? Math.min(seconds / average, 1) : 0
+  const offset = CIRCUMFERENCE * (1 - progress)
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className="relative" style={{ width: 180, height: 180 }}>
+        <svg width="180" height="180" viewBox="0 0 180 180">
+          {/* Background ring */}
+          <circle cx="90" cy="90" r={RADIUS} fill="none" stroke="#374151" strokeWidth="10" />
+          {/* Progress ring — only when average exists */}
+          {average && (
+            <circle
+              cx="90" cy="90" r={RADIUS}
+              fill="none"
+              stroke="#f97316"
+              strokeWidth="10"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={offset}
+              strokeLinecap="round"
+              transform="rotate(-90 90 90)"
+              style={{ transition: 'stroke-dashoffset 0.5s linear' }}
+            />
+          )}
+        </svg>
+        {/* Time centered absolutely over SVG */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-4xl font-mono font-bold text-white tabular-nums">
+            {formatDuration(seconds)}
+          </span>
+        </div>
+      </div>
+      {average && (
+        <p className="text-gray-500 text-xs">snitt ~{formatDuration(average)}</p>
+      )}
+    </div>
+  )
+}
+
 type Package = { id: string; name: string }
 
 type Props = {
@@ -33,6 +75,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [deletingId, setDeletingId] = useState<string | null>(null)
   const [timerRunning, setTimerRunning] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(0)
+  const [averageSeconds, setAverageSeconds] = useState<number | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const supabase = createClient()
@@ -47,6 +90,28 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
     }
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [timerRunning])
+
+  const activePackage = selectedPackage && packages.find(p => p.id === selectedPackage.id)
+    ? selectedPackage
+    : packages[0] ?? null
+
+  useEffect(() => {
+    if (!activePackage) return
+    supabase
+      .from('daily_logs')
+      .select('duration_seconds')
+      .eq('user_id', userId)
+      .eq('package_id', activePackage.id)
+      .not('duration_seconds', 'is', null)
+      .then(({ data }) => {
+        if (data && data.length > 0) {
+          const sum = data.reduce((acc, row) => acc + (row.duration_seconds as number), 0)
+          setAverageSeconds(Math.round(sum / data.length))
+        } else {
+          setAverageSeconds(null)
+        }
+      })
+  }, [activePackage?.id])
 
   function startTimer() {
     startTimeRef.current = Date.now()
@@ -64,10 +129,6 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const logsForDay = dayLogs.filter(l => l.date === selectedDate)
   const availablePackages = packages
   const canAdd = !isFuture && packages.length > 0
-
-  const activePackage = selectedPackage && packages.find(p => p.id === selectedPackage.id)
-    ? selectedPackage
-    : packages[0] ?? null
 
   const labelDate = isToday
     ? 'I dag'
@@ -196,10 +257,9 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
               )}
 
               {timerRunning ? (
-                <div className="space-y-2">
-                  <div className="text-center py-2">
-                    <p className="text-4xl font-mono font-bold text-orange-400">{formatDuration(timerSeconds)}</p>
-                    <p className="text-gray-500 text-xs mt-1">tidtaker kjører</p>
+                <div className="space-y-3">
+                  <div className="flex justify-center py-2">
+                    <TimerRing seconds={timerSeconds} average={averageSeconds} />
                   </div>
                   <button
                     onClick={() => addLog(true)}
@@ -245,7 +305,6 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
               Kan ikke registrere fremtidige datoer
             </p>
           )}
-
 
           {/* Nothing logged, past day */}
           {logsForDay.length === 0 && !isFuture && !isToday && (
