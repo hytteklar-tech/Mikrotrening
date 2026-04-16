@@ -15,8 +15,11 @@ const RADIUS = 68
 const CIRCUMFERENCE = 2 * Math.PI * RADIUS
 
 function TimerRing({ seconds, average }: { seconds: number; average: number | null }) {
-  const progress = average ? Math.min(seconds / average, 1) : 0
-  const offset = CIRCUMFERENCE * (1 - progress)
+  const isOvertime = average ? seconds > average : false
+  const orangeProgress = average ? Math.min(seconds / average, 1) : 0
+  const orangeOffset = CIRCUMFERENCE * (1 - orangeProgress)
+  const whiteProgress = average && isOvertime ? Math.min((seconds - average) / average, 1) : 0
+  const whiteOffset = CIRCUMFERENCE * (1 - whiteProgress)
 
   return (
     <div className="flex flex-col items-center gap-2">
@@ -24,7 +27,7 @@ function TimerRing({ seconds, average }: { seconds: number; average: number | nu
         <svg width="180" height="180" viewBox="0 0 180 180">
           {/* Background ring */}
           <circle cx="90" cy="90" r={RADIUS} fill="none" stroke="#374151" strokeWidth="10" />
-          {/* Progress ring — only when average exists */}
+          {/* Orange ring — fills up to average */}
           {average && (
             <circle
               cx="90" cy="90" r={RADIUS}
@@ -32,7 +35,21 @@ function TimerRing({ seconds, average }: { seconds: number; average: number | nu
               stroke="#f97316"
               strokeWidth="10"
               strokeDasharray={CIRCUMFERENCE}
-              strokeDashoffset={offset}
+              strokeDashoffset={orangeOffset}
+              strokeLinecap="round"
+              transform="rotate(-90 90 90)"
+              style={{ transition: 'stroke-dashoffset 0.5s linear' }}
+            />
+          )}
+          {/* White overtime ring — fills on top from average to 2× average */}
+          {isOvertime && (
+            <circle
+              cx="90" cy="90" r={RADIUS}
+              fill="none"
+              stroke="white"
+              strokeWidth="10"
+              strokeDasharray={CIRCUMFERENCE}
+              strokeDashoffset={whiteOffset}
               strokeLinecap="round"
               transform="rotate(-90 90 90)"
               style={{ transition: 'stroke-dashoffset 0.5s linear' }}
@@ -47,7 +64,9 @@ function TimerRing({ seconds, average }: { seconds: number; average: number | nu
         </div>
       </div>
       {average && (
-        <p className="text-gray-500 text-xs">snitt ~{formatDuration(average)}</p>
+        <p className={`text-sm font-medium ${isOvertime ? 'text-white' : 'text-gray-400'}`}>
+          {isOvertime ? 'over snittet ditt' : 'gjennomsnitt tidligere treninger'}
+        </p>
       )}
     </div>
   )
