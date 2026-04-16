@@ -463,7 +463,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
 
           return (
             <>
-              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Treningspakke</p>
+              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Treningspakke — {periodLabel2}</p>
               <div className="grid grid-cols-2 gap-2">
                 <div className="border border-orange-500 rounded-xl px-3 py-2 text-center">
                   <p className="text-orange-400 text-lg font-bold leading-tight">{totalPeriodTrainings}</p>
