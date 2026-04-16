@@ -445,6 +445,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           const maxCount = entries[0]?.[1].count ?? 1
           const totalPeriodTrainings = periodLogs.length
           const totalPeriodReps = periodLogs.reduce((s, l) => s + l.reps, 0)
+          const totalPeriodTime = periodLogs.reduce((s, l) => s + (l.durationSeconds ?? 0), 0)
           // Total tid per pakke
           const totalTimeByPackage: Record<string, number | null> = {}
           for (const [name] of entries) {
@@ -464,15 +465,21 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           return (
             <>
               <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Treningspakke — {periodLabel2}</p>
-              <div className="grid grid-cols-2 gap-2">
-                <div className="border border-orange-500 rounded-xl px-3 py-2 text-center">
-                  <p className="text-orange-400 text-lg font-bold leading-tight">{totalPeriodTrainings}</p>
+              <div className={`grid gap-2 ${totalPeriodTime > 0 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                <div className="border border-orange-500 rounded-xl px-2 py-1.5 text-center">
+                  <p className="text-orange-400 text-base font-bold leading-tight">{totalPeriodTrainings}</p>
                   <p className="text-orange-400 text-xs">treninger</p>
                 </div>
-                <div className="border border-orange-500 rounded-xl px-3 py-2 text-center">
-                  <p className="text-orange-400 text-lg font-bold leading-tight">{totalPeriodReps.toLocaleString('nb-NO')}</p>
+                <div className="border border-orange-500 rounded-xl px-2 py-1.5 text-center">
+                  <p className="text-orange-400 text-base font-bold leading-tight">{totalPeriodReps.toLocaleString('nb-NO')}</p>
                   <p className="text-orange-400 text-xs">reps</p>
                 </div>
+                {totalPeriodTime > 0 && (
+                  <div className="border border-orange-500 rounded-xl px-2 py-1.5 text-center">
+                    <p className="text-orange-400 text-base font-bold leading-tight">{fmtTotal(totalPeriodTime)}</p>
+                    <p className="text-orange-400 text-xs">tid</p>
+                  </div>
+                )}
               </div>
               {entries.map(([name, stats]) => (
                 <div key={name} className="space-y-1">
