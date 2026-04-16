@@ -34,11 +34,14 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [timerRunning, setTimerRunning] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const startTimeRef = useRef<number>(0)
   const supabase = createClient()
 
   useEffect(() => {
     if (timerRunning) {
-      intervalRef.current = setInterval(() => setTimerSeconds(s => s + 1), 1000)
+      intervalRef.current = setInterval(() => {
+        setTimerSeconds(Math.floor((Date.now() - startTimeRef.current) / 1000))
+      }, 500)
     } else {
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
@@ -46,6 +49,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   }, [timerRunning])
 
   function startTimer() {
+    startTimeRef.current = Date.now()
     setTimerSeconds(0)
     setTimerRunning(true)
   }
