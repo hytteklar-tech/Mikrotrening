@@ -10,15 +10,12 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('display_name, notifications_enabled')
-    .eq('id', user.id)
-    .single()
-
-  if (!profile?.display_name) redirect('/onboarding')
-
-  const [{ data: logs }, { data: packages }] = await Promise.all([
+  const [{ data: profile }, { data: logs }, { data: packages }] = await Promise.all([
+    supabase
+      .from('users')
+      .select('display_name, notifications_enabled')
+      .eq('id', user.id)
+      .single(),
     supabase
       .from('daily_logs')
       .select('id, logged_date, package_id, duration_seconds, workout_packages(name)')
@@ -31,6 +28,8 @@ export default async function DashboardPage() {
       .eq('is_active', true)
       .order('created_at', { ascending: false }),
   ])
+
+  if (!profile?.display_name) redirect('/onboarding')
 
   const initialDayLogs: DayLog[] = (logs ?? []).map(row => ({
     id: row.id as string,
