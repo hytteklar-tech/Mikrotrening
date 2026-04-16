@@ -460,15 +460,15 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
 
           return (
             <>
-              <div className="flex justify-between items-center">
-                <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Per treningspakke — {periodLabel2}</p>
-                <div className="flex items-center gap-1.5">
-                  <span className="border border-orange-500 rounded-full px-2 py-0.5 text-orange-400 text-xs font-semibold leading-none">
-                    {totalPeriodTrainings} tr
-                  </span>
-                  <span className="border border-orange-500 rounded-full px-2 py-0.5 text-orange-400 text-xs font-semibold leading-none">
-                    {totalPeriodReps.toLocaleString('nb-NO')} reps
-                  </span>
+              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Treningspakke</p>
+              <div className="grid grid-cols-2 gap-2">
+                <div className="border border-orange-500 rounded-xl px-3 py-2 text-center">
+                  <p className="text-orange-400 text-lg font-bold leading-tight">{totalPeriodTrainings}</p>
+                  <p className="text-orange-400 text-xs">treninger</p>
+                </div>
+                <div className="border border-orange-500 rounded-xl px-3 py-2 text-center">
+                  <p className="text-orange-400 text-lg font-bold leading-tight">{totalPeriodReps.toLocaleString('nb-NO')}</p>
+                  <p className="text-orange-400 text-xs">reps</p>
                 </div>
               </div>
               {entries.map(([name, stats]) => (
