@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Props = {
   dayCounts: Record<string, number>
@@ -23,6 +23,13 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate }: 
   const today = toLocalDateStr(new Date())
   const [viewYear, setViewYear] = useState(() => parseInt(selectedDate.slice(0, 4)))
   const [viewMonth, setViewMonth] = useState(() => parseInt(selectedDate.slice(5, 7)) - 1)
+
+  // Sync calendar view when selectedDate changes (e.g. after SSR timezone correction)
+  useEffect(() => {
+    if (!selectedDate) return
+    setViewYear(parseInt(selectedDate.slice(0, 4)))
+    setViewMonth(parseInt(selectedDate.slice(5, 7)) - 1)
+  }, [selectedDate])
 
   function prevMonth() {
     if (viewMonth === 0) { setViewMonth(11); setViewYear(y => y - 1) }

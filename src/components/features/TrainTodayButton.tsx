@@ -80,6 +80,13 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const startTimeRef = useRef<number>(0)
   const supabase = createClient()
 
+  // Correct for SSR/hydration timezone mismatch: server runs UTC, user is in local time.
+  // useState(today) uses the server's date during SSR and stays stuck after hydration.
+  useEffect(() => {
+    const clientToday = toLocalDateStr(new Date())
+    setSelectedDate(prev => prev === clientToday ? prev : clientToday)
+  }, [])
+
   useEffect(() => {
     if (timerRunning) {
       intervalRef.current = setInterval(() => {
