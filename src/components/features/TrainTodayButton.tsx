@@ -298,7 +298,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   </button>
                   <button
                     onClick={stopTimer}
-                    className="w-full text-gray-500 text-sm py-1 hover:text-white transition"
+                    className="w-full text-white text-base py-1 hover:text-gray-300 transition"
                   >
                     Avbryt tidtaker
                   </button>
