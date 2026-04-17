@@ -18,9 +18,8 @@ function addDays(d: Date, n: number) {
 function calcPeriods(period: Period) {
   const today = new Date()
   today.setHours(12, 0, 0, 0)
-
   if (period === 'uken') {
-    const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1 // 0=Man
+    const dayOfWeek = today.getDay() === 0 ? 6 : today.getDay() - 1
     const monday = addDays(today, -dayOfWeek)
     return {
       thisStart: toLocalStr(monday),
@@ -42,20 +41,40 @@ function filterLogs(logs: StatLog[], start: string, end: string) {
   return logs.filter(l => l.logged_date >= start && l.logged_date <= end)
 }
 
-function calcMetrics(logs: StatLog[]) {
-  return {
-    sessions: logs.length,
-    reps: logs.reduce((sum, l) => sum + l.reps, 0),
-    totalSeconds: logs.reduce((sum, l) => sum + (l.durationSeconds ?? 0), 0),
-  }
+function fmtTime(seconds: number) {
+  if (seconds < 3600) return `${Math.round(seconds / 60)} min`
+  const h = Math.floor(seconds / 3600)
+  const m = Math.floor((seconds % 3600) / 60)
+  return m > 0 ? `${h}t ${m}m` : `${h}t`
 }
 
-function formatMinutes(seconds: number) {
-  const m = Math.round(seconds / 60)
-  return `${m} min`
+function PctArrow({ thisVal, prevVal }: { thisVal: number; prevVal: number }) {
+  const diff = thisVal - prevVal
+  const pct = prevVal > 0 ? Math.round((diff / prevVal) * 100) : null
+  const noChange = diff === 0
+
+  if (thisVal === 0 && prevVal === 0) return <span className="text-gray-600 text-2xl font-black">→</span>
+
+  if (noChange) return (
+    <div className="flex items-center gap-1 text-gray-400">
+      <span className="text-2xl font-black">→</span>
+      <span className="text-sm font-bold">0%</span>
+    </div>
+  )
+
+  const better = diff > 0
+  const color = better ? 'text-green-400' : 'text-red-400'
+  return (
+    <div className={`flex items-center gap-1 ${color}`}>
+      <span className="text-2xl font-black">{better ? '↑' : '↓'}</span>
+      <span className="text-sm font-bold">
+        {pct !== null ? `${better ? '+' : ''}${pct}%` : (better ? 'ny' : '–')}
+      </span>
+    </div>
+  )
 }
 
-function TrendCard({
+function StatCard({
   label,
   thisVal,
   prevVal,
@@ -66,42 +85,76 @@ function TrendCard({
   prevVal: number
   format: (n: number) => string
 }) {
-  const diff = thisVal - prevVal
-  const noData = thisVal === 0 && prevVal === 0
-  const pct = prevVal > 0 ? Math.round((diff / prevVal) * 100) : null
-  const better = diff > 0
-  const same = diff === 0
+  return (
+    <div className="bg-gray-800 rounded-2xl p-4 flex flex-col gap-2">
+      <p className="text-xs text-gray-400 font-medium">{label}</p>
+      <div>
+        <span className="text-4xl font-bold text-white">{format(thisVal)}</span>
+        <span className="text-sm text-gray-500 ml-1">/ {format(prevVal)}</span>
+      </div>
+      <PctArrow thisVal={thisVal} prevVal={prevVal} />
+    </div>
+  )
+}
 
-  const arrowColor = noData || same ? 'text-gray-500' : better ? 'text-green-400' : 'text-red-400'
+function PackageCompare({
+  thisLogs,
+  prevLogs,
+  prevLabel,
+}: {
+  thisLogs: StatLog[]
+  prevLogs: StatLog[]
+  prevLabel: string
+}) {
+  function byPackage(logs: StatLog[]) {
+    const map: Record<string, { count: number; reps: number }> = {}
+    for (const l of logs) {
+      if (!map[l.packageName]) map[l.packageName] = { count: 0, reps: 0 }
+      map[l.packageName].count++
+      map[l.packageName].reps += l.reps
+    }
+    return map
+  }
 
-  let motivationText = ''
-  if (noData) motivationText = 'Ingen data ennå'
-  else if (same && prevVal === 0) motivationText = 'Ingen data ennå'
-  else if (same) motivationText = 'Likt som forrige periode'
-  else if (better) motivationText = `${format(diff)} mer enn forrige periode`
-  else motivationText = `${format(Math.abs(diff))} til for å matche forrige periode`
+  const thisMap = byPackage(thisLogs)
+  const prevMap = byPackage(prevLogs)
+
+  const allNames = [...new Set([...Object.keys(thisMap), ...Object.keys(prevMap)])]
+    .sort((a, b) => (thisMap[b]?.count ?? 0) - (thisMap[a]?.count ?? 0))
+
+  if (allNames.length === 0) return null
 
   return (
-    <div className="bg-gray-800 rounded-2xl p-4">
-      <p className="text-sm text-gray-400 font-medium mb-3">{label}</p>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-4xl font-bold text-white">{format(thisVal)}</p>
-          <p className="text-xs text-gray-500 mt-1">forrige: {format(prevVal)}</p>
-        </div>
-        <div className={`flex flex-col items-end gap-0.5 ${arrowColor}`}>
-          <span className="text-3xl leading-none">{noData || same ? '→' : better ? '↑' : '↓'}</span>
-          {pct !== null && !same && (
-            <span className="text-sm font-bold">{better ? '+' : ''}{pct}%</span>
-          )}
-          {pct === null && !noData && !same && (
-            <span className="text-xs font-semibold">ny</span>
-          )}
-        </div>
+    <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
+      <div className="flex justify-between items-baseline">
+        <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Treningspakker</p>
+        <p className="text-xs text-gray-500">denne / {prevLabel}</p>
       </div>
-      <p className={`text-xs mt-3 font-medium ${better ? 'text-green-400' : noData || same ? 'text-gray-500' : 'text-gray-400'}`}>
-        {motivationText}
-      </p>
+      {allNames.map(name => {
+        const t = thisMap[name] ?? { count: 0, reps: 0 }
+        const p = prevMap[name] ?? { count: 0, reps: 0 }
+        const diff = t.count - p.count
+        const better = diff > 0
+        const same = diff === 0
+        return (
+          <div key={name} className="space-y-1.5">
+            <div className="flex justify-between items-center">
+              <span className="text-white text-sm font-medium">{name}</span>
+              <div className="flex items-center gap-2 text-xs">
+                <span className={better ? 'text-green-400 font-bold' : same ? 'text-gray-400' : 'text-red-400 font-bold'}>
+                  {better ? '↑' : same ? '→' : '↓'}
+                </span>
+                <span className="text-white font-semibold">{t.count} tr</span>
+                <span className="text-gray-500">/ {p.count} tr</span>
+              </div>
+            </div>
+            <div className="flex justify-between text-xs text-gray-500">
+              <span>{t.reps.toLocaleString('nb-NO')} reps</span>
+              <span>forrige: {p.reps.toLocaleString('nb-NO')} reps</span>
+            </div>
+          </div>
+        )
+      })}
     </div>
   )
 }
@@ -112,11 +165,16 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
   const { thisStart, thisEnd, prevStart, prevEnd } = calcPeriods(period)
   const thisLogs = filterLogs(logs, thisStart, thisEnd)
   const prevLogs = filterLogs(logs, prevStart, prevEnd)
-  const thisM = calcMetrics(thisLogs)
-  const prevM = calcMetrics(prevLogs)
 
+  const thisSessions = thisLogs.length
+  const prevSessions = prevLogs.length
+  const thisReps = thisLogs.reduce((s, l) => s + l.reps, 0)
+  const prevReps = prevLogs.reduce((s, l) => s + l.reps, 0)
+  const thisTime = thisLogs.reduce((s, l) => s + (l.durationSeconds ?? 0), 0)
+  const prevTime = prevLogs.reduce((s, l) => s + (l.durationSeconds ?? 0), 0)
   const anyDuration = logs.some(l => l.durationSeconds != null)
 
+  const prevLabel = period === 'uken' ? 'forrige uke' : '7–14 dager siden'
   const periodLabel = period === 'uken'
     ? { this: 'Man–i dag', prev: 'forrige uke (tilsvarende)' }
     : { this: 'Siste 7 dager', prev: '7–14 dager siden' }
@@ -142,26 +200,31 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
         <span>vs {periodLabel.prev}</span>
       </div>
 
-      <TrendCard
-        label="Økter"
-        thisVal={thisM.sessions}
-        prevVal={prevM.sessions}
-        format={n => String(n)}
-      />
-      <TrendCard
-        label="Repetisjoner"
-        thisVal={thisM.reps}
-        prevVal={prevM.reps}
-        format={n => String(n)}
-      />
+      <div className="grid grid-cols-2 gap-3">
+        <StatCard
+          label="Treninger"
+          thisVal={thisSessions}
+          prevVal={prevSessions}
+          format={n => String(n)}
+        />
+        <StatCard
+          label="Reps"
+          thisVal={thisReps}
+          prevVal={prevReps}
+          format={n => n.toLocaleString('nb-NO')}
+        />
+      </div>
+
       {anyDuration && (
-        <TrendCard
+        <StatCard
           label="Tid"
-          thisVal={thisM.totalSeconds}
-          prevVal={prevM.totalSeconds}
-          format={formatMinutes}
+          thisVal={thisTime}
+          prevVal={prevTime}
+          format={fmtTime}
         />
       )}
+
+      <PackageCompare thisLogs={thisLogs} prevLogs={prevLogs} prevLabel={prevLabel} />
     </div>
   )
 }
