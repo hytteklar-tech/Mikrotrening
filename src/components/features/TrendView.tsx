@@ -51,25 +51,20 @@ function fmtTime(seconds: number) {
 function PctArrow({ thisVal, prevVal }: { thisVal: number; prevVal: number }) {
   const diff = thisVal - prevVal
   const pct = prevVal > 0 ? Math.round((diff / prevVal) * 100) : null
-  const noChange = diff === 0
+  const noData = thisVal === 0 && prevVal === 0
 
-  if (thisVal === 0 && prevVal === 0) return <span className="text-gray-600 text-2xl font-black">→</span>
+  if (noData) return <span className="text-gray-600 text-xl font-black leading-none">→</span>
 
-  if (noChange) return (
-    <div className="flex items-center gap-1 text-gray-400">
-      <span className="text-2xl font-black">→</span>
-      <span className="text-sm font-bold">0%</span>
-    </div>
-  )
-
+  const same = diff === 0
   const better = diff > 0
-  const color = better ? 'text-green-400' : 'text-red-400'
+  const color = same ? 'text-gray-400' : better ? 'text-green-400' : 'text-red-400'
+  const arrow = same ? '→' : better ? '↑' : '↓'
+  const pctStr = pct !== null ? `${better ? '+' : ''}${pct}%` : better ? 'ny' : '–'
+
   return (
-    <div className={`flex items-center gap-1 ${color}`}>
-      <span className="text-2xl font-black">{better ? '↑' : '↓'}</span>
-      <span className="text-sm font-bold">
-        {pct !== null ? `${better ? '+' : ''}${pct}%` : (better ? 'ny' : '–')}
-      </span>
+    <div className={`flex items-center gap-0.5 ${color}`}>
+      <span className="text-xl font-black leading-none">{arrow}</span>
+      <span className="text-sm font-black">{pctStr}</span>
     </div>
   )
 }
@@ -79,20 +74,39 @@ function StatCard({
   thisVal,
   prevVal,
   format,
+  thisLabel,
+  prevLabel,
 }: {
   label: string
   thisVal: number
   prevVal: number
   format: (n: number) => string
+  thisLabel: string
+  prevLabel: string
 }) {
+  const thisWins = thisVal > prevVal
+  const prevWins = prevVal > thisVal
+
   return (
-    <div className="bg-gray-800 rounded-2xl p-4 flex flex-col gap-2">
-      <p className="text-xs text-gray-400 font-medium">{label}</p>
-      <div>
-        <span className="text-4xl font-bold text-white">{format(thisVal)}</span>
-        <span className="text-sm text-gray-500 ml-1">/ {format(prevVal)}</span>
+    <div className="bg-gray-800 rounded-2xl p-4">
+      <div className="flex justify-between items-start mb-3">
+        <p className="text-xs text-gray-400 font-medium">{label}</p>
+        <PctArrow thisVal={thisVal} prevVal={prevVal} />
       </div>
-      <PctArrow thisVal={thisVal} prevVal={prevVal} />
+      <div className="flex gap-4">
+        <div>
+          <p className={`text-3xl font-bold leading-none ${thisWins ? 'text-green-400' : 'text-white'}`}>
+            {format(thisVal)}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">{thisLabel}</p>
+        </div>
+        <div>
+          <p className={`text-3xl font-bold leading-none ${prevWins ? 'text-green-400' : 'text-white'}`}>
+            {format(prevVal)}
+          </p>
+          <p className="text-xs text-gray-500 mt-1">{prevLabel}</p>
+        </div>
+      </div>
     </div>
   )
 }
@@ -206,12 +220,16 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
           thisVal={thisSessions}
           prevVal={prevSessions}
           format={n => String(n)}
+          thisLabel={period === 'uken' ? 'denne uken' : 'siste 7 d'}
+          prevLabel={period === 'uken' ? 'forrige uke' : '7–14 d siden'}
         />
         <StatCard
           label="Reps"
           thisVal={thisReps}
           prevVal={prevReps}
           format={n => n.toLocaleString('nb-NO')}
+          thisLabel={period === 'uken' ? 'denne uken' : 'siste 7 d'}
+          prevLabel={period === 'uken' ? 'forrige uke' : '7–14 d siden'}
         />
       </div>
 
@@ -221,6 +239,8 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
           thisVal={thisTime}
           prevVal={prevTime}
           format={fmtTime}
+          thisLabel={period === 'uken' ? 'denne uken' : 'siste 7 d'}
+          prevLabel={period === 'uken' ? 'forrige uke' : '7–14 d siden'}
         />
       )}
 
