@@ -1,8 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { exercises, MUSCLE_GROUP_LABELS } from '@/data/exercises'
 import type { Exercise } from '@/data/exercises'
+
+function ExerciseMedia({ src, alt, className }: { src: string; alt: string; className?: string }) {
+  const isVideo = src.endsWith('.mp4') || src.endsWith('.webm')
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (videoRef.current) videoRef.current.playbackRate = 0.1
+  }, [])
+
+  if (isVideo) {
+    return (
+      <video
+        ref={videoRef}
+        src={src}
+        autoPlay
+        loop
+        muted
+        playsInline
+        className={className}
+      />
+    )
+  }
+  return <img src={src} alt={alt} className={className} loading="lazy" />
+}
 
 const MUSCLE_GROUPS = ['alle', 'bryst', 'ben'] as const
 const LABELS: Record<string, string> = { alle: 'Alle', ...MUSCLE_GROUP_LABELS }
@@ -23,6 +47,12 @@ export default function TestExercisesPage() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [selected, setSelected] = useState<Exercise | null>(null)
+  const [speed, setSpeed] = useState(0.1)
+  const modalVideoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    if (modalVideoRef.current) modalVideoRef.current.playbackRate = speed
+  }, [speed, selected])
 
   const filtered = exercises.filter(ex => {
     const matchGroup = muscleGroup === 'alle' || ex.muscleGroup === muscleGroup
@@ -86,11 +116,10 @@ export default function TestExercisesPage() {
             onClick={() => setSelected(ex)}
             className="bg-gray-800 rounded-2xl overflow-hidden text-left hover:ring-2 hover:ring-orange-500 transition"
           >
-            <img
+            <ExerciseMedia
               src={ex.image}
               alt={ex.name}
               className="w-full aspect-square object-cover bg-gray-700"
-              loading="lazy"
             />
             <div className="p-2">
               <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
@@ -112,7 +141,33 @@ export default function TestExercisesPage() {
               <h2 className="text-white font-bold capitalize">{selected.name}</h2>
               <button onClick={() => setSelected(null)} className="text-gray-400 text-xl">✕</button>
             </div>
-            <img src={selected.image} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
+            {(selected.image.endsWith('.mp4') || selected.image.endsWith('.webm')) ? (
+              <div className="flex flex-col items-center my-4 gap-2">
+                <video
+                  ref={modalVideoRef}
+                  src={selected.image}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="w-full max-w-xs mx-auto block"
+                />
+                <div className="flex items-center gap-3 text-xs text-gray-400">
+                  <span>Hastighet:</span>
+                  {[0.05, 0.1, 0.25, 0.5, 1].map(s => (
+                    <button
+                      key={s}
+                      onClick={() => setSpeed(s)}
+                      className={`px-2 py-1 rounded-full ${speed === s ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}
+                    >
+                      {s}x
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <img src={selected.image} alt={selected.name} className="w-full max-w-xs mx-auto block my-4" />
+            )}
             <div className="px-4 pb-4 space-y-2">
               <div className="flex gap-2 flex-wrap">
                 <span className="bg-orange-500/20 text-orange-400 text-xs px-2 py-1 rounded-full capitalize">
