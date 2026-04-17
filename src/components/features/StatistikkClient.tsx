@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import StatsView from './StatsView'
 import TestStatsView from './TestStatsView'
+import TrendView from './TrendView'
 import type { TestType, TestResult } from './TestClient'
 
 export type StatLog = {
@@ -18,7 +19,7 @@ type Props = {
   testResults: TestResult[]
 }
 
-type MainTab = 'trening' | 'tester'
+type MainTab = 'trend' | 'trening' | 'tester'
 
 function calcLongestStreak(dates: string[]): number {
   if (!dates.length) return 0
@@ -93,20 +94,22 @@ export default function StatistikkClient({ logs, testTypes, testResults }: Props
       </div>
 
       <div className="flex bg-gray-800 rounded-2xl p-1">
-        {(['trening', 'tester'] as MainTab[]).map(t => (
+        {(['trend', 'trening', 'tester'] as MainTab[]).map(t => (
           <button
             key={t}
             onClick={() => setMainTab(t)}
-            className={`flex-1 py-2 rounded-xl text-sm font-semibold transition capitalize ${
+            className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${
               mainTab === t ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
             }`}
           >
-            {t === 'trening' ? 'Trening' : 'Tester'}
+            {t === 'trend' ? 'Trend' : t === 'trening' ? 'Trening' : 'Tester'}
           </button>
         ))}
       </div>
 
-      {mainTab === 'trening' ? (
+      {mainTab === 'trend' ? (
+        <TrendView logs={logs} />
+      ) : mainTab === 'trening' ? (
         <StatsView logs={logs} currentStreak={currentStreak} longestStreak={longestStreak} topStreaks={topStreaks} />
       ) : (
         <TestStatsView testTypes={testTypes} testResults={testResults} />
