@@ -64,10 +64,10 @@ function TimerRing({ seconds, average }: { seconds: number; average: number | nu
         </div>
       </div>
       {average && (
-        <p className={`text-sm font-medium ${isOvertime ? 'text-white' : 'text-gray-400'}`}>
+        <p className="text-base font-medium text-white">
           {isOvertime
             ? `over snittet ditt (${formatDuration(average)})`
-            : `Snitt: ${formatDuration(average)}`}
+            : `Snitt tidligere økter: ${formatDuration(average)}`}
         </p>
       )}
     </div>
