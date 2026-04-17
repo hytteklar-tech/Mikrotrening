@@ -16,7 +16,7 @@ export default function BottomNav() {
   const pathname = usePathname()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t border-gray-800">
+    <nav className="shrink-0 bg-gray-900 border-t border-gray-800 pb-[env(safe-area-inset-bottom)]">
       <div className="max-w-lg mx-auto flex">
         {links.map(link => (
           <Link

@@ -10,13 +10,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect('/login')
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white">
-      <header className="sticky top-0 z-10 bg-gray-950/90 backdrop-blur border-b border-gray-800/50">
+    <div className="h-dvh flex flex-col bg-gray-950 text-white">
+      <header className="shrink-0 bg-gray-950/90 backdrop-blur border-b border-gray-800/50">
         <div className="max-w-lg mx-auto px-4 py-2 flex justify-end">
           <Logo size={36} />
         </div>
       </header>
-      <main className="pb-20 max-w-lg mx-auto">
+      <main className="flex-1 overflow-y-auto w-full max-w-lg mx-auto">
         {children}
       </main>
       <BottomNav />
