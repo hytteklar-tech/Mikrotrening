@@ -4,49 +4,196 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening' | 'manual'
+
+const TIME_OPTIONS: { value: TimeOption; label: string; emoji: string }[] = [
+  { value: 'morning', label: 'Morgen', emoji: '🌅' },
+  { value: 'midday', label: 'Formiddag', emoji: '☀️' },
+  { value: 'afternoon', label: 'Ettermiddag', emoji: '🌤️' },
+  { value: 'evening', label: 'Kveld', emoji: '🌙' },
+  { value: 'manual', label: 'Jeg velger selv', emoji: '🎯' },
+]
+
 export default function OnboardingPage() {
+  const [step, setStep] = useState(1)
   const [name, setName] = useState('')
+  const [preferredTime, setPreferredTime] = useState<TimeOption | null>(null)
+  const [notifGranted, setNotifGranted] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
-  async function saveName() {
-    if (!name.trim()) return
+  async function finish(notificationsEnabled: boolean) {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      await supabase.from('users').update({ display_name: name.trim() }).eq('id', user.id)
+      await supabase.from('users').update({
+        display_name: name.trim(),
+        preferred_time: preferredTime,
+        notifications_enabled: notificationsEnabled,
+      }).eq('id', user.id)
     }
     setLoading(false)
     router.push('/')
     router.refresh()
   }
 
-  return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <div className="text-5xl mb-3">💪</div>
-          <h1 className="text-2xl font-bold text-white">Velkommen!</h1>
-          <p className="text-gray-400 mt-1">Hva skal vi kalle deg?</p>
+  async function handleNotifications(want: boolean) {
+    if (!want) {
+      setNotifGranted(false)
+      await finish(false)
+      return
+    }
+    let granted = false
+    if ('Notification' in window) {
+      const permission = await Notification.requestPermission()
+      granted = permission === 'granted'
+    }
+    setNotifGranted(granted)
+    await finish(granted)
+  }
+
+  // Steg 1: Velkomst
+  if (step === 1) {
+    return (
+      <Screen>
+        <div className="text-center space-y-4">
+          <div className="text-6xl">💪</div>
+          <h1 className="text-2xl font-bold text-white leading-snug">
+            3 korte økter om dagen.<br />
+            <span className="text-orange-400">48% lavere risiko</span> for hjertedød.
+          </h1>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Ingen utstyr. Ingen planlegging.<br />Bare 30 sekunder.
+          </p>
+        </div>
+        <button
+          onClick={() => setStep(2)}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 transition"
+        >
+          Kom i gang
+        </button>
+        <StepDots current={1} total={4} />
+      </Screen>
+    )
+  }
+
+  // Steg 2: Navn
+  if (step === 2) {
+    return (
+      <Screen>
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-bold text-white">Hva skal vi kalle deg?</h2>
+          <p className="text-gray-400 text-sm">Navnet vises på resultattavlen.</p>
         </div>
         <input
           type="text"
           placeholder="Ditt navn"
           value={name}
           onChange={e => setName(e.target.value)}
-          onKeyDown={e => e.key === 'Enter' && saveName()}
+          onKeyDown={e => e.key === 'Enter' && name.trim() && setStep(3)}
           className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
           autoFocus
         />
         <button
-          onClick={saveName}
-          disabled={loading || !name.trim()}
+          onClick={() => setStep(3)}
+          disabled={!name.trim()}
           className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
         >
-          {loading ? 'Lagrer...' : 'Start!'}
+          Neste
+        </button>
+        <StepDots current={2} total={4} />
+      </Screen>
+    )
+  }
+
+  // Steg 3: Habit-anker
+  if (step === 3) {
+    return (
+      <Screen>
+        <div className="text-center space-y-2">
+          <h2 className="text-xl font-bold text-white">Når passer det best å mikrotrene?</h2>
+          <p className="text-gray-400 text-sm">Vi bruker dette til å minne deg på rett tid.</p>
+        </div>
+        <div className="space-y-2">
+          {TIME_OPTIONS.map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setPreferredTime(opt.value)}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left
+                ${preferredTime === opt.value
+                  ? 'border-orange-500 bg-orange-500/10 text-white'
+                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-500'}`}
+            >
+              <span className="text-xl">{opt.emoji}</span>
+              <span className="font-medium">{opt.label}</span>
+            </button>
+          ))}
+        </div>
+        <button
+          onClick={() => setStep(4)}
+          disabled={!preferredTime}
+          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+        >
+          Neste
+        </button>
+        <StepDots current={3} total={4} />
+      </Screen>
+    )
+  }
+
+  // Steg 4: Varsler
+  return (
+    <Screen>
+      <div className="text-center space-y-3">
+        <div className="text-5xl">🔔</div>
+        <h2 className="text-xl font-bold text-white">Daglig påminnelse?</h2>
+        <p className="text-gray-400 text-sm leading-relaxed">
+          En liten dytt på rett tidspunkt. Ikke stress — bare en invitasjon.
+        </p>
+      </div>
+      <div className="space-y-3">
+        <button
+          onClick={() => handleNotifications(true)}
+          disabled={loading}
+          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+        >
+          {loading ? 'Lagrer...' : 'Ja, send meg påminnelser'}
+        </button>
+        <button
+          onClick={() => handleNotifications(false)}
+          disabled={loading}
+          className="w-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 font-medium rounded-xl py-3 transition"
+        >
+          Ikke nå
         </button>
       </div>
+      <StepDots current={4} total={4} />
+    </Screen>
+  )
+}
+
+function Screen({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
+      <div className="w-full max-w-sm space-y-6">
+        {children}
+      </div>
+    </div>
+  )
+}
+
+function StepDots({ current, total }: { current: number; total: number }) {
+  return (
+    <div className="flex justify-center gap-2 pt-2">
+      {Array.from({ length: total }, (_, i) => (
+        <div
+          key={i}
+          className={`h-1.5 rounded-full transition-all ${
+            i + 1 === current ? 'w-6 bg-orange-500' : 'w-1.5 bg-gray-700'
+          }`}
+        />
+      ))}
     </div>
   )
 }
