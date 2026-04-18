@@ -45,9 +45,17 @@ export default function OnboardingPage() {
       return
     }
     let granted = false
-    if ('Notification' in window) {
-      const permission = await Notification.requestPermission()
-      granted = permission === 'granted'
+    try {
+      await new Promise<void>(resolve => {
+        window.OneSignalDeferred = window.OneSignalDeferred || []
+        window.OneSignalDeferred.push(async (OneSignal) => {
+          await OneSignal.User.PushSubscription.optIn()
+          resolve()
+        })
+      })
+      granted = Notification.permission === 'granted'
+    } catch {
+      granted = false
     }
     setNotifGranted(granted)
     await finish(granted)

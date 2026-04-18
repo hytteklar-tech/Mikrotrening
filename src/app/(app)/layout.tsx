@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import BottomNav from '@/components/ui/BottomNav'
 import Logo from '@/components/ui/Logo'
+import OneSignalProvider from '@/components/ui/OneSignalProvider'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -20,6 +21,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         {children}
       </main>
       <BottomNav />
+      <OneSignalProvider />
     </div>
   )
 }
