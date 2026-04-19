@@ -113,12 +113,21 @@ function LoginForm() {
               >
                 {loading ? 'Verifiserer...' : 'Logg inn'}
               </button>
-              <button
-                onClick={() => { setStep('email'); setCode(''); setError('') }}
-                className="w-full text-gray-500 text-sm hover:text-white transition"
-              >
-                ← Bruk annen e-post
-              </button>
+              <div className="flex flex-col items-center gap-2">
+                <button
+                  onClick={sendCode}
+                  disabled={loading}
+                  className="text-orange-400 text-sm hover:text-orange-300 transition disabled:opacity-50"
+                >
+                  Send koden på nytt
+                </button>
+                <button
+                  onClick={() => { setStep('email'); setCode(''); setError('') }}
+                  className="text-gray-500 text-sm hover:text-white transition"
+                >
+                  ← Bruk annen e-post
+                </button>
+              </div>
             </>
           )}
         </div>
