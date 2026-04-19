@@ -191,6 +191,11 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       onLogChange(dayLogs)
     } else if (data) {
       onLogChange([...dayLogs, { ...optimisticLog, id: data.id as string }])
+      fetch('/api/milestones/check', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      })
     }
 
     setLoading(false)
