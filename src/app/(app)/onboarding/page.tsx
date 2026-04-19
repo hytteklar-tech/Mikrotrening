@@ -41,18 +41,30 @@ export default function OnboardingPage() {
       await finish(false)
       return
     }
-    // Be om tillatelse direkte fra nettleseren — blokkerer ikke
     let granted = false
     try {
-      const permission = await Notification.requestPermission()
-      granted = permission === 'granted'
-      if (granted) {
-        // Registrer med OneSignal i bakgrunnen etter at siden er ferdig
-        window.OneSignalDeferred = window.OneSignalDeferred || []
-        window.OneSignalDeferred.push(async (OneSignal: any) => {
-          try { await OneSignal.User.PushSubscription.optIn() } catch {}
-        })
-      }
+      // Vent på at OneSignal er initialisert (maks 5 sek), kall så optIn()
+      await Promise.race([
+        new Promise<void>(resolve => {
+          window.OneSignalDeferred = window.OneSignalDeferred || []
+          window.OneSignalDeferred.push(async (OneSignal: any) => {
+            try {
+              await OneSignal.User.PushSubscription.optIn()
+              const id = OneSignal.User.PushSubscription.id
+              if (id) {
+                const supabase = createClient()
+                const { data: { user } } = await supabase.auth.getUser()
+                if (user) {
+                  await supabase.from('users').update({ onesignal_id: id }).eq('id', user.id)
+                }
+              }
+            } catch {}
+            resolve()
+          })
+        }),
+        new Promise<void>(resolve => setTimeout(resolve, 5000)),
+      ])
+      granted = Notification.permission === 'granted'
     } catch {
       granted = false
     }
