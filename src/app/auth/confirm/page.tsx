@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import type { EmailOtpType } from '@supabase/supabase-js'
 import { createClient } from '@/lib/supabase/client'
@@ -11,15 +11,21 @@ function ConfirmForm() {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [ready, setReady] = useState(false)
 
   const token_hash = searchParams.get('token_hash')
   const type = searchParams.get('type') as EmailOtpType | null
 
-  async function handleConfirm() {
+  useEffect(() => {
     if (!token_hash || !type) {
       router.replace('/login?error=auth')
-      return
+    } else {
+      setReady(true)
     }
+  }, [token_hash, type, router])
+
+  async function handleConfirm() {
+    if (!token_hash || !type) return
     setLoading(true)
     setError('')
     const supabase = createClient()
@@ -31,10 +37,7 @@ function ConfirmForm() {
     }
   }
 
-  if (!token_hash || !type) {
-    router.replace('/login?error=auth')
-    return null
-  }
+  if (!ready) return null
 
   return (
     <div className="min-h-screen bg-gray-950 flex items-center justify-center p-4">
