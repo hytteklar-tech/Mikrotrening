@@ -31,23 +31,36 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   async function activatePush() {
     setActivating(true)
     try {
-      await Promise.race([
-        new Promise<void>(resolve => {
-          window.OneSignalDeferred = window.OneSignalDeferred || []
-          window.OneSignalDeferred.push(async (OneSignal: any) => {
-            try {
-              await OneSignal.User.PushSubscription.optIn()
-              const id = OneSignal.User.PushSubscription.id
-              if (id) {
-                await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
-                setHasOnesignalId(true)
-              }
-            } catch {}
+      await new Promise<void>(resolve => {
+        window.OneSignalDeferred = window.OneSignalDeferred || []
+        window.OneSignalDeferred.push(async (OneSignal: any) => {
+          async function saveId(id: string | null) {
+            if (!id) return false
+            await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+            setHasOnesignalId(true)
+            return true
+          }
+
+          // Lytt på change-event (iOS tildeler ID asynkront)
+          OneSignal.User.PushSubscription.addEventListener('change', async () => {
+            await saveId(OneSignal.User.PushSubscription.id)
             resolve()
           })
-        }),
-        new Promise<void>(resolve => setTimeout(resolve, 5000)),
-      ])
+
+          await OneSignal.User.PushSubscription.optIn()
+
+          // Sjekk om ID allerede finnes (Android/desktop tildeler umiddelbart)
+          const saved = await saveId(OneSignal.User.PushSubscription.id)
+          if (saved) resolve()
+
+          // Retry etter 3s og 8s som fallback
+          setTimeout(async () => {
+            const saved = await saveId(OneSignal.User.PushSubscription.id)
+            if (saved) resolve()
+          }, 3000)
+          setTimeout(() => resolve(), 8000)
+        })
+      })
     } catch {}
     setActivating(false)
   }
