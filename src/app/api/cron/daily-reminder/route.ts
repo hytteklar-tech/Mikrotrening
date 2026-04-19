@@ -74,7 +74,7 @@ export async function GET(request: Request) {
   const { data: users } = await supabase
     .from('users')
     .select('onesignal_id')
-    .eq('preferred_time', preferredTime)
+    .contains('preferred_times', [preferredTime])
     .eq('notifications_enabled', true)
     .not('onesignal_id', 'is', null)
 

@@ -4,20 +4,19 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening' | 'manual'
+type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
 const TIME_OPTIONS: { value: TimeOption; label: string; hint: string; emoji: string }[] = [
   { value: 'morning', label: 'Morgen', hint: 'kl 08 · kl 09 i helg', emoji: '🌅' },
   { value: 'midday', label: 'Formiddag', hint: 'kl 11', emoji: '☀️' },
   { value: 'afternoon', label: 'Ettermiddag', hint: 'kl 15', emoji: '🌤️' },
   { value: 'evening', label: 'Kveld', hint: 'kl 19', emoji: '🌙' },
-  { value: 'manual', label: 'Jeg velger selv', hint: 'ingen varsler', emoji: '🎯' },
 ]
 
 export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
-  const [preferredTime, setPreferredTime] = useState<TimeOption | null>(null)
+  const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
   const [notifGranted, setNotifGranted] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
@@ -29,7 +28,7 @@ export default function OnboardingPage() {
     if (user) {
       await supabase.from('users').update({
         display_name: name.trim(),
-        preferred_time: preferredTime,
+        preferred_times: preferredTimes,
         notifications_enabled: notificationsEnabled,
       }).eq('id', user.id)
     }
@@ -115,35 +114,45 @@ export default function OnboardingPage() {
     )
   }
 
-  // Steg 3: Habit-anker
+  // Steg 3: Habit-anker (multiselekt)
   if (step === 3) {
+    function toggleTime(val: TimeOption) {
+      setPreferredTimes(prev =>
+        prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
+      )
+    }
+
     return (
       <Screen>
         <div className="text-center space-y-2">
           <h2 className="text-xl font-bold text-white">Når passer det best å mikrotrene?</h2>
-          <p className="text-gray-400 text-sm">Vi bruker dette til å minne deg på rett tid.</p>
+          <p className="text-gray-400 text-sm">Velg én eller flere — du får varsel på hvert tidspunkt.</p>
         </div>
         <div className="space-y-2">
-          {TIME_OPTIONS.map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => setPreferredTime(opt.value)}
-              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left
-                ${preferredTime === opt.value
-                  ? 'border-orange-500 bg-orange-500/10 text-white'
-                  : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-500'}`}
-            >
-              <span className="text-xl">{opt.emoji}</span>
-              <div>
-                <div className="font-medium">{opt.label}</div>
-                <div className="text-xs text-gray-500">{opt.hint}</div>
-              </div>
-            </button>
-          ))}
+          {TIME_OPTIONS.map(opt => {
+            const selected = preferredTimes.includes(opt.value)
+            return (
+              <button
+                key={opt.value}
+                onClick={() => toggleTime(opt.value)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl border transition text-left
+                  ${selected
+                    ? 'border-orange-500 bg-orange-500/10 text-white'
+                    : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-500'}`}
+              >
+                <span className="text-xl">{opt.emoji}</span>
+                <div className="flex-1">
+                  <div className="font-medium">{opt.label}</div>
+                  <div className="text-xs text-gray-500">{opt.hint}</div>
+                </div>
+                {selected && <span className="text-orange-400 text-sm">✓</span>}
+              </button>
+            )
+          })}
         </div>
         <button
           onClick={() => setStep(4)}
-          disabled={!preferredTime}
+          disabled={preferredTimes.length === 0}
           className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
         >
           Neste
