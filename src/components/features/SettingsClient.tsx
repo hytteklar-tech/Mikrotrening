@@ -4,10 +4,20 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
+
+const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
+  { value: 'morning', label: 'Morgen', hint: 'kl 08 · kl 09 i helg' },
+  { value: 'midday', label: 'Formiddag', hint: 'kl 11' },
+  { value: 'afternoon', label: 'Ettermiddag', hint: 'kl 15' },
+  { value: 'evening', label: 'Kveld', hint: 'kl 19' },
+]
+
 export default function SettingsClient({ profile, userId }: { profile: any; userId: string }) {
   const [name, setName] = useState(profile?.display_name ?? '')
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
+  const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -15,12 +25,19 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const router = useRouter()
   const supabase = createClient()
 
+  function toggleTime(val: TimeOption) {
+    setPreferredTimes(prev =>
+      prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
+    )
+  }
+
   async function save() {
     setSaving(true)
     await supabase.from('users').update({
       display_name: name.trim(),
       notifications_enabled: notifications,
       push_enabled: pushEnabled,
+      preferred_times: preferredTimes,
     }).eq('id', userId)
     setSaving(false)
     setSaved(true)
@@ -69,7 +86,9 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         </div>
+
         <div className="border-t border-gray-700" />
+
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold">Push-varsler</p>
@@ -82,6 +101,31 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         </div>
+
+        {pushEnabled && (
+          <div className="space-y-2">
+            <p className="text-xs text-gray-400">Når vil du ha påminnelse?</p>
+            {TIME_OPTIONS.map(opt => {
+              const selected = preferredTimes.includes(opt.value)
+              return (
+                <button
+                  key={opt.value}
+                  onClick={() => toggleTime(opt.value)}
+                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border transition text-left
+                    ${selected
+                      ? 'border-orange-500 bg-orange-500/10 text-white'
+                      : 'border-gray-700 bg-gray-700 text-gray-400'}`}
+                >
+                  <div>
+                    <span className="text-sm font-medium">{opt.label}</span>
+                    <span className="text-xs text-gray-500 ml-2">{opt.hint}</span>
+                  </div>
+                  {selected && <span className="text-orange-400 text-xs">✓</span>}
+                </button>
+              )
+            })}
+          </div>
+        )}
       </div>
 
       <button
