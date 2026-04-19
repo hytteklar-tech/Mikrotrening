@@ -4,11 +4,6 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-declare global {
-  interface Window {
-    OneSignalDeferred: ((os: any) => void)[]
-  }
-}
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
