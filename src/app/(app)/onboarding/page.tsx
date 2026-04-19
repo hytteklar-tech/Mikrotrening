@@ -83,11 +83,11 @@ export default function OnboardingPage() {
         <div className="text-center space-y-4">
           <div className="text-6xl">💪</div>
           <h1 className="text-2xl font-bold text-white leading-snug">
-            3 korte økter om dagen.<br />
-            <span className="text-orange-400">48% lavere risiko</span> for hjertedød.
+            Små bevegelser.<br />
+            <span className="text-orange-400">Stor forskjell.</span>
           </h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            Ingen utstyr. Ingen planlegging.<br />Bare 30 sekunder.
+            3 korte økter om dagen gir mer energi<br />og en vane som faktisk holder.<br /><br />Ingen utstyr. Bare 30 sekunder.
           </p>
         </div>
         <button
@@ -208,7 +208,7 @@ export default function OnboardingPage() {
 
 function Screen({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-gray-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-gray-950 flex items-start justify-center p-6 pt-16">
       <div className="w-full max-w-sm space-y-6">
         {children}
       </div>
