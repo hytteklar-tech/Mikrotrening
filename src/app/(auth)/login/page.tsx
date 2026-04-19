@@ -87,7 +87,7 @@ function LoginForm() {
                 <p className="text-2xl">📬</p>
                 <p className="text-white font-semibold">Sjekk innboksen din</p>
                 <p className="text-gray-400 text-sm">
-                  Vi sendte en 6-sifret kode til <span className="text-white">{email}</span>
+                  Vi sendte en kode til <span className="text-white">{email}</span>
                 </p>
               </div>
               <div>
