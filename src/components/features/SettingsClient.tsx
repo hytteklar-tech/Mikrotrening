@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 export default function SettingsClient({ profile, userId }: { profile: any; userId: string }) {
   const [name, setName] = useState(profile?.display_name ?? '')
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
+  const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -19,6 +20,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     await supabase.from('users').update({
       display_name: name.trim(),
       notifications_enabled: notifications,
+      push_enabled: pushEnabled,
     }).eq('id', userId)
     setSaving(false)
     setSaved(true)
@@ -54,7 +56,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         </div>
       </div>
 
-      <div className="bg-gray-800 rounded-2xl p-4">
+      <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
         <div className="flex items-center justify-between">
           <div>
             <p className="text-sm font-semibold">Motivasjonsmeldinger</p>
@@ -65,6 +67,19 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             className={`w-12 h-6 rounded-full transition-colors ${notifications ? 'bg-orange-500' : 'bg-gray-600'}`}
           >
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
+        <div className="border-t border-gray-700" />
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold">Push-varsler</p>
+            <p className="text-xs text-gray-400 mt-0.5">Daglig påminnelse på valgte tidspunkt</p>
+          </div>
+          <button
+            onClick={() => setPushEnabled(!pushEnabled)}
+            className={`w-12 h-6 rounded-full transition-colors ${pushEnabled ? 'bg-orange-500' : 'bg-gray-600'}`}
+          >
+            <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         </div>
       </div>

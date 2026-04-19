@@ -21,14 +21,14 @@ export default function OnboardingPage() {
   const router = useRouter()
   const supabase = createClient()
 
-  async function finish(notificationsEnabled: boolean) {
+  async function finish(pushEnabled: boolean) {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
       await supabase.from('users').update({
         display_name: name.trim(),
         preferred_times: preferredTimes,
-        notifications_enabled: notificationsEnabled,
+        push_enabled: pushEnabled,
       }).eq('id', user.id)
     }
     router.push('/')

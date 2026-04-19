@@ -75,7 +75,7 @@ export async function GET(request: Request) {
     .from('users')
     .select('onesignal_id')
     .contains('preferred_times', [preferredTime])
-    .eq('notifications_enabled', true)
+    .eq('push_enabled', true)
     .not('onesignal_id', 'is', null)
 
   if (!users?.length) {
