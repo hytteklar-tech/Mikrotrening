@@ -27,13 +27,14 @@ export default function OneSignalProvider() {
         }
       }
 
-      // Lagre ID umiddelbart hvis allerede abonnert
-      await saveId(OneSignal.User.PushSubscription.id)
-
-      // Lagre ved fremtidige endringer (ny abonnement)
+      // Lagre ved fremtidige endringer (ny abonnement / optIn)
       OneSignal.User.PushSubscription.addEventListener('change', () => {
         saveId(OneSignal.User.PushSubscription.id)
       })
+
+      // Sjekk umiddelbart, og igjen etter kort forsinkelse (abonnement kan ta litt tid)
+      await saveId(OneSignal.User.PushSubscription.id)
+      setTimeout(() => saveId(OneSignal.User.PushSubscription.id), 3000)
     })
   }
 
