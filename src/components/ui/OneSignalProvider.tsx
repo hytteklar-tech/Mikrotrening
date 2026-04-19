@@ -18,15 +18,21 @@ export default function OneSignalProvider() {
         notifyButton: { enable: false },
       })
 
-      // Lagre OneSignal-ID til databasen når bruker er abonnert
-      OneSignal.User.PushSubscription.addEventListener('change', async () => {
-        const id = OneSignal.User.PushSubscription.id
+      async function saveId(id: string | null) {
         if (!id) return
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
         if (user) {
           await supabase.from('users').update({ onesignal_id: id }).eq('id', user.id)
         }
+      }
+
+      // Lagre ID umiddelbart hvis allerede abonnert
+      await saveId(OneSignal.User.PushSubscription.id)
+
+      // Lagre ved fremtidige endringer (ny abonnement)
+      OneSignal.User.PushSubscription.addEventListener('change', () => {
+        saveId(OneSignal.User.PushSubscription.id)
       })
     })
   }
