@@ -6,12 +6,12 @@ import { useRouter } from 'next/navigation'
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening' | 'manual'
 
-const TIME_OPTIONS: { value: TimeOption; label: string; emoji: string }[] = [
-  { value: 'morning', label: 'Morgen', emoji: '🌅' },
-  { value: 'midday', label: 'Formiddag', emoji: '☀️' },
-  { value: 'afternoon', label: 'Ettermiddag', emoji: '🌤️' },
-  { value: 'evening', label: 'Kveld', emoji: '🌙' },
-  { value: 'manual', label: 'Jeg velger selv', emoji: '🎯' },
+const TIME_OPTIONS: { value: TimeOption; label: string; hint: string; emoji: string }[] = [
+  { value: 'morning', label: 'Morgen', hint: 'kl 08 · kl 09 i helg', emoji: '🌅' },
+  { value: 'midday', label: 'Formiddag', hint: 'kl 11', emoji: '☀️' },
+  { value: 'afternoon', label: 'Ettermiddag', hint: 'kl 15', emoji: '🌤️' },
+  { value: 'evening', label: 'Kveld', hint: 'kl 19', emoji: '🌙' },
+  { value: 'manual', label: 'Jeg velger selv', hint: 'ingen varsler', emoji: '🎯' },
 ]
 
 export default function OnboardingPage() {
@@ -134,7 +134,10 @@ export default function OnboardingPage() {
                   : 'border-gray-700 bg-gray-800 text-gray-300 hover:border-gray-500'}`}
             >
               <span className="text-xl">{opt.emoji}</span>
-              <span className="font-medium">{opt.label}</span>
+              <div>
+                <div className="font-medium">{opt.label}</div>
+                <div className="text-xs text-gray-500">{opt.hint}</div>
+              </div>
             </button>
           ))}
         </div>

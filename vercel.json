@@ -1,8 +1,9 @@
 {
   "crons": [
-    {
-      "path": "/api/cron/daily-reminder",
-      "schedule": "0 5,9,13,17 * * *"
-    }
+    { "path": "/api/cron/daily-reminder", "schedule": "0 6 * * 1-5" },
+    { "path": "/api/cron/daily-reminder", "schedule": "0 7 * * 0,6" },
+    { "path": "/api/cron/daily-reminder", "schedule": "0 9 * * *" },
+    { "path": "/api/cron/daily-reminder", "schedule": "0 13 * * *" },
+    { "path": "/api/cron/daily-reminder", "schedule": "0 17 * * *" }
   ]
 }

@@ -37,8 +37,10 @@ const MESSAGES: Record<string, string[]> = {
 }
 
 // Norsk time (UTC+2) → preferred_time
+// Morgen: kl 08 hverdager, kl 09 helg (begge mapper til 'morning')
 const HOUR_TO_TIME: Record<number, string> = {
-  7: 'morning',
+  8: 'morning',
+  9: 'morning',
   11: 'midday',
   15: 'afternoon',
   19: 'evening',
