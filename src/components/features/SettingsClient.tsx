@@ -4,6 +4,12 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
+declare global {
+  interface Window {
+    OneSignalDeferred: ((os: any) => void)[]
+  }
+}
+
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
 const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
@@ -18,12 +24,38 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
+  const [hasOnesignalId, setHasOnesignalId] = useState(!!profile?.onesignal_id)
+  const [activating, setActivating] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const router = useRouter()
   const supabase = createClient()
+
+  async function activatePush() {
+    setActivating(true)
+    try {
+      await Promise.race([
+        new Promise<void>(resolve => {
+          window.OneSignalDeferred = window.OneSignalDeferred || []
+          window.OneSignalDeferred.push(async (OneSignal: any) => {
+            try {
+              await OneSignal.User.PushSubscription.optIn()
+              const id = OneSignal.User.PushSubscription.id
+              if (id) {
+                await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+                setHasOnesignalId(true)
+              }
+            } catch {}
+            resolve()
+          })
+        }),
+        new Promise<void>(resolve => setTimeout(resolve, 5000)),
+      ])
+    } catch {}
+    setActivating(false)
+  }
 
   function toggleTime(val: TimeOption) {
     setPreferredTimes(prev =>
@@ -101,6 +133,16 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         </div>
+
+        {pushEnabled && !hasOnesignalId && (
+          <button
+            onClick={activatePush}
+            disabled={activating}
+            className="w-full bg-orange-500/20 border border-orange-500/40 text-orange-400 rounded-xl py-2 text-sm font-medium transition hover:bg-orange-500/30 disabled:opacity-50"
+          >
+            {activating ? 'Aktiverer...' : '🔔 Trykk her for å aktivere push på denne enheten'}
+          </button>
+        )}
 
         {pushEnabled && (
           <div className="space-y-2">

@@ -9,7 +9,7 @@ export default async function SettingsPage() {
 
   const { data: profile } = await supabase
     .from('users')
-    .select('display_name, notifications_enabled, push_enabled, preferred_times')
+    .select('display_name, notifications_enabled, push_enabled, preferred_times, onesignal_id')
     .eq('id', user.id)
     .single()
 
