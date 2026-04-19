@@ -21,6 +21,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
   const [hasOnesignalId, setHasOnesignalId] = useState(!!profile?.onesignal_id)
   const [activating, setActivating] = useState(false)
+  const [activateError, setActivateError] = useState('')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
@@ -30,38 +31,36 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
 
   async function activatePush() {
     setActivating(true)
+    setActivateError('')
+    let saved = false
     try {
+      const permission = await Notification.requestPermission()
+      if (permission !== 'granted') {
+        setActivateError('Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler')
+        setActivating(false)
+        return
+      }
       await new Promise<void>(resolve => {
         window.OneSignalDeferred = window.OneSignalDeferred || []
         window.OneSignalDeferred.push(async (OneSignal: any) => {
-          async function saveId(id: string | null) {
-            if (!id) return false
-            await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
-            setHasOnesignalId(true)
-            return true
-          }
-
-          // Lytt på change-event (iOS tildeler ID asynkront)
-          OneSignal.User.PushSubscription.addEventListener('change', async () => {
-            await saveId(OneSignal.User.PushSubscription.id)
-            resolve()
-          })
-
           await OneSignal.User.PushSubscription.optIn()
-
-          // Sjekk om ID allerede finnes (Android/desktop tildeler umiddelbart)
-          const saved = await saveId(OneSignal.User.PushSubscription.id)
-          if (saved) resolve()
-
-          // Retry etter 3s og 8s som fallback
-          setTimeout(async () => {
-            const saved = await saveId(OneSignal.User.PushSubscription.id)
-            if (saved) resolve()
-          }, 3000)
-          setTimeout(() => resolve(), 8000)
+          const tryId = async () => {
+            const id = OneSignal.User.PushSubscription.id
+            if (id) {
+              await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+              setHasOnesignalId(true)
+              saved = true
+              resolve()
+            }
+          }
+          OneSignal.User.PushSubscription.addEventListener('change', tryId)
+          await tryId()
+          setTimeout(tryId, 3000)
+          setTimeout(resolve, 5000)
         })
       })
     } catch {}
+    if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
     setActivating(false)
   }
 
@@ -143,13 +142,16 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         </div>
 
         {pushEnabled && !hasOnesignalId && (
-          <button
-            onClick={activatePush}
-            disabled={activating}
-            className="w-full bg-orange-500/20 border border-orange-500/40 text-orange-400 rounded-xl py-2 text-sm font-medium transition hover:bg-orange-500/30 disabled:opacity-50"
-          >
-            {activating ? 'Aktiverer...' : '🔔 Trykk her for å aktivere push på denne enheten'}
-          </button>
+          <div className="space-y-2">
+            <button
+              onClick={activatePush}
+              disabled={activating}
+              className="w-full bg-orange-500/20 border border-orange-500/40 text-orange-400 rounded-xl py-2 text-sm font-medium transition hover:bg-orange-500/30 disabled:opacity-50"
+            >
+              {activating ? 'Aktiverer...' : '🔔 Trykk her for å aktivere push på denne enheten'}
+            </button>
+            {activateError && <p className="text-xs text-red-400 text-center">{activateError}</p>}
+          </div>
         )}
 
         {pushEnabled && (
