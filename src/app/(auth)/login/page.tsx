@@ -1,30 +1,41 @@
 'use client'
 
 import { useState, Suspense } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Logo from '@/components/ui/Logo'
 
 function LoginForm() {
   const [email, setEmail] = useState('')
-  const [sent, setSent] = useState(false)
+  const [code, setCode] = useState('')
+  const [step, setStep] = useState<'email' | 'code'>('email')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const searchParams = useSearchParams()
   const authError = searchParams.get('error') === 'auth'
+  const router = useRouter()
   const supabase = createClient()
 
-  async function sendMagicLink() {
+  async function sendCode() {
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${location.origin}/auth/confirm` },
-    })
+    const { error } = await supabase.auth.signInWithOtp({ email })
     if (error) {
       setError(error.message)
     } else {
-      setSent(true)
+      setStep('code')
+    }
+    setLoading(false)
+  }
+
+  async function verifyCode() {
+    setLoading(true)
+    setError('')
+    const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
+    if (error) {
+      setError('Feil kode. Prøv igjen eller be om ny kode.')
+    } else {
+      router.replace('/')
     }
     setLoading(false)
   }
@@ -41,27 +52,13 @@ function LoginForm() {
         </div>
 
         {authError && (
-          <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm text-center">
-            Innloggingslenken er utløpt eller ugyldig. Send en ny nedenfor.
+          <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm text-center mb-4">
+            Innloggingen feilet. Prøv på nytt.
           </div>
         )}
 
         <div className="bg-gray-900 rounded-2xl p-6 space-y-4">
-          {sent ? (
-            <div className="text-center space-y-3">
-              <p className="text-2xl">📬</p>
-              <p className="text-white font-semibold">Sjekk innboksen din</p>
-              <p className="text-gray-400 text-sm">
-                Vi har sendt en innloggingslenke til <span className="text-white">{email}</span>
-              </p>
-              <button
-                onClick={() => { setSent(false); setEmail('') }}
-                className="text-gray-500 text-sm hover:text-white transition"
-              >
-                Bruk en annen e-post
-              </button>
-            </div>
-          ) : (
+          {step === 'email' ? (
             <>
               <div>
                 <label className="block text-sm text-gray-400 mb-1">E-postadresse</label>
@@ -70,17 +67,57 @@ function LoginForm() {
                   placeholder="deg@eksempel.no"
                   value={email}
                   onChange={e => setEmail(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && sendMagicLink()}
+                  onKeyDown={e => e.key === 'Enter' && email.includes('@') && sendCode()}
                   className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500"
+                  autoFocus
                 />
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button
-                onClick={sendMagicLink}
+                onClick={sendCode}
                 disabled={loading || !email.includes('@')}
                 className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
               >
-                {loading ? 'Sender...' : 'Send innloggingslenke'}
+                {loading ? 'Sender...' : 'Send kode'}
+              </button>
+            </>
+          ) : (
+            <>
+              <div className="text-center space-y-1">
+                <p className="text-2xl">📬</p>
+                <p className="text-white font-semibold">Sjekk innboksen din</p>
+                <p className="text-gray-400 text-sm">
+                  Vi sendte en 6-sifret kode til <span className="text-white">{email}</span>
+                </p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Kode</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  placeholder="123456"
+                  maxLength={6}
+                  value={code}
+                  onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
+                  onKeyDown={e => e.key === 'Enter' && code.length === 6 && verifyCode()}
+                  className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500 text-center text-2xl tracking-widest"
+                  autoFocus
+                />
+              </div>
+              {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+              <button
+                onClick={verifyCode}
+                disabled={loading || code.length !== 6}
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+              >
+                {loading ? 'Verifiserer...' : 'Logg inn'}
+              </button>
+              <button
+                onClick={() => { setStep('email'); setCode(''); setError('') }}
+                className="w-full text-gray-500 text-sm hover:text-white transition"
+              >
+                ← Bruk annen e-post
               </button>
             </>
           )}
