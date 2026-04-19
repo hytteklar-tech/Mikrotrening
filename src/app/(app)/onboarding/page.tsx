@@ -18,6 +18,7 @@ export default function OnboardingPage() {
   const [name, setName] = useState('')
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
   const [loading, setLoading] = useState(false)
+  const [debugMsg, setDebugMsg] = useState('')
   const router = useRouter()
   const supabase = createClient()
 
@@ -43,29 +44,35 @@ export default function OnboardingPage() {
     }
     let granted = false
     try {
-      // Vent på at OneSignal er initialisert (maks 5 sek), kall så optIn()
+      setDebugMsg('Venter på OneSignal...')
       await Promise.race([
         new Promise<void>(resolve => {
           window.OneSignalDeferred = window.OneSignalDeferred || []
           window.OneSignalDeferred.push(async (OneSignal: any) => {
             try {
+              setDebugMsg('Kaller optIn...')
               await OneSignal.User.PushSubscription.optIn()
               const id = OneSignal.User.PushSubscription.id
+              setDebugMsg(`ID: ${id ?? 'null'}`)
               if (id) {
                 const supabase = createClient()
                 const { data: { user } } = await supabase.auth.getUser()
                 if (user) {
                   await supabase.from('users').update({ onesignal_id: id }).eq('id', user.id)
+                  setDebugMsg(`Lagret: ${id.slice(0, 8)}...`)
                 }
               }
-            } catch {}
+            } catch (e: any) {
+              setDebugMsg(`Feil: ${e?.message ?? 'ukjent'}`)
+            }
             resolve()
           })
         }),
-        new Promise<void>(resolve => setTimeout(resolve, 5000)),
+        new Promise<void>(resolve => setTimeout(() => { setDebugMsg('Timeout etter 5s'); resolve() }, 5000)),
       ])
       granted = Notification.permission === 'granted'
-    } catch {
+    } catch (e: any) {
+      setDebugMsg(`Catch: ${e?.message}`)
       granted = false
     }
     await finish(granted)
@@ -185,6 +192,7 @@ export default function OnboardingPage() {
           En liten dytt på rett tidspunkt. Ikke stress — bare en invitasjon.
         </p>
       </div>
+      {debugMsg && <p className="text-yellow-400 text-xs text-center">{debugMsg}</p>}
       <div className="space-y-3">
         <button
           onClick={() => handleNotifications(true)}
