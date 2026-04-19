@@ -14,7 +14,6 @@ export default function OneSignalProvider() {
     window.OneSignalDeferred.push(async (OneSignal: OneSignalType) => {
       await OneSignal.init({
         appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!,
-        safari_web_id: process.env.NEXT_PUBLIC_ONESIGNAL_SAFARI_ID!,
         notifyButton: { enable: false },
       })
 
