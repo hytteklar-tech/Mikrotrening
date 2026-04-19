@@ -45,13 +45,16 @@ export default function OnboardingPage() {
     }
     let granted = false
     try {
-      await new Promise<void>(resolve => {
-        window.OneSignalDeferred = window.OneSignalDeferred || []
-        window.OneSignalDeferred.push(async (OneSignal) => {
-          await OneSignal.User.PushSubscription.optIn()
-          resolve()
-        })
-      })
+      await Promise.race([
+        new Promise<void>(resolve => {
+          window.OneSignalDeferred = window.OneSignalDeferred || []
+          window.OneSignalDeferred.push(async (OneSignal) => {
+            await OneSignal.User.PushSubscription.optIn()
+            resolve()
+          })
+        }),
+        new Promise<void>(resolve => setTimeout(resolve, 5000)),
+      ])
       granted = Notification.permission === 'granted'
     } catch {
       granted = false
