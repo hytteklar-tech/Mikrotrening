@@ -17,7 +17,6 @@ export default function OnboardingPage() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
-  const [notifGranted, setNotifGranted] = useState<boolean | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -32,35 +31,38 @@ export default function OnboardingPage() {
         notifications_enabled: notificationsEnabled,
       }).eq('id', user.id)
     }
-    setLoading(false)
     router.push('/')
     router.refresh()
   }
 
   async function handleNotifications(want: boolean) {
+    setLoading(true)
     if (!want) {
-      setNotifGranted(false)
       await finish(false)
       return
     }
+    // Be om tillatelse direkte fra nettleseren — blokkerer ikke
     let granted = false
     try {
-      await Promise.race([
-        new Promise<void>(resolve => {
-          window.OneSignalDeferred = window.OneSignalDeferred || []
-          window.OneSignalDeferred.push(async (OneSignal) => {
-            await OneSignal.User.PushSubscription.optIn()
-            resolve()
-          })
-        }),
-        new Promise<void>(resolve => setTimeout(resolve, 5000)),
-      ])
-      granted = Notification.permission === 'granted'
+      const permission = await Notification.requestPermission()
+      granted = permission === 'granted'
+      if (granted) {
+        // Registrer med OneSignal i bakgrunnen etter at siden er ferdig
+        window.OneSignalDeferred = window.OneSignalDeferred || []
+        window.OneSignalDeferred.push(async (OneSignal: any) => {
+          try { await OneSignal.User.PushSubscription.optIn() } catch {}
+        })
+      }
     } catch {
       granted = false
     }
-    setNotifGranted(granted)
     await finish(granted)
+  }
+
+  function toggleTime(val: TimeOption) {
+    setPreferredTimes(prev =>
+      prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
+    )
   }
 
   // Steg 1: Velkomst
@@ -112,6 +114,7 @@ export default function OnboardingPage() {
         >
           Neste
         </button>
+        <BackButton onClick={() => setStep(1)} />
         <StepDots current={2} total={4} />
       </Screen>
     )
@@ -119,12 +122,6 @@ export default function OnboardingPage() {
 
   // Steg 3: Habit-anker (multiselekt)
   if (step === 3) {
-    function toggleTime(val: TimeOption) {
-      setPreferredTimes(prev =>
-        prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
-      )
-    }
-
     return (
       <Screen>
         <div className="text-center space-y-2">
@@ -160,6 +157,7 @@ export default function OnboardingPage() {
         >
           Neste
         </button>
+        <BackButton onClick={() => setStep(2)} />
         <StepDots current={3} total={4} />
       </Screen>
     )
@@ -191,6 +189,7 @@ export default function OnboardingPage() {
           Ikke nå
         </button>
       </div>
+      <BackButton onClick={() => setStep(3)} disabled={loading} />
       <StepDots current={4} total={4} />
     </Screen>
   )
@@ -203,6 +202,18 @@ function Screen({ children }: { children: React.ReactNode }) {
         {children}
       </div>
     </div>
+  )
+}
+
+function BackButton({ onClick, disabled }: { onClick: () => void; disabled?: boolean }) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className="w-full text-gray-500 hover:text-gray-300 disabled:opacity-30 text-sm py-1 transition"
+    >
+      ← Tilbake
+    </button>
   )
 }
 
