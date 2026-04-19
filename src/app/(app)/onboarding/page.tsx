@@ -83,11 +83,11 @@ export default function OnboardingPage() {
         <div className="text-center space-y-4">
           <div className="text-6xl">💪</div>
           <h1 className="text-2xl font-bold text-white leading-snug">
-            Små bevegelser.<br />
-            <span className="text-orange-400">Stor forskjell.</span>
+            Mikrotrening passer inn<br />
+            <span className="text-orange-400">overalt.</span>
           </h1>
           <p className="text-gray-400 text-sm leading-relaxed">
-            3 korte økter om dagen gir mer energi<br />og en vane som faktisk holder.<br /><br />Ingen utstyr. Bare 30 sekunder.
+            På kjøkkenet. På kontoret. Mellom møter.<br /><br />30 sekunder er nok til å gjøre en forskjell.
           </p>
         </div>
         <button
