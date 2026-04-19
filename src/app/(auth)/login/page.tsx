@@ -96,11 +96,11 @@ function LoginForm() {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  placeholder="123456"
-                  maxLength={6}
+                  placeholder="12345678"
+                  maxLength={8}
                   value={code}
                   onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
-                  onKeyDown={e => e.key === 'Enter' && code.length === 6 && verifyCode()}
+                  onKeyDown={e => e.key === 'Enter' && code.length >= 6 && verifyCode()}
                   className="w-full bg-gray-800 text-white rounded-xl px-4 py-3 outline-none focus:ring-2 focus:ring-orange-500 text-center text-2xl tracking-widest"
                   autoFocus
                 />
@@ -108,7 +108,7 @@ function LoginForm() {
               {error && <p className="text-red-400 text-sm text-center">{error}</p>}
               <button
                 onClick={verifyCode}
-                disabled={loading || code.length !== 6}
+                disabled={loading || code.length < 6}
                 className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
               >
                 {loading ? 'Verifiserer...' : 'Logg inn'}
