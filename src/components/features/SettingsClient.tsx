@@ -36,7 +36,11 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     try {
       const permission = await Notification.requestPermission()
       if (permission !== 'granted') {
-        setActivateError('Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler')
+        const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+        setActivateError(isIos
+          ? 'Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler'
+          : 'Tillat varsler ved å klikke hengelåsen i adressefeltet → Varsler → Tillat'
+        )
         setActivating(false)
         return
       }
