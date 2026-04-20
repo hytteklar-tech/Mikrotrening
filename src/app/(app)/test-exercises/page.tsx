@@ -28,7 +28,7 @@ function ExerciseMedia({ src, alt, className }: { src: string; alt: string; clas
   return <img src={src} alt={alt} className={className} loading="lazy" />
 }
 
-const MUSCLE_GROUPS = ['alle', 'bryst', 'ben'] as const
+const MUSCLE_GROUPS = ['alle', ...Object.keys(MUSCLE_GROUP_LABELS)] as const
 const LABELS: Record<string, string> = { alle: 'Alle', ...MUSCLE_GROUP_LABELS }
 
 const LEVEL_COLORS: Record<string, string> = {
@@ -48,6 +48,8 @@ export default function TestExercisesPage() {
   const [searchInput, setSearchInput] = useState('')
   const [selected, setSelected] = useState<Exercise | null>(null)
   const [speed, setSpeed] = useState(0.1)
+  const [selectMode, setSelectMode] = useState(false)
+  const [picked, setPicked] = useState<Set<string>>(new Set())
   const modalVideoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
@@ -65,11 +67,39 @@ export default function TestExercisesPage() {
     setSearch(searchInput)
   }
 
+  function togglePick(id: string) {
+    setPicked(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function handleCardClick(ex: Exercise) {
+    if (selectMode) {
+      togglePick(ex.id)
+    } else {
+      setSelected(ex)
+    }
+  }
+
+  const pickedExercises = exercises.filter(e => picked.has(e.id))
+
   return (
     <div className="p-4 space-y-4 pb-28">
-      <div className="pt-4">
-        <h1 className="text-2xl font-bold">Øvelsesbibliotek</h1>
-        <p className="text-gray-400 text-sm mt-1">{exercises.length} øvelser — trykk for detaljer</p>
+      <div className="pt-4 flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold">Øvelsesbibliotek</h1>
+          <p className="text-gray-400 text-sm mt-1">{exercises.length} øvelser — trykk for detaljer</p>
+        </div>
+        <button
+          onClick={() => { setSelectMode(v => !v); if (selectMode) setPicked(new Set()) }}
+          className={`px-3 py-1.5 rounded-full text-xs font-semibold transition ${
+            selectMode ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'
+          }`}
+        >
+          {selectMode ? 'Avbryt' : 'Velg'}
+        </button>
       </div>
 
       {/* Søk */}
@@ -110,27 +140,64 @@ export default function TestExercisesPage() {
 
       {/* Grid */}
       <div className="grid grid-cols-2 gap-3">
-        {filtered.map(ex => (
-          <button
-            key={ex.id}
-            onClick={() => setSelected(ex)}
-            className="bg-gray-800 rounded-2xl overflow-hidden text-left hover:ring-2 hover:ring-orange-500 transition"
-          >
-            <ExerciseMedia
-              src={ex.image}
-              alt={ex.name}
-              className="w-full aspect-square object-cover bg-gray-700"
-            />
-            <div className="p-2">
-              <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
-              <p className="text-gray-500 text-xs capitalize mt-0.5">{LABELS[ex.muscleGroup] ?? ex.muscleGroup}</p>
-            </div>
-          </button>
-        ))}
+        {filtered.map(ex => {
+          const isPicked = picked.has(ex.id)
+          return (
+            <button
+              key={ex.id}
+              onClick={() => handleCardClick(ex)}
+              className={`bg-gray-800 rounded-2xl overflow-hidden text-left transition relative ${
+                isPicked
+                  ? 'ring-2 ring-orange-500'
+                  : 'hover:ring-2 hover:ring-orange-500'
+              }`}
+            >
+              {selectMode && (
+                <div className={`absolute top-2 right-2 z-10 w-5 h-5 rounded-full border-2 flex items-center justify-center transition ${
+                  isPicked ? 'bg-orange-500 border-orange-500' : 'border-gray-400 bg-black/40'
+                }`}>
+                  {isPicked && <span className="text-white text-xs leading-none">✓</span>}
+                </div>
+              )}
+              <ExerciseMedia
+                src={ex.image}
+                alt={ex.name}
+                className="w-full aspect-square object-cover bg-gray-700"
+              />
+              <div className="p-2">
+                <p className="text-white text-xs font-semibold capitalize leading-tight">{ex.name}</p>
+                <p className="text-gray-500 text-xs capitalize mt-0.5">{LABELS[ex.muscleGroup] ?? ex.muscleGroup}</p>
+              </div>
+            </button>
+          )
+        })}
       </div>
 
       {filtered.length === 0 && (
         <p className="text-gray-500 text-center py-12 text-sm">Ingen øvelser funnet</p>
+      )}
+
+      {/* Valg-bar */}
+      {selectMode && picked.size > 0 && (
+        <div className="fixed bottom-20 left-0 right-0 px-4 z-40">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-4 flex items-center justify-between shadow-xl">
+            <div>
+              <p className="text-white font-semibold text-sm">{picked.size} øvelse{picked.size !== 1 ? 'r' : ''} valgt</p>
+              <p className="text-gray-400 text-xs mt-0.5 truncate max-w-[200px]">
+                {pickedExercises.map(e => e.name).join(', ')}
+              </p>
+            </div>
+            <button
+              onClick={() => {
+                // TODO: koble til treningspakke
+                alert(`Valgte:\n${pickedExercises.map(e => e.name).join('\n')}`)
+              }}
+              className="bg-orange-500 text-white px-4 py-2 rounded-xl text-sm font-semibold ml-4 shrink-0"
+            >
+              Bruk disse
+            </button>
+          </div>
+        </div>
       )}
 
       {/* Detalj-modal */}

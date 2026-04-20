@@ -1,9 +1,3 @@
-// Generert av scripts/download-exercises.mjs
-// Kjør scriptet på nytt for å oppdatere: node scripts/download-exercises.mjs
-//
-// NB: Bytt ut bildene i public/exercises/ med Gym Visual GIF-er.
-// Hold filnavnene like (bruk samme id-slug).
-
 export type Exercise = {
   id: string
   name: string
@@ -17,14 +11,14 @@ export type Exercise = {
 
 export const exercises: Exercise[] = [
   {
-    "id": "archer-push-up",
-    "name": "Bueskytter push-up",
-    "muscleGroup": "bryst",
-    "image": "/exercises/archer-push-up.mp4",
-    "equipment": "body only",
-    "level": "intermediate",
-    "primaryMuscles": ["chest"],
-    "description": [
+    id: "archer-push-up",
+    name: "Bueskytter push-up",
+    muscleGroup: "bryst",
+    image: "/exercises/archer-push-up.mp4",
+    equipment: "body only",
+    level: "intermediate",
+    primaryMuscles: ["chest"],
+    description: [
       "Start i vanlig push-up posisjon med hendene litt bredere enn skulderbredde.",
       "Senk deg ned mot én hånd mens den andre armen strekkes rett ut til siden.",
       "Skyv deg opp igjen til startposisjon.",
@@ -32,14 +26,14 @@ export const exercises: Exercise[] = [
     ]
   },
   {
-    "id": "bird-dog-push-up",
-    "name": "Fuglehund push-up",
-    "muscleGroup": "bryst",
-    "image": "/exercises/bird-dog-push-up.mp4",
-    "equipment": "body only",
-    "level": "intermediate",
-    "primaryMuscles": ["chest"],
-    "description": [
+    id: "bird-dog-push-up",
+    name: "Fuglehund push-up",
+    muscleGroup: "bryst",
+    image: "/exercises/bird-dog-push-up.mp4",
+    equipment: "body only",
+    level: "intermediate",
+    primaryMuscles: ["chest"],
+    description: [
       "Start i push-up posisjon med rett kropp fra hode til hæl.",
       "Gjør én push-up ned og opp.",
       "Løft venstre arm og høyre ben samtidig — strekk dem ut og hold 1 sekund.",
@@ -47,14 +41,14 @@ export const exercises: Exercise[] = [
     ]
   },
   {
-    "id": "bent-side-knee-push-up",
-    "name": "Push-up på knær",
-    "muscleGroup": "bryst",
-    "image": "/exercises/bent-side-knee-push-up.mp4",
-    "equipment": "body only",
-    "level": "beginner",
-    "primaryMuscles": ["chest"],
-    "description": [
+    id: "bent-side-knee-push-up",
+    name: "Push-up på knær",
+    muscleGroup: "bryst",
+    image: "/exercises/bent-side-knee-push-up.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["chest"],
+    description: [
       "Start på knærne i push-up posisjon med hendene skulderbredde fra hverandre.",
       "Plasser ett kne ute til siden for balanse.",
       "Senk brystet kontrollert mot gulvet.",
@@ -62,338 +56,178 @@ export const exercises: Exercise[] = [
     ]
   },
   {
-    "id": "alternating-floor-press",
-    "name": "Alternating Floor Press",
-    "muscleGroup": "bryst",
-    "image": "/exercises/alternating-floor-press.jpg",
-    "equipment": "kettlebells",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "barbell-bench-press",
+    name: "Benkpress med stang",
+    muscleGroup: "bryst",
+    image: "/exercises/barbell-bench-press.mp4",
+    equipment: "barbell",
+    level: "intermediate",
+    primaryMuscles: ["chest"],
+    description: [
+      "Ligg flat på benken med føttene i gulvet og ryggen mot benken.",
+      "Grip stangen litt bredere enn skulderbredde med overgrep.",
+      "Løft stangen av stativet og hold den rett over brystet.",
+      "Senk stangen kontrollert mot brystet, hold albuene let inn.",
+      "Press stangen tilbake til startposisjon med strake armer."
     ]
   },
   {
-    "id": "around-the-worlds",
-    "name": "Around The Worlds",
-    "muscleGroup": "bryst",
-    "image": "/exercises/around-the-worlds.jpg",
-    "equipment": "dumbbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "chest"
+    id: "clock-push-up",
+    name: "Klokke push-up",
+    muscleGroup: "bryst",
+    image: "/exercises/clock-push-up.mp4",
+    equipment: "body only",
+    level: "intermediate",
+    primaryMuscles: ["chest"],
+    description: [
+      "Start i vanlig push-up posisjon.",
+      "Gjør en push-up, og flytt deretter én hånd ett skritt i klokkebevegelse.",
+      "Fortsett rundt hele 'klokken' — trener brystet fra alle vinkler.",
+      "Hold kroppen strak og core spent gjennom hele øvelsen."
     ]
   },
   {
-    "id": "barbell-bench-press-medium-grip",
-    "name": "Barbell Bench Press - Medium Grip",
-    "muscleGroup": "bryst",
-    "image": "/exercises/barbell-bench-press-medium-grip.jpg",
-    "equipment": "barbell",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "cobra-push-up",
+    name: "Kobra push-up",
+    muscleGroup: "bryst",
+    image: "/exercises/cobra-push-up.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["chest"],
+    description: [
+      "Start liggende på magen med hendene ved siden av brystet.",
+      "Press deg opp og strekk armene, løft hoften og skyv bakover som en kobra.",
+      "Senk deg kontrollert ned og forover til startposisjon.",
+      "Kombinerer brystpress med dynamisk skulder- og ryggjobb."
     ]
   },
   {
-    "id": "barbell-guillotine-bench-press",
-    "name": "Barbell Guillotine Bench Press",
-    "muscleGroup": "bryst",
-    "image": "/exercises/barbell-guillotine-bench-press.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "chest"
+    id: "negative-push-up",
+    name: "Negativ push-up",
+    muscleGroup: "bryst",
+    image: "/exercises/negative-push-up.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["chest"],
+    description: [
+      "Start øverst i push-up posisjon med strake armer.",
+      "Senk deg svært sakte ned mot gulvet — bruk 3–5 sekunder.",
+      "Når du når bunnen, senk knærne og reset til toppen.",
+      "Den sakte nedsenkningen bygger styrke i bryst og triceps raskt."
     ]
   },
   {
-    "id": "barbell-incline-bench-press-medium-grip",
-    "name": "Barbell Incline Bench Press - Medium Grip",
-    "muscleGroup": "bryst",
-    "image": "/exercises/barbell-incline-bench-press-medium-grip.jpg",
-    "equipment": "barbell",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "kneeling-shoulder-tap",
+    name: "Skuldertap på knær",
+    muscleGroup: "bryst",
+    image: "/exercises/kneeling-shoulder-tap.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["chest"],
+    description: [
+      "Start i push-up posisjon på knærne med rett rygg.",
+      "Gjør en push-up ned og opp.",
+      "Løft én hånd og tapp motsatt skulder, hold balansen.",
+      "Gjenta og veksle side. Trener bryst og core-stabilitet."
     ]
   },
   {
-    "id": "behind-head-chest-stretch",
-    "name": "Behind Head Chest Stretch",
-    "muscleGroup": "bryst",
-    "image": "/exercises/behind-head-chest-stretch.jpg",
-    "equipment": "other",
-    "level": "expert",
-    "primaryMuscles": [
-      "chest"
+    id: "lying-floor-fly",
+    name: "Gulvfly",
+    muscleGroup: "bryst",
+    image: "/exercises/lying-floor-fly.mp4",
+    equipment: "dumbbell",
+    level: "intermediate",
+    primaryMuscles: ["chest"],
+    description: [
+      "Ligg på ryggen på gulvet med en manuell i hver hånd.",
+      "Start med armene strakt opp over brystet, lett bøy i albuene.",
+      "Senk armene ut til siden til albuene nesten treffer gulvet.",
+      "Klem brystet og løft tilbake til startposisjon."
     ]
   },
   {
-    "id": "bench-press-with-bands",
-    "name": "Bench Press - With Bands",
-    "muscleGroup": "bryst",
-    "image": "/exercises/bench-press-with-bands.jpg",
-    "equipment": "bands",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "crunchy-frog-on-floor",
+    name: "Crunchy frog",
+    muscleGroup: "mage",
+    image: "/exercises/crunchy-frog-on-floor.mp4",
+    equipment: "body only",
+    level: "intermediate",
+    primaryMuscles: ["abs"],
+    description: [
+      "Sitt på gulvet, lene deg let bakover med føttene løftet fra gulvet.",
+      "Strekk armene og bena ut i en V-form.",
+      "Trekk knærne inn mot brystet og klem armene rundt dem.",
+      "Strekk ut igjen og gjenta. Gir intens mageaktivering."
     ]
   },
   {
-    "id": "bent-arm-dumbbell-pullover",
-    "name": "Bent-Arm Dumbbell Pullover",
-    "muscleGroup": "bryst",
-    "image": "/exercises/bent-arm-dumbbell-pullover.jpg",
-    "equipment": "dumbbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "chest"
+    id: "front-to-side-plank-female",
+    name: "Front- til sideplank",
+    muscleGroup: "mage",
+    image: "/exercises/front-to-side-plank-female.mp4",
+    equipment: "body only",
+    level: "intermediate",
+    primaryMuscles: ["abs"],
+    description: [
+      "Start i frontplank på underarmene med rett kropp.",
+      "Roter til sideplank — støtt på én underarm, kroppen sidelengs.",
+      "Hold et sekund, roter tilbake til frontplank.",
+      "Gjenta til andre side. Trener hele core, spesielt de skrå magemusklene."
     ]
   },
   {
-    "id": "bodyweight-flyes",
-    "name": "Bodyweight Flyes",
-    "muscleGroup": "bryst",
-    "image": "/exercises/bodyweight-flyes.jpg",
-    "equipment": "e-z curl bar",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "chest"
+    id: "floor-hyperextension-female",
+    name: "Rygghev på gulv",
+    muscleGroup: "hofter",
+    image: "/exercises/floor-hyperextension-female.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["lower back"],
+    description: [
+      "Ligg på magen med armene langs siden eller under haken.",
+      "Løft overkroppen og ev. bena forsiktig opp fra gulvet.",
+      "Hold et sekund øverst, senk kontrollert ned.",
+      "Styrker korsryggen og setemuskulaturen."
     ]
   },
   {
-    "id": "butterfly",
-    "name": "Butterfly",
-    "muscleGroup": "bryst",
-    "image": "/exercises/butterfly.jpg",
-    "equipment": "machine",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "lying-prone-w-to-y",
+    name: "W-til-Y ryggøvelse",
+    muscleGroup: "rygg",
+    image: "/exercises/lying-prone-w-to-y.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["upper back"],
+    description: [
+      "Ligg på magen med armene bøyd i 90 grader (W-form).",
+      "Løft armene fra gulvet og press skulderbladene sammen.",
+      "Strekk armene ut og opp til Y-form over hodet.",
+      "Senk tilbake til W. Styrker øvre rygg og stabiliserer skuldrene."
     ]
   },
   {
-    "id": "cable-chest-press",
-    "name": "Cable Chest Press",
-    "muscleGroup": "bryst",
-    "image": "/exercises/cable-chest-press.jpg",
-    "equipment": "cable",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
+    id: "standing-calf-raise-on-a-staircase-female",
+    name: "Tåhev på trapp",
+    muscleGroup: "legger",
+    image: "/exercises/standing-calf-raise-on-a-staircase-female.mp4",
+    equipment: "body only",
+    level: "beginner",
+    primaryMuscles: ["calves"],
+    description: [
+      "Stå på kanten av et trinn med hælen hengende fritt.",
+      "Senk hælen under trinnkanten for å strekke leggene.",
+      "Press deg opp på tå så høyt som mulig.",
+      "Senk kontrollert tilbake. Full bevegelsesbane gir maksimal leggtreningseffekt."
     ]
   },
-  {
-    "id": "cable-crossover",
-    "name": "Cable Crossover",
-    "muscleGroup": "bryst",
-    "image": "/exercises/cable-crossover.jpg",
-    "equipment": "cable",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
-    ]
-  },
-  {
-    "id": "cable-iron-cross",
-    "name": "Cable Iron Cross",
-    "muscleGroup": "bryst",
-    "image": "/exercises/cable-iron-cross.jpg",
-    "equipment": "cable",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
-    ]
-  },
-  {
-    "id": "chain-press",
-    "name": "Chain Press",
-    "muscleGroup": "bryst",
-    "image": "/exercises/chain-press.jpg",
-    "equipment": "other",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "chest"
-    ]
-  },
-  {
-    "id": "chest-and-front-of-shoulder-stretch",
-    "name": "Chest And Front Of Shoulder Stretch",
-    "muscleGroup": "bryst",
-    "image": "/exercises/chest-and-front-of-shoulder-stretch.jpg",
-    "equipment": "other",
-    "level": "beginner",
-    "primaryMuscles": [
-      "chest"
-    ]
-  },
-  {
-    "id": "90-90-hamstring",
-    "name": "90/90 Hamstring",
-    "muscleGroup": "ben",
-    "image": "/exercises/90-90-hamstring.jpg",
-    "equipment": "body only",
-    "level": "beginner",
-    "primaryMuscles": [
-      "hamstrings"
-    ]
-  },
-  {
-    "id": "all-fours-quad-stretch",
-    "name": "All Fours Quad Stretch",
-    "muscleGroup": "ben",
-    "image": "/exercises/all-fours-quad-stretch.jpg",
-    "equipment": "body only",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "alternate-leg-diagonal-bound",
-    "name": "Alternate Leg Diagonal Bound",
-    "muscleGroup": "ben",
-    "image": "/exercises/alternate-leg-diagonal-bound.jpg",
-    "equipment": null,
-    "level": "beginner",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "alternating-hang-clean",
-    "name": "Alternating Hang Clean",
-    "muscleGroup": "ben",
-    "image": "/exercises/alternating-hang-clean.jpg",
-    "equipment": "kettlebells",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "hamstrings"
-    ]
-  },
-  {
-    "id": "ankle-on-the-knee",
-    "name": "Ankle On The Knee",
-    "muscleGroup": "ben",
-    "image": "/exercises/ankle-on-the-knee.jpg",
-    "equipment": null,
-    "level": "beginner",
-    "primaryMuscles": [
-      "glutes"
-    ]
-  },
-  {
-    "id": "backward-drag",
-    "name": "Backward Drag",
-    "muscleGroup": "ben",
-    "image": "/exercises/backward-drag.jpg",
-    "equipment": "other",
-    "level": "beginner",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "ball-leg-curl",
-    "name": "Ball Leg Curl",
-    "muscleGroup": "ben",
-    "image": "/exercises/ball-leg-curl.jpg",
-    "equipment": "exercise ball",
-    "level": "beginner",
-    "primaryMuscles": [
-      "hamstrings"
-    ]
-  },
-  {
-    "id": "band-good-morning",
-    "name": "Band Good Morning",
-    "muscleGroup": "ben",
-    "image": "/exercises/band-good-morning.jpg",
-    "equipment": "bands",
-    "level": "beginner",
-    "primaryMuscles": [
-      "hamstrings"
-    ]
-  },
-  {
-    "id": "band-good-morning-pull-through",
-    "name": "Band Good Morning (Pull Through)",
-    "muscleGroup": "ben",
-    "image": "/exercises/band-good-morning-pull-through.jpg",
-    "equipment": "bands",
-    "level": "beginner",
-    "primaryMuscles": [
-      "hamstrings"
-    ]
-  },
-  {
-    "id": "barbell-full-squat",
-    "name": "Barbell Full Squat",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-full-squat.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "barbell-glute-bridge",
-    "name": "Barbell Glute Bridge",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-glute-bridge.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "glutes"
-    ]
-  },
-  {
-    "id": "barbell-hack-squat",
-    "name": "Barbell Hack Squat",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-hack-squat.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "barbell-hip-thrust",
-    "name": "Barbell Hip Thrust",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-hip-thrust.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "glutes"
-    ]
-  },
-  {
-    "id": "barbell-lunge",
-    "name": "Barbell Lunge",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-lunge.jpg",
-    "equipment": "barbell",
-    "level": "intermediate",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  },
-  {
-    "id": "barbell-side-split-squat",
-    "name": "Barbell Side Split Squat",
-    "muscleGroup": "ben",
-    "image": "/exercises/barbell-side-split-squat.jpg",
-    "equipment": "barbell",
-    "level": "beginner",
-    "primaryMuscles": [
-      "quadriceps"
-    ]
-  }
 ]
 
 export const MUSCLE_GROUP_LABELS: Record<string, string> = {
   bryst: 'Bryst',
+  mage: 'Mage',
+  rygg: 'Rygg',
+  hofter: 'Hofter',
+  legger: 'Legger',
   ben: 'Ben',
 }
