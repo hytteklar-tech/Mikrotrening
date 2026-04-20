@@ -9,7 +9,7 @@ function ExerciseMedia({ src, alt, className }: { src: string; alt: string; clas
   const videoRef = useRef<HTMLVideoElement>(null)
 
   useEffect(() => {
-    if (videoRef.current) videoRef.current.playbackRate = 0.1
+    if (videoRef.current) videoRef.current.playbackRate = 1
   }, [])
 
   if (isVideo) {
@@ -47,7 +47,7 @@ export default function TestExercisesPage() {
   const [search, setSearch] = useState('')
   const [searchInput, setSearchInput] = useState('')
   const [selected, setSelected] = useState<Exercise | null>(null)
-  const [speed, setSpeed] = useState(0.1)
+  const [speed, setSpeed] = useState(1)
   const [selectMode, setSelectMode] = useState(false)
   const [picked, setPicked] = useState<Set<string>>(new Set())
   const modalVideoRef = useRef<HTMLVideoElement>(null)
