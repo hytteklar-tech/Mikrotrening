@@ -64,7 +64,18 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         window.OneSignalDeferred = window.OneSignalDeferred || []
         window.OneSignalDeferred.push(async (OneSignal: any) => {
           clearTimeout(outerTimeout)
-          await OneSignal.User.PushSubscription.optIn()
+          setActivateError('Debug: OneSignal klar, kaller optIn...')
+          try {
+            await Promise.race([
+              OneSignal.User.PushSubscription.optIn(),
+              new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 6000)),
+            ])
+          } catch (e: any) {
+            setActivateError(`Debug: optIn feilet: ${e.message}`)
+            resolve()
+            return
+          }
+          setActivateError('Debug: optIn OK, henter ID...')
           const tryId = async () => {
             const id = OneSignal.User.PushSubscription.id
             if (id) {
