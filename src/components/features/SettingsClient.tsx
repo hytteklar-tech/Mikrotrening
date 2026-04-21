@@ -34,7 +34,18 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     setActivateError('')
     let saved = false
     try {
-      const permission = await Notification.requestPermission()
+      if (!('Notification' in window)) {
+        setActivateError('Push-varsler støttes ikke på denne enheten/nettleseren.')
+        setActivating(false)
+        return
+      }
+      console.log('[Push] Notification.permission før dialog:', Notification.permission)
+      const permission = await Promise.race([
+        Notification.requestPermission(),
+        new Promise<NotificationPermission>((_, reject) =>
+          setTimeout(() => reject(new Error('timeout')), 10000)
+        ),
+      ])
       if (permission !== 'granted') {
         const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
         setActivateError(isIos
