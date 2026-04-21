@@ -63,19 +63,29 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           return
         }
       }
-      setActivateError('Debug: kaller optIn direkte...')
-      try {
-        await Promise.race([
-          os.User.PushSubscription.optIn(),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 8000)),
-        ])
-      } catch (e: any) {
-        setActivateError(`Debug: optIn feilet: ${e.message}`)
-        setActivating(false)
-        return
+      // Sjekk om allerede abonnert (omgå optIn)
+      let id = os.User.PushSubscription.id
+      setActivateError(`Debug: id før optIn = ${id ?? 'null'}`)
+      if (!id) {
+        try {
+          await Promise.race([
+            os.User.PushSubscription.optIn(),
+            new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 8000)),
+          ])
+        } catch (e: any) {
+          // optIn feilet — prøv nativt PushManager
+        }
+        id = os.User.PushSubscription.id
       }
-      setActivateError('Debug: optIn OK, henter ID...')
-      const id = os.User.PushSubscription.id
+      // Fallback: hent direkte fra nettleserens PushManager
+      if (!id && 'serviceWorker' in navigator) {
+        try {
+          const reg = await navigator.serviceWorker.ready
+          const sub = await reg.pushManager.getSubscription()
+          setActivateError(`Debug: nativ sub = ${sub ? 'funnet' : 'null'}`)
+        } catch {}
+      }
+      setActivateError(`Debug: id etter alt = ${id ?? 'null'}`)
       if (id) {
         await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
         setHasOnesignalId(true)
