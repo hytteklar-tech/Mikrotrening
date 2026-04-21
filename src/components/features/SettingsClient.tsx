@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -22,6 +22,16 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [hasOnesignalId, setHasOnesignalId] = useState(!!profile?.onesignal_id)
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
+
+  // Absolutt sikkerhetsstopp — stopper spinneren uansett hva som henger
+  useEffect(() => {
+    if (!activating) return
+    const t = setTimeout(() => {
+      setActivating(false)
+      setActivateError('Tidsavbrudd. Prøv igjen eller restart appen.')
+    }, 20000)
+    return () => clearTimeout(t)
+  }, [activating])
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
