@@ -57,6 +57,7 @@ export default function OneSignalProvider() {
 declare global {
   interface Window {
     OneSignalDeferred: ((os: OneSignalType) => void)[]
+    OneSignal: OneSignalType
   }
 }
 

@@ -56,41 +56,43 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         setActivating(false)
         return
       }
-      await new Promise<void>(resolve => {
-        const outerTimeout = setTimeout(() => {
-          console.warn('[OneSignal] deferred callback aldri kalt — OneSignal ikke initialisert?')
-          resolve()
-        }, 8000)
-        window.OneSignalDeferred = window.OneSignalDeferred || []
-        window.OneSignalDeferred.push(async (OneSignal: any) => {
-          clearTimeout(outerTimeout)
-          setActivateError('Debug: OneSignal klar, kaller optIn...')
-          try {
-            await Promise.race([
-              OneSignal.User.PushSubscription.optIn(),
-              new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 6000)),
-            ])
-          } catch (e: any) {
-            setActivateError(`Debug: optIn feilet: ${e.message}`)
-            resolve()
-            return
-          }
-          setActivateError('Debug: optIn OK, henter ID...')
-          const tryId = async () => {
-            const id = OneSignal.User.PushSubscription.id
-            if (id) {
-              await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+      const os = (window as any).OneSignal
+      if (!os) {
+        setActivateError('OneSignal ikke lastet — prøv å laste siden på nytt.')
+        setActivating(false)
+        return
+      }
+      setActivateError('Debug: OneSignal klar, kaller optIn...')
+      try {
+        await Promise.race([
+          os.User.PushSubscription.optIn(),
+          new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 8000)),
+        ])
+      } catch (e: any) {
+        setActivateError(`Debug: optIn feilet: ${e.message}`)
+        setActivating(false)
+        return
+      }
+      setActivateError('Debug: optIn OK, henter ID...')
+      const id = os.User.PushSubscription.id
+      if (id) {
+        await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+        setHasOnesignalId(true)
+        saved = true
+      } else {
+        await new Promise<void>(resolve => {
+          os.User.PushSubscription.addEventListener('change', async () => {
+            const newId = os.User.PushSubscription.id
+            if (newId) {
+              await supabase.from('users').update({ onesignal_id: newId }).eq('id', userId)
               setHasOnesignalId(true)
               saved = true
               resolve()
             }
-          }
-          OneSignal.User.PushSubscription.addEventListener('change', tryId)
-          await tryId()
-          setTimeout(tryId, 3000)
+          })
           setTimeout(resolve, 5000)
         })
-      })
+      }
     } catch {}
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
     setActivating(false)
