@@ -62,10 +62,15 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
       if (isIos) {
         const reg = await navigator.serviceWorker.ready
         const existing = await reg.pushManager.getSubscription()
-        const sub = existing ?? await reg.pushManager.subscribe({
-          userVisibleOnly: true,
-          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-        })
+        const sub = existing ?? await Promise.race([
+          reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+          }),
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('PushManager.subscribe timed out')), 10000)
+          ),
+        ])
         await fetch('/api/push/subscribe', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
