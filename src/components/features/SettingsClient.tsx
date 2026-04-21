@@ -39,41 +39,31 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         setActivating(false)
         return
       }
-      setActivateError(`Debug: Notification.permission = ${Notification.permission}`)
-      const permission = await Promise.race([
-        Notification.requestPermission(),
-        new Promise<NotificationPermission>((_, reject) =>
-          setTimeout(() => reject(new Error('timeout')), 10000)
-        ),
-      ])
-      setActivateError(`Debug: permission etter dialog = ${permission}`)
-      if (permission !== 'granted') {
-        const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
-        setActivateError(isIos
-          ? 'Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler'
-          : 'Tillat varsler ved å klikke hengelåsen i adressefeltet → Varsler → Tillat'
-        )
-        setActivating(false)
-        return
-      }
       const os = (window as any).OneSignal
       if (!os) {
         setActivateError('OneSignal ikke lastet — prøv å laste siden på nytt.')
         setActivating(false)
         return
       }
-      setActivateError('Debug: venter på service worker...')
-      if ('serviceWorker' in navigator) {
-        try {
-          await Promise.race([
-            navigator.serviceWorker.ready,
-            new Promise((_, reject) => setTimeout(() => reject(new Error('sw timeout')), 5000)),
-          ])
-        } catch {
-          setActivateError('Debug: service worker ikke klar — prøver likevel...')
+      // Hopp over requestPermission hvis allerede innvilget — bevarer iOS user gesture
+      if (Notification.permission !== 'granted') {
+        const permission = await Promise.race([
+          Notification.requestPermission(),
+          new Promise<NotificationPermission>((_, reject) =>
+            setTimeout(() => reject(new Error('timeout')), 10000)
+          ),
+        ])
+        if (permission !== 'granted') {
+          const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+          setActivateError(isIos
+            ? 'Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler'
+            : 'Tillat varsler ved å klikke hengelåsen i adressefeltet → Varsler → Tillat'
+          )
+          setActivating(false)
+          return
         }
       }
-      setActivateError('Debug: OneSignal klar, kaller optIn...')
+      setActivateError('Debug: kaller optIn direkte...')
       try {
         await Promise.race([
           os.User.PushSubscription.optIn(),
