@@ -63,46 +63,27 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           return
         }
       }
-      // Sjekk om allerede abonnert (omgå optIn)
       let id = os.User.PushSubscription.id
-      setActivateError(`Debug: id før optIn = ${id ?? 'null'}`)
+      setActivateError(`Debug: id = ${id ?? 'null'}`)
       if (!id) {
-        try {
-          await Promise.race([
-            os.User.PushSubscription.optIn(),
-            new Promise((_, reject) => setTimeout(() => reject(new Error('optIn timeout')), 8000)),
-          ])
-        } catch (e: any) {
-          // optIn feilet — prøv nativt PushManager
-        }
-        id = os.User.PushSubscription.id
+        // Start optIn uten await — blokkerer ikke JS-løkken
+        os.User.PushSubscription.optIn().catch(() => {})
+        // Poll for ID i 12 sekunder
+        id = await new Promise<string | null>(resolve => {
+          let attempts = 0
+          const interval = setInterval(() => {
+            attempts++
+            const newId = os.User.PushSubscription.id
+            setActivateError(`Debug: polling ${attempts}/12 — id=${newId ?? 'null'}`)
+            if (newId) { clearInterval(interval); resolve(newId) }
+            if (attempts >= 12) { clearInterval(interval); resolve(null) }
+          }, 1000)
+        })
       }
-      // Fallback: hent direkte fra nettleserens PushManager
-      if (!id && 'serviceWorker' in navigator) {
-        try {
-          const reg = await navigator.serviceWorker.ready
-          const sub = await reg.pushManager.getSubscription()
-          setActivateError(`Debug: nativ sub = ${sub ? 'funnet' : 'null'}`)
-        } catch {}
-      }
-      setActivateError(`Debug: id etter alt = ${id ?? 'null'}`)
       if (id) {
         await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
         setHasOnesignalId(true)
         saved = true
-      } else {
-        await new Promise<void>(resolve => {
-          os.User.PushSubscription.addEventListener('change', async () => {
-            const newId = os.User.PushSubscription.id
-            if (newId) {
-              await supabase.from('users').update({ onesignal_id: newId }).eq('id', userId)
-              setHasOnesignalId(true)
-              saved = true
-              resolve()
-            }
-          })
-          setTimeout(resolve, 5000)
-        })
       }
     } catch {}
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
