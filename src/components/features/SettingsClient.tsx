@@ -71,11 +71,11 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             setTimeout(() => reject(new Error('PushManager.subscribe timed out')), 10000)
           ),
         ])
-        await fetch('/api/push/subscribe', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(sub.toJSON()),
-        })
+        const { error } = await supabase
+          .from('users')
+          .update({ push_subscription: sub.toJSON() })
+          .eq('id', userId)
+        if (error) throw new Error('Kunne ikke lagre abonnement: ' + error.message)
         setHasOnesignalId(true)
         saved = true
       } else {
