@@ -119,7 +119,10 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         }
       }
     } catch (e: any) {
+      clearTimeout(safetyStop)
       setActivateError(`Feil: ${e.message}`)
+      setActivating(false)
+      return
     }
     clearTimeout(safetyStop)
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
