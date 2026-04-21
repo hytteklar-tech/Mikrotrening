@@ -33,6 +33,10 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     setActivating(true)
     setActivateError('')
     let saved = false
+    const safetyStop = setTimeout(() => {
+      setActivating(false)
+      if (!saved) setActivateError('Tidsavbrudd — prøv igjen eller restart appen.')
+    }, 15000)
     try {
       if (!('Notification' in window)) {
         setActivateError('Push-varsler støttes ikke på denne enheten/nettleseren.')
@@ -101,6 +105,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     } catch (e: any) {
       setActivateError(`Feil: ${e.message}`)
     }
+    clearTimeout(safetyStop)
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
     setActivating(false)
   }
