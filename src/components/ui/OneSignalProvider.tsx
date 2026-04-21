@@ -15,6 +15,7 @@ export default function OneSignalProvider() {
       try {
         await OneSignal.init({
           appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!,
+          safari_web_id: process.env.NEXT_PUBLIC_ONESIGNAL_SAFARI_ID,
           notifyButton: { enable: false },
           serviceWorkerParam: { scope: '/' },
         })
