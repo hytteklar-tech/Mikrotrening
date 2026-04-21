@@ -45,8 +45,13 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         return
       }
       await new Promise<void>(resolve => {
+        const outerTimeout = setTimeout(() => {
+          console.warn('[OneSignal] deferred callback aldri kalt — OneSignal ikke initialisert?')
+          resolve()
+        }, 8000)
         window.OneSignalDeferred = window.OneSignalDeferred || []
         window.OneSignalDeferred.push(async (OneSignal: any) => {
+          clearTimeout(outerTimeout)
           await OneSignal.User.PushSubscription.optIn()
           const tryId = async () => {
             const id = OneSignal.User.PushSubscription.id
