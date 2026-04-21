@@ -12,10 +12,16 @@ export default function OneSignalProvider() {
   function onLoad() {
     window.OneSignalDeferred = window.OneSignalDeferred || []
     window.OneSignalDeferred.push(async (OneSignal: OneSignalType) => {
-      await OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!,
-        notifyButton: { enable: false },
-      })
+      try {
+        await OneSignal.init({
+          appId: process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!,
+          notifyButton: { enable: false },
+          serviceWorkerParam: { scope: '/' },
+        })
+      } catch (err) {
+        console.error('[OneSignal] init feilet:', err)
+        return
+      }
 
       async function saveId(id: string | null) {
         if (!id) return
