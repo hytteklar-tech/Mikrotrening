@@ -74,8 +74,14 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
       }
 
       if (isIos) {
-        const reg = await navigator.serviceWorker.ready
+        const reg = await Promise.race([
+          navigator.serviceWorker.ready,
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error('Service worker ikke klar')), 8000)
+          ),
+        ])
         const existing = await reg.pushManager.getSubscription()
+        setActivateError(existing ? 'Eksisterende abonnement funnet...' : 'Abonnerer...')
         const sub = existing ?? await Promise.race([
           reg.pushManager.subscribe({
             userVisibleOnly: true,
