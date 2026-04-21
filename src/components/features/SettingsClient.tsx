@@ -39,13 +39,14 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         setActivating(false)
         return
       }
-      console.log('[Push] Notification.permission før dialog:', Notification.permission)
+      setActivateError(`Debug: Notification.permission = ${Notification.permission}`)
       const permission = await Promise.race([
         Notification.requestPermission(),
         new Promise<NotificationPermission>((_, reject) =>
           setTimeout(() => reject(new Error('timeout')), 10000)
         ),
       ])
+      setActivateError(`Debug: permission etter dialog = ${permission}`)
       if (permission !== 'granted') {
         const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
         setActivateError(isIos
