@@ -62,6 +62,17 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         setActivating(false)
         return
       }
+      setActivateError('Debug: venter på service worker...')
+      if ('serviceWorker' in navigator) {
+        try {
+          await Promise.race([
+            navigator.serviceWorker.ready,
+            new Promise((_, reject) => setTimeout(() => reject(new Error('sw timeout')), 5000)),
+          ])
+        } catch {
+          setActivateError('Debug: service worker ikke klar — prøver likevel...')
+        }
+      }
       setActivateError('Debug: OneSignal klar, kaller optIn...')
       try {
         await Promise.race([
