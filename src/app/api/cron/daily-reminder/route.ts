@@ -73,23 +73,25 @@ export async function GET(request: Request) {
 
   const { data: users } = await supabase
     .from('users')
-    .select('onesignal_id')
+    .select('onesignal_id, push_subscription')
     .contains('preferred_times', [preferredTime])
     .eq('push_enabled', true)
-    .not('onesignal_id', 'is', null)
+    .or('onesignal_id.not.is.null,push_subscription.not.is.null')
 
   if (!users?.length) {
     return NextResponse.json({ sent: 0 })
   }
 
-  const playerIds = users.map(u => u.onesignal_id as string)
+  const playerIds = users.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
+  const nativeSubscriptions = users.filter(u => u.push_subscription).map(u => u.push_subscription)
   const message = pickMessage(MESSAGES[preferredTime])
 
   await sendPushNotification({
     playerIds,
+    nativeSubscriptions,
     title: 'Mikrotrening',
     body: message,
   })
 
-  return NextResponse.json({ sent: playerIds.length, hour, preferredTime })
+  return NextResponse.json({ sent: users.length, hour, preferredTime })
 }

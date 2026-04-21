@@ -39,13 +39,9 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
         setActivating(false)
         return
       }
-      const os = (window as any).OneSignal
-      if (!os) {
-        setActivateError('OneSignal ikke lastet — prøv å laste siden på nytt.')
-        setActivating(false)
-        return
-      }
-      // Hopp over requestPermission hvis allerede innvilget — bevarer iOS user gesture
+
+      const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+
       if (Notification.permission !== 'granted') {
         const permission = await Promise.race([
           Notification.requestPermission(),
@@ -54,7 +50,6 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           ),
         ])
         if (permission !== 'granted') {
-          const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
           setActivateError(isIos
             ? 'Tillat varsler i iPhone-innstillinger → Mikrotrening → Varsler'
             : 'Tillat varsler ved å klikke hengelåsen i adressefeltet → Varsler → Tillat'
@@ -63,29 +58,44 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           return
         }
       }
-      let id = os.User.PushSubscription.id
-      setActivateError(`Debug: id = ${id ?? 'null'}`)
-      if (!id) {
-        // Start optIn uten await — blokkerer ikke JS-løkken
-        os.User.PushSubscription.optIn().catch(() => {})
-        // Poll for ID i 12 sekunder
-        id = await new Promise<string | null>(resolve => {
-          let attempts = 0
-          const interval = setInterval(() => {
-            attempts++
-            const newId = os.User.PushSubscription.id
-            setActivateError(`Debug: polling ${attempts}/12 — id=${newId ?? 'null'}`)
-            if (newId) { clearInterval(interval); resolve(newId) }
-            if (attempts >= 12) { clearInterval(interval); resolve(null) }
-          }, 1000)
+
+      if (isIos) {
+        const reg = await navigator.serviceWorker.ready
+        const existing = await reg.pushManager.getSubscription()
+        const sub = existing ?? await reg.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
         })
-      }
-      if (id) {
-        await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+        await fetch('/api/push/subscribe', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(sub.toJSON()),
+        })
         setHasOnesignalId(true)
         saved = true
+      } else {
+        const os = (window as any).OneSignal
+        if (os) {
+          os.User.PushSubscription.optIn().catch(() => {})
+          const id = await new Promise<string | null>(resolve => {
+            let attempts = 0
+            const interval = setInterval(() => {
+              attempts++
+              const newId = os.User.PushSubscription.id
+              if (newId) { clearInterval(interval); resolve(newId) }
+              if (attempts >= 10) { clearInterval(interval); resolve(null) }
+            }, 1000)
+          })
+          if (id) {
+            await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
+            setHasOnesignalId(true)
+            saved = true
+          }
+        }
       }
-    } catch {}
+    } catch (e: any) {
+      setActivateError(`Feil: ${e.message}`)
+    }
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
     setActivating(false)
   }
