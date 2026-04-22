@@ -107,7 +107,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
       </span>
       {firstLogDate && (
         <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-red-900/40 inline-block" /> Ikke trent
+          <span className="w-3 h-3 rounded bg-gray-700 inline-block" /> Ikke trent
         </span>
       )}
     </div>
@@ -135,7 +135,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
         {legend}
         <button
           onClick={() => setExpanded(true)}
-          className="w-full text-center text-xs text-gray-500 hover:text-gray-300 mt-3 transition"
+          className="w-full text-center text-xs text-white font-semibold hover:text-gray-200 mt-3 transition"
         >
           Vis hele måneden ↓
         </button>
@@ -178,7 +178,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
       {legend}
       <button
         onClick={() => setExpanded(false)}
-        className="w-full text-center text-xs text-gray-500 hover:text-gray-300 mt-3 transition"
+        className="w-full text-center text-xs text-white font-semibold hover:text-gray-200 mt-3 transition"
       >
         Vis mindre ↑
       </button>
