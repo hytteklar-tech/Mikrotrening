@@ -63,7 +63,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     if (isSelected) base += 'ring-2 ring-orange-400 '
 
     if (count >= 2) {
-      base += 'bg-blue-700/70 text-blue-200 hover:bg-blue-600/80'
+      base += 'bg-orange-500 text-white hover:bg-orange-400'
     } else if (count === 1) {
       base += 'bg-green-900/60 text-green-300 hover:bg-green-800/70'
     } else if (isToday) {
@@ -89,7 +89,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
           <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-400" />
         )}
         {(dayCounts[dateStr] ?? 0) >= 2 && (
-          <span className="absolute top-0.5 right-1 text-[9px] font-bold text-blue-200">
+          <span className="absolute top-0.5 right-1 text-[9px] font-bold text-white">
             {dayCounts[dateStr]}
           </span>
         )}
@@ -103,7 +103,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
         <span className="w-3 h-3 rounded bg-green-900/60 inline-block" /> 1 trening
       </span>
       <span className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded bg-blue-700/70 inline-block" /> 2+ treninger
+        <span className="w-3 h-3 rounded bg-orange-500 inline-block" /> 2+ treninger
       </span>
       {firstLogDate && (
         <span className="flex items-center gap-1">
