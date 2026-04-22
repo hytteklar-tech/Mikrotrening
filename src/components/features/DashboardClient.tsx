@@ -116,18 +116,19 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
     dayCounts[log.date] = (dayCounts[log.date] ?? 0) + 1
   }
 
-  // Vis installasjonsbanner ved 7, 14, 21... registreringer
+  // Vis installasjonsbanner ved 3, 7 og 10 registreringer
+  const INSTALL_MILESTONES = [3, 7, 10]
   useEffect(() => {
-    if (dayLogs.length === 0) return
-    if (dayLogs.length % 7 !== 0) return
+    if (!INSTALL_MILESTONES.includes(dayLogs.length)) return
     if (window.matchMedia('(display-mode: standalone)').matches) return
-    const dismissedAt = parseInt(localStorage.getItem('install_dismissed_at') ?? '0')
-    if (dismissedAt === dayLogs.length) return
+    const dismissed: number[] = JSON.parse(localStorage.getItem('install_dismissed') ?? '[]')
+    if (dismissed.includes(dayLogs.length)) return
     setShowInstallBanner(true)
   }, [dayLogs.length])
 
   function dismissInstallBanner() {
-    localStorage.setItem('install_dismissed_at', String(dayLogs.length))
+    const dismissed: number[] = JSON.parse(localStorage.getItem('install_dismissed') ?? '[]')
+    localStorage.setItem('install_dismissed', JSON.stringify([...dismissed, dayLogs.length]))
     setShowInstallBanner(false)
   }
 
