@@ -6,6 +6,7 @@ type Props = {
   dayCounts: Record<string, number>
   selectedDate: string
   onSelectDate: (date: string) => void
+  firstLogDate?: string
 }
 
 function toLocalDateStr(date: Date) {
@@ -19,7 +20,7 @@ const MONTHS = [
   'Juli', 'August', 'September', 'Oktober', 'November', 'Desember',
 ]
 
-export default function CalendarView({ dayCounts, selectedDate, onSelectDate }: Props) {
+export default function CalendarView({ dayCounts, selectedDate, onSelectDate, firstLogDate }: Props) {
   const today = toLocalDateStr(new Date())
   const [viewYear, setViewYear] = useState(() => parseInt(selectedDate.slice(0, 4)))
   const [viewMonth, setViewMonth] = useState(() => parseInt(selectedDate.slice(5, 7)) - 1)
@@ -73,7 +74,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate }: 
       base += 'bg-green-900/60 text-green-300 hover:bg-green-800/70'
     } else if (isToday) {
       base += 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
-    } else if (isPast) {
+    } else if (isPast && firstLogDate && dateStr >= firstLogDate) {
       base += 'bg-red-900/40 text-red-400 hover:bg-red-900/60'
     } else {
       base += 'bg-gray-800/50 text-gray-500 hover:bg-gray-700/60'
@@ -144,9 +145,11 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate }: 
         <span className="flex items-center gap-1">
           <span className="w-3 h-3 rounded bg-blue-700/70 inline-block" /> 2+ treninger
         </span>
-        <span className="flex items-center gap-1">
-          <span className="w-3 h-3 rounded bg-red-900/40 inline-block" /> Ikke trent
-        </span>
+        {firstLogDate && (
+          <span className="flex items-center gap-1">
+            <span className="w-3 h-3 rounded bg-red-900/40 inline-block" /> Ikke trent
+          </span>
+        )}
       </div>
     </div>
   )

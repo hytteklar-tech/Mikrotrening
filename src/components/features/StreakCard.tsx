@@ -30,10 +30,11 @@ const VOLUME_BADGES = [
   { sessions: 1000, emoji: '💪',   name: 'Tusenkunstner' },
 ]
 
-export default function StreakCard({ streak, hasTrained, totalSessions }: {
+export default function StreakCard({ streak, hasTrained, totalSessions, isNewUser }: {
   streak: number
   hasTrained: boolean
   totalSessions: number
+  isNewUser?: boolean
 }) {
   const [showInfo, setShowInfo] = useState(false)
   const [showStreakInfo, setShowStreakInfo] = useState(false)
@@ -59,10 +60,16 @@ export default function StreakCard({ streak, hasTrained, totalSessions }: {
               <InfoIcon />
             </button>
           </div>
-          <div className="flex items-end gap-1 mt-1">
-            <span className="text-5xl font-bold">{streak}</span>
-            <span className="text-lg mb-1 opacity-75">dager på rad</span>
-          </div>
+          {isNewUser ? (
+            <div className="mt-1">
+              <span className="text-2xl font-bold">Du er i gang! 🚀</span>
+            </div>
+          ) : (
+            <div className="flex items-end gap-1 mt-1">
+              <span className="text-5xl font-bold">{streak}</span>
+              <span className="text-lg mb-1 opacity-75">dager på rad</span>
+            </div>
+          )}
         </div>
         <span className="text-6xl">🔥</span>
       </div>
@@ -73,7 +80,7 @@ export default function StreakCard({ streak, hasTrained, totalSessions }: {
         </div>
       )}
 
-      {!showInfo && (
+      {!showInfo && !isNewUser && (
         <div className="mt-3 bg-black/20 rounded-xl px-3 py-2 text-sm space-y-2">
           {/* Streak badge */}
           <div>

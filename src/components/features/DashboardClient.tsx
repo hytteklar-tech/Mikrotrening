@@ -150,7 +150,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
 
   return (
     <>
-      <StreakCard streak={streak} hasTrained={hasTrained} totalSessions={dayLogs.length} />
+      <StreakCard streak={streak} hasTrained={hasTrained} totalSessions={dayLogs.length} isNewUser={isNewUser} />
       {isNewUser && (
         <div className="bg-gradient-to-br from-orange-500/20 to-orange-700/10 border border-orange-500/40 rounded-2xl p-5 space-y-3">
           <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide">En gave fra oss</p>

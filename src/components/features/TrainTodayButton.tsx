@@ -230,6 +230,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
         dayCounts={dayCounts}
         selectedDate={selectedDate}
         onSelectDate={handleDateChange}
+        firstLogDate={dayLogs.length > 0 ? [...dayLogs].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined}
       />
 
       <p className="text-center text-sm text-gray-400 capitalize">{labelDate}</p>
