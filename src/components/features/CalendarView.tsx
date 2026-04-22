@@ -65,7 +65,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     if (count >= 2) {
       base += 'bg-orange-500 text-white hover:bg-orange-400'
     } else if (count === 1) {
-      base += 'bg-green-700/70 text-green-100 hover:bg-green-600/80'
+      base += 'bg-green-400/30 text-green-400 hover:bg-green-400/40'
     } else if (isToday) {
       base += 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
     } else if (isPast && firstLogDate && dateStr >= firstLogDate) {
@@ -100,7 +100,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
   const legend = (
     <div className="flex items-center gap-3 mt-3 text-xs text-gray-500 justify-center flex-wrap">
       <span className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded bg-green-700/70 inline-block" /> 1 trening
+        <span className="w-3 h-3 rounded bg-green-400/30 inline-block border border-green-400/50" /> 1 trening
       </span>
       <span className="flex items-center gap-1">
         <span className="w-3 h-3 rounded bg-orange-500 inline-block" /> 2+ treninger
