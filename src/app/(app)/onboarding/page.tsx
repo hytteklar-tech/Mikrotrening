@@ -113,14 +113,20 @@ export default function OnboardingPage() {
   if (step === 1) {
     return (
       <Screen>
-        <div className="text-center space-y-4">
-          <div className="text-6xl">💪</div>
-          <h1 className="text-2xl font-bold text-white leading-snug">
-            Mikrotrening passer inn<br />
-            <span className="text-orange-400">overalt.</span>
-          </h1>
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold text-white leading-tight">
+              Velkommen til Mikrotrening.
+            </h1>
+            <p className="text-orange-400 font-semibold text-lg">
+              Du har tatt et godt valg.
+            </p>
+          </div>
+          <p className="text-2xl font-bold text-white">
+            30 sekunder om dagen.
+          </p>
           <p className="text-gray-400 text-sm leading-relaxed">
-            På kjøkkenet. På kontoret. Mellom møter.<br /><br />30 sekunder er nok til å gjøre en forskjell.
+            Gode treningsvaner er én av de viktigste tingene du kan gjøre for helsen din. Forskning på 90 000 mennesker viser at det er nok til å gjøre en reell forskjell — ti til fjorten ekstra leveår.
           </p>
         </div>
         <button
