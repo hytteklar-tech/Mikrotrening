@@ -50,6 +50,8 @@ export async function logWorkout(userId: string, packageId: string, date: string
   notifyAfterLog(userId, date).catch(() => {})
 }
 
+const DAILY_PUSH_LIMIT = 5
+
 async function notifyAfterLog(userId: string, today: string) {
   const admin = createAdmin(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,12 +61,26 @@ async function notifyAfterLog(userId: string, today: string) {
   // Hent brukerinfo
   const { data: user } = await admin
     .from('users')
-    .select('onesignal_id, display_name, notifications_enabled')
+    .select('onesignal_id, push_subscription, display_name, notifications_enabled, push_count_today, push_date')
     .eq('id', userId)
     .single()
 
+  // Sjekk daglig grense (maks 5 push per bruker per dag)
+  const sameDay = user?.push_date === today
+  const countToday = sameDay ? (user?.push_count_today ?? 0) : 0
+  if (countToday >= DAILY_PUSH_LIMIT) return
+
+  async function sendAndCount(fn: () => Promise<void>) {
+    await fn()
+    const newCount = countToday + 1
+    await admin.from('users').update({
+      push_count_today: newCount,
+      push_date: today,
+    }).eq('id', userId)
+  }
+
   // --- Streak-milepæl ---
-  if (user?.onesignal_id && user.notifications_enabled) {
+  if (user?.notifications_enabled && (user.onesignal_id || user.push_subscription)) {
     const { data: logs } = await admin
       .from('daily_logs')
       .select('logged_date')
@@ -75,11 +91,12 @@ async function notifyAfterLog(userId: string, today: string) {
     const milestoneMsg = STREAK_MILESTONES[streak]
 
     if (milestoneMsg) {
-      await sendPushNotification({
-        playerIds: [user.onesignal_id],
+      await sendAndCount(() => sendPushNotification({
+        playerIds: user.onesignal_id ? [user.onesignal_id] : [],
+        nativeSubscriptions: user.push_subscription ? [user.push_subscription] : [],
         title: 'Ny milepæl! 🎉',
         body: milestoneMsg,
-      })
+      }))
     }
   }
 
@@ -96,7 +113,7 @@ async function notifyAfterLog(userId: string, today: string) {
   // Finn andre gruppemedlemmer med push aktivert som IKKE har trent i dag
   const { data: otherMembers } = await admin
     .from('group_members')
-    .select('user_id, users!inner(onesignal_id, notifications_enabled, display_name)')
+    .select('user_id, users!inner(onesignal_id, notifications_enabled, push_count_today, push_date)')
     .in('group_id', groupIds)
     .neq('user_id', userId)
 
@@ -113,8 +130,19 @@ async function notifyAfterLog(userId: string, today: string) {
 
   const playerIds = otherMembers
     .filter(m => {
-      const u = m.users as unknown as { onesignal_id: string | null; notifications_enabled: boolean }
-      return u.onesignal_id && u.notifications_enabled && !trainedToday.has(m.user_id as string)
+      const u = m.users as unknown as {
+        onesignal_id: string | null
+        notifications_enabled: boolean
+        push_count_today: number
+        push_date: string | null
+      }
+      const recipientCount = u.push_date === today ? (u.push_count_today ?? 0) : 0
+      return (
+        u.onesignal_id &&
+        u.notifications_enabled &&
+        !trainedToday.has(m.user_id as string) &&
+        recipientCount < DAILY_PUSH_LIMIT
+      )
     })
     .map(m => (m.users as unknown as { onesignal_id: string }).onesignal_id)
 

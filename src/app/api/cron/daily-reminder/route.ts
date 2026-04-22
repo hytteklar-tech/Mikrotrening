@@ -82,8 +82,14 @@ export async function GET(request: Request) {
     return NextResponse.json({ sent: 0 })
   }
 
-  const playerIds = users.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
-  const nativeSubscriptions = users.filter(u => u.push_subscription).map(u => u.push_subscription)
+  const CRON_BATCH_LIMIT = 100
+  if (users.length > CRON_BATCH_LIMIT) {
+    console.error(`ADVARSEL: cron forsøkte å sende til ${users.length} brukere — begrenset til ${CRON_BATCH_LIMIT}. Mulig bug.`)
+  }
+  const batch = users.slice(0, CRON_BATCH_LIMIT)
+
+  const playerIds = batch.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
+  const nativeSubscriptions = batch.filter(u => u.push_subscription).map(u => u.push_subscription)
   const message = pickMessage(MESSAGES[preferredTime])
 
   await sendPushNotification({
@@ -93,5 +99,5 @@ export async function GET(request: Request) {
     body: message,
   })
 
-  return NextResponse.json({ sent: users.length, hour, preferredTime })
+  return NextResponse.json({ sent: batch.length, total_matched: users.length, hour, preferredTime })
 }
