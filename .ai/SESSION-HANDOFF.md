@@ -1,49 +1,49 @@
 # SESSION-HANDOFF — Mikrotrening
-**Lagret:** 2026-04-05
-**Fase:** 7 — FULLFØRT ✅
-**URL:** https://mikrotrening-phi.vercel.app
+**Lagret:** 2026-04-22
+**Fase:** 7 — Live / Post-launch
+**URL:** https://www.mikrotrening.no
 
-## Appen er live!
+## Hva ble gjort denne økten (sess-023)
 
-Alle faser fullført. Appen kjører i produksjon på Vercel.
+### Onboarding redesignet (4 steg)
+- Pre-registrerer gårsdagen → nye brukere ankommer med streak = 1
+- Steg 3: hopp-knapp for de som ikke vil ha varsler
+- Steg 4: viser startknapp først etter at push er aktivert
 
-## Hva ble gjort denne økten
+### Mikro 30 standardpakke
+- Migration 013: `handle_new_user`-trigger oppretter "Mikro 30" + Knebøy-øvelse automatisk
 
-### Badges
-- Nye streak-badges: Gnisten (7d) → Legenden (365d)
-- Nye volum-badges: Første steg (10 økt) → Tusenkunstner (1000 økt)
-- Info-ikon på begge badge-typer i StreakCard — viser full liste med opptjente/fremtidige
-- Topp 3 streak-perioder med datoperiode og badge-navn på statistikk-siden
+### Dashboard ny bruker-UX
+- `isNewUser` flagg: velkomstkort med oransje aksent i stedet for streak
+- StreakCard: "Du er i gang! 🚀" for nye brukere
+- Install-banner vises ved 7/14/21 registreringer (ikke ved første besøk)
+- `is_pwa` logges til DB (migration 012)
 
-### Bugs fikset
-- Nested `<button>` i TestClient (hydration-feil) — ytre header gjort om til `<div role="button">`
-- Gruppe-innmelding feilet stille (upsert → insert med feilhåndtering)
-- RLS blokkerte lesing av andre gruppemedlemmers display_name → migrasjon 005
+### Kalender
+- Komprimert 2-ukersvisning som standard, knapp utvider til full måned
+- Rød farge fjernet — alle utrenede dager er grå
 
-### Fase 6 (kvalitet)
-- 404-side og error-side opprettet
-- PWA manifest.json
-- Slett konto med dobbel bekreftelse (GDPR)
-- App omdøpt til "Mikrotrening" i alle brukerflater
+### Gruppe-banner på hjemskjerm
+- Avatarer med grønn/grå farge basert på om de trente i dag
+- Hentes server-side med dagens logger for alle gruppemedlemmer
 
-### Fase 7 (publisering)
-- GitHub repo: github.com/hytteklar-tech/Mikrotrening
-- Vercel: mikrotrening-phi.vercel.app
-- Supabase redirect-URL oppdatert til produksjons-URL
-- Miljøvariabler satt i Vercel
+### Daglig hilsemelding
+- 13 roterende meldinger, ny per dag, aldri samme som i går, låst i localStorage
 
-## Viktige filer
-- `src/components/features/StreakCard.tsx` — badges med info
-- `src/components/features/StatsView.tsx` — topp 3 streak-perioder
-- `src/components/features/GroupManager.tsx` — gruppe-innmelding
-- `supabase/migrations/005_users_group_read.sql` — RLS-fix for gruppe
-- `src/app/layout.tsx` — PWA-metadata
-- `src/components/ui/Logo.tsx` — M-logo
+### Push-varsler
+- Streak-milepæler utvidet: 7/14/30/45/60/90/120/180/270/365 dager
+- Rate-limit: maks 5 push per bruker per dag (migration 011)
+- **Cron-fix**: Hobby-plan tillater bare 2 cron-jobs — 5 entries slått til 1: `0 6,9,13,17 * * *`
 
-## Hvis du kommer tilbake
-- Fikse noe: rediger fil → `git add . && git commit -m "beskrivelse" && git push` → Vercel deployer automatisk
-- Supabase rate limit: maks 2 e-poster/time på gratisplan
-- Legge til funksjoner: start ny sesjon, si "Bygge", fortsett fra fase 7
+## Ventende
+- Sjekk Vercel Logs etter kl 15 eller 19 norsk tid — verifiser at push faktisk sendes
+- Supabase-migrasjoner 011, 012, 013 må kjøres hvis ikke allerede gjort
 
-## Tech stack
-- Next.js (Turbopack), Supabase (auth: email magic link, DB: PostgreSQL + RLS), Tailwind CSS, Vercel
+## Neste sesjon
+- Bekreft at push-cron fungerer
+- Vurder å bygge "velg øvelser fra bibliotek" inn i treningspakke-editoren
+
+## Miljø
+- Vercel: www.mikrotrening.no
+- Supabase: lnnejzxebvbtygcrknkh
+- OneSignal App ID: 5940cc3a-ce56-4cce-a252-6c3f3e39a612

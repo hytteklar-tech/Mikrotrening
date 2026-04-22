@@ -2,6 +2,103 @@
 
 ---
 
+## 2026-04-22 | P7 | SESSION_START
+Sesjon 022. Fokus: OneSignal push-varsler.
+
+## 2026-04-22 | P7 | DONE — Push-infrastruktur fikset
+- middleware.ts gjenskapt (proxy.ts var ikke koblet inn)
+- OneSignalSDKWorker.js og manifest.json lagt til i matcher-unntak
+- OneSignal site URL endret til www.mikrotrening.no
+- NEXT_PUBLIC_ONESIGNAL_APP_ID lagt inn i Vercel
+- Chrome/Android: push fungerer via OneSignal
+
+## 2026-04-22 | P7 | DONE — iOS native Web Push
+- OneSignal optIn() fungerer ikke på iOS 26 — omgått med native PushManager
+- Egne VAPID-nøkler generert og lagt inn i Vercel
+- push-sw.js: separat service worker for iOS push-abonnement
+- web-push bibliotek for server-side sending
+- Cron-jobben sender til begge (onesignal_id + push_subscription)
+- push_subscription kolonne lagt til i users-tabellen
+
+## 2026-04-22 | P7 | PENDING — Streak og gruppe-varsler mangler iOS-støtte
+- log.ts henter kun onesignal_id — iOS-brukere får ikke streak- eller gruppevarsler
+- Bruker vil tenke på push-strategi før vi bygger videre
+
+---
+
+## 2026-04-22 | P7 | SESSION_START
+Sesjon 023. Fokus: post-launch UX-forbedringer og push-fiks.
+
+## 2026-04-22 | P7 | DONE — Streak-milepæler utvidet
+- Lagt til 7, 14, 30, 45, 60, 90, 120, 180, 270, 365 dager
+- Push-rate-limit: maks 5 varsler per dag per bruker (migration 011)
+- Milepælvarsler sender til både onesignal_id og push_subscription
+
+## 2026-04-22 | P7 | DONE — Onboarding redesignet (4 steg)
+- Steg 5 (install-prompt) fjernet
+- Steg 3: "Jeg vil ikke ha varsler" hopp-knapp
+- Steg 4: notificationsDone-state — startknapp vises etter push-aktivering
+- saveAndGoToInstall: finner "Mikro 30", logger gårsdagen som pre-registrering
+
+## 2026-04-22 | P7 | DONE — Ny bruker-opplevelse på dashboard
+- is_pwa logges til DB når åpnet i standalone-modus (migration 012)
+- Install-banner vises ved 7/14/21 registreringer (ikke ved første besøk)
+- isNewUser-flagg: viser velkomstkort med oransje aksent i stedet for streak
+- StreakCard: "Du er i gang! 🚀" for nye brukere, ingen badge-seksjon
+
+## 2026-04-22 | P7 | DONE — Mikro 30 standardpakke for nye brukere
+- Migration 013: handle_new_user-trigger oppretter "Mikro 30" + Knebøy-øvelse
+- Første dag pre-registrert i onboarding → streak = 1 ved ankomst
+
+## 2026-04-22 | P7 | DONE — Kalender redesignet
+- Komprimert 2-ukersvisning som standard, "Vis hele måneden ↓" utvider
+- Rød farge fjernet fra utrenede dager — alle grå (samme som fremtid)
+- Grønn (1 trening) og oransje (2+ treninger)
+
+## 2026-04-22 | P7 | DONE — Gruppe-banner på hjemskjerm
+- GroupBanner: avatarer (grønn=trent, grå=ikke), antall av totalt, lenke til /gruppe
+- Hentes server-side i page.tsx med dagens logger for alle gruppemedlemmer
+
+## 2026-04-22 | P7 | DONE — Rullerende daglig hilsemelding
+- DailyMessage: 13 meldinger, ny per dag, aldri samme som i går, låst i localStorage
+
+## 2026-04-22 | P7 | DONE — Cron-fix: Hobby-plan støtter maks 2 cron-jobs
+- 5 separate cron-entries slått sammen til 1: "0 6,9,13,17 * * *"
+- Dekker norsk kl 08, 11, 15, 19
+
+## 2026-04-22 | P7 | SESSION_END
+
+---
+
+## 2026-04-20 | P7 | SESSION_START
+Sesjon 021 startet. Fase 7 (post-launch). Fokus: øvelsesbibliotek.
+
+## 2026-04-20 | P7 | DONE — Øvelsesbibliotek: GIF → MP4
+- Fant 10 ZIP-filer i public/exercises/ + sample-set.zip (barbell bench press)
+- Konverterte alle 11 GIF-er til MP4 (h264, 360x360, 25fps) med ffmpeg
+- Fjernet alle JPG, GIF og ZIP fra exercises-mappen
+- 14 MP4-filer totalt i public/exercises/
+
+## 2026-04-20 | P7 | DONE — exercises.ts oppdatert
+- Fjernet 23 øvelser uten MP4-video
+- La til 11 nye øvelser med norsk navn, beskrivelse og muskelgruppe
+- Nye muskelgrupper: mage, rygg, hofter, legger
+
+## 2026-04-20 | P7 | DONE — Test-exercises: valg-funksjon + hastighet
+- Velg-modus med avkrysning på kort og valg-bar nederst
+- Standard hastighet endret fra 0.1x til 1x
+- Muskelgruppe-filter oppdatert med nye grupper
+
+## 2026-04-20 | P7 | DECISION — Neste steg øvelsesbibliotek
+- Alternativ B valgt: velg øvelser fra biblioteket inne i treningspakke-redigering
+- Avventer flere GIF-pakker fra bruker før løsningen bygges ferdig
+- Mangler øvelser for: ben, skuldre, armer, mer rygg
+
+## 2026-04-20 | P7 | SESSION_END
+Sesjon avsluttet. State lagret i SESSION-HANDOFF.md.
+
+---
+
 ## 2026-04-01T07:00:00Z | CLA | SESSION_START
 Bootstrap fullført. Nytt prosjekt opprettet.
 
@@ -95,3 +192,37 @@ ts=08:30 event=FILE op=created path="src/app/(app)/statistikk/page.tsx" desc="St
 ts=08:30 event=FILE op=modified path="src/components/ui/BottomNav.tsx" desc="La til Statistikk (📊) som nytt menypunkt"
 ts=08:30 event=DONE task="STREAK-FIX" output="Streak oppdateres nå optimistisk uten server-roundtrip"
 ts=08:30 event=DONE task="STATS-PAGE" output="/statistikk med uke/måned/år-tabs og grafer"
+
+## 2026-04-16 | CLA | SESSION_START
+Sesjon 015 startet. Gjenopptatt fra fase 7 (live).
+
+## 2026-04-16 | CLA | BUG_FIX
+task="bug-timer-sleep" — Tidtaker stoppet ved skjermhvile. Byttet til Date.now()-diff.
+
+## 2026-04-16 | CLA | FEATURE
+task="feature-ring-timer" — SVG ring-tidtaker med oransje/hvit overtidsring og snitt fra DB.
+
+## 2026-04-16 | CLA | BUG_FIX
+task="bug-kalender-dato" — Kalender viste gaarsdagens dato. useEffect korrigerer SSR timezone-mismatch.
+
+## 2026-04-16 | CLA | PERF
+task="perf-responstid" — staleTimes 30s, parallell profil-fetch, statistikk -> serverkomponent.
+
+## 2026-04-16 | CLA | IMPROVEMENT
+task="stats-forbedringer" — Tre kolonner, totaltid, periode i overskrift.
+
+## 2026-04-16 | CLA | SESSION_END
+Alt deployet til mikrotrening.no. State lagret.
+
+## 2026-04-17 | CLA | SESSION_START
+Sesjon 016 startet. Gjenopptok fra sesjon 015.
+
+## 2026-04-17 | CLA | BUG_FIX
+iOS PWA nav-bug: BottomNav sto midt på siden ved scrolling.
+Fix: h-dvh flex-layout, main overflow-y-auto, BottomNav shrink-0 (fjernet fixed).
+
+## 2026-04-17 | CLA | FEATURE
+Safe area inset: viewportFit=cover + pb-[env(safe-area-inset-bottom)] på BottomNav.
+
+## 2026-04-17 | CLA | SESSION_END
+Sesjon 016 avsluttet.

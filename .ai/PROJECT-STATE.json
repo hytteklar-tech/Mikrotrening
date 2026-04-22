@@ -34,14 +34,56 @@
     "phase7": { "status": "completed", "completedSteps": ["github-repo", "vercel-deploy", "supabase-redirect-url", "live"] }
   },
 
-  "pendingTasks": [],
-  "completedTasks": [],
+  "pendingTasks": [
+    {
+      "id": "test-cron-push-delivery",
+      "title": "Verifiser at push-varsler leveres fra cron — sjekk Vercel-logg etter kl 15/19"
+    }
+  ],
+  "completedTasks": [
+    {
+      "id": "bug-magic-link-scanner",
+      "title": "Magic link brukes opp av e-postscanner — FIKSET",
+      "completedAt": "2026-04-12",
+      "solution": "Lagt til /auth/confirm mellomside. emailRedirectTo peker nå dit. verifyOtp kalles kun når bruker klikker knappen."
+    },
+    {
+      "id": "bug-timer-sleep",
+      "title": "Tidtaker stoppet når skjermen sov — FIKSET",
+      "completedAt": "2026-04-16",
+      "solution": "Byttet fra setInterval-teller til Date.now()-diff. startTimeRef lagrer starttidspunkt, elapsed = Date.now() - startTimeRef."
+    },
+    {
+      "id": "feature-ring-timer",
+      "title": "Ring-tidtaker med snitt og overtidsring — BYGGET",
+      "completedAt": "2026-04-16",
+      "solution": "SVG-ring: oransje fyller mot snitt (hentet fra Supabase), hvit ring fyller på overtid. Tekst skifter til 'over snittet ditt'. B-modus (grå ring) når ingen historikk."
+    },
+    {
+      "id": "bug-kalender-dato",
+      "title": "Kalender viste feil dato ved midnatt — FIKSET",
+      "completedAt": "2026-04-16",
+      "solution": "SSR/hydration timezone-mismatch (server UTC, bruker UTC+2). useEffect korrigerer selectedDate til klientens lokale dato etter mount. CalendarView synkroniserer viewMonth/viewYear."
+    },
+    {
+      "id": "perf-responstid",
+      "title": "Forbedret responstid mellom sider — GJORT",
+      "completedAt": "2026-04-16",
+      "solution": "staleTimes.dynamic 0→30s. Hjemside: profil+logger+pakker parallellisert i ett Promise.all. Statistikk konvertert fra klientkomponent til serverkomponent (fjerner spinner)."
+    },
+    {
+      "id": "stats-forbedringer",
+      "title": "Stats-side: layout og innhold forbedret — GJORT",
+      "completedAt": "2026-04-16",
+      "solution": "Treningspakke-seksjon: overskrift med periode, tre like bokser (treninger/reps/totaltid), totaltid per pakke i stedet for snitt."
+    }
+  ],
 
   "session": {
     "status": "completed",
-    "startedAt": "2026-04-05T00:00:00Z",
-    "sessionId": "sess-sommerkropp-008",
-    "lastSignificantAction": "live-deploy til Vercel, Supabase redirect-URL oppdatert"
+    "startedAt": "2026-04-22T00:00:00Z",
+    "sessionId": "sess-sommerkropp-023",
+    "lastSignificantAction": "Cron-fix (5→1 job, Hobby-plan). Onboarding 4-steg, Mikro 30 standardpakke, ny bruker-UX, gruppe-banner, daglig hilsemelding, kalender uten rød farge."
   },
 
   "dataTypes": {
