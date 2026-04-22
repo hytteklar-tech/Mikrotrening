@@ -46,13 +46,8 @@ export default function OnboardingPage() {
         push_enabled: pushEnabled,
       }).eq('id', user.id)
     }
-    setLoading(false)
-    if (installed) {
-      router.push('/')
-      router.refresh()
-    } else {
-      setStep(5)
-    }
+    router.push('/')
+    router.refresh()
   }
 
   async function handleNotifications(want: boolean) {
@@ -106,8 +101,8 @@ export default function OnboardingPage() {
     )
   }
 
-  const isIos = true // MIDLERTIDIG: tving iOS-visning for testing
-  const TOTAL_STEPS = installed ? 4 : 5
+  const isIos = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
+  const TOTAL_STEPS = 4
 
   // Steg 1: Velkomst
   if (step === 1) {
@@ -252,60 +247,6 @@ export default function OnboardingPage() {
     )
   }
 
-  // Steg 5: Installer på hjemskjerm
-  return (
-    <Screen>
-      <div className="text-center space-y-3">
-        <div className="text-5xl">📲</div>
-        <h2 className="text-xl font-bold text-white">Legg til på hjemskjermen</h2>
-        <p className="text-gray-400 text-sm leading-relaxed">
-          Da er appen alltid ett trykk unna — akkurat som en vanlig app.
-        </p>
-      </div>
-
-      {isIos ? (
-        <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">1</div>
-            <div className="flex items-center gap-2 pt-1">
-              <span className="text-gray-300 text-sm">Trykk på</span>
-              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-              </svg>
-              <span className="text-gray-300 text-sm">i Safari</span>
-            </div>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">2</div>
-            <p className="text-gray-300 text-sm pt-1">Scroll ned og trykk <span className="text-white font-medium">"Legg til på Hjem-skjerm"</span></p>
-          </div>
-          <div className="flex items-start gap-3">
-            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">3</div>
-            <p className="text-gray-300 text-sm pt-1">Trykk <span className="text-white font-medium">"Legg til"</span> øverst til høyre</p>
-          </div>
-        </div>
-      ) : deferredPrompt ? (
-        <button
-          onClick={handleAndroidInstall}
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 transition"
-        >
-          Installer appen
-        </button>
-      ) : (
-        <div className="bg-gray-800 rounded-2xl p-4">
-          <p className="text-gray-400 text-sm text-center">Åpne mikrotrening.no i Chrome og trykk "Legg til på startskjermen" i menyen.</p>
-        </div>
-      )}
-
-      <button
-        onClick={() => { router.push('/'); router.refresh() }}
-        className="w-full text-gray-400 hover:text-gray-200 text-sm py-1 transition"
-      >
-        {isIos ? 'Jeg gjør det senere →' : 'Hopp over →'}
-      </button>
-      <StepDots current={5} total={5} />
-    </Screen>
-  )
 }
 
 function Screen({ children }: { children: React.ReactNode }) {

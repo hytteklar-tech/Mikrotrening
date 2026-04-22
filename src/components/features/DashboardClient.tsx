@@ -63,6 +63,16 @@ function calcStreak(uniqueDates: string[]): number {
 
 export default function DashboardClient({ initialDayLogs, packages, userId, notificationsEnabled }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
+  const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+
+  useEffect(() => {
+    if (window.matchMedia('(display-mode: standalone)').matches) return
+    if (localStorage.getItem('install_prompt_dismissed')) return
+    const handler = (e: Event) => { e.preventDefault(); setDeferredPrompt(e) }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -102,6 +112,29 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
     dayCounts[log.date] = (dayCounts[log.date] ?? 0) + 1
   }
 
+  // Vis installasjonsbanner etter første økt
+  useEffect(() => {
+    if (dayLogs.length >= 1 && !window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('install_prompt_dismissed')) {
+      setShowInstallBanner(true)
+    }
+  }, [dayLogs.length])
+
+  function dismissInstallBanner() {
+    localStorage.setItem('install_prompt_dismissed', '1')
+    setShowInstallBanner(false)
+  }
+
+  async function handleInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      await deferredPrompt.userChoice
+      setDeferredPrompt(null)
+    }
+    dismissInstallBanner()
+  }
+
+  const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+
   const showMotivation = notificationsEnabled && dayLogs.length > 0 && dayLogs.length % 5 === 0
   const motivationMsg = ONELINERS[(Math.floor(dayLogs.length / 5) - 1) % ONELINERS.length]
 
@@ -114,6 +147,29 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
           <p className="text-sm text-gray-100 leading-relaxed">{motivationMsg}</p>
         </div>
       )}
+      {showInstallBanner && (
+        <div className="bg-gray-800 border border-gray-700 rounded-2xl p-4 space-y-3">
+          <div>
+            <p className="text-sm font-semibold text-white">📲 Legg til på hjemskjermen</p>
+            <p className="text-xs text-gray-400 mt-0.5">Alltid ett trykk unna — akkurat som en vanlig app.</p>
+          </div>
+          {isIos ? (
+            <div className="space-y-2 text-xs text-gray-300">
+              <p>1. Trykk på <span className="text-blue-400">deleknappen</span> nederst i Safari</p>
+              <p>2. Velg <span className="text-white font-medium">"Legg til på Hjem-skjerm"</span></p>
+              <p>3. Trykk <span className="text-white font-medium">"Legg til"</span></p>
+            </div>
+          ) : deferredPrompt ? (
+            <button onClick={handleInstall} className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl py-2 transition">
+              Installer appen
+            </button>
+          ) : null}
+          <button onClick={dismissInstallBanner} className="w-full text-gray-400 hover:text-gray-200 text-xs py-1 transition">
+            Ikke nå
+          </button>
+        </div>
+      )}
+
       <TrainTodayButton
         dayLogs={dayLogs}
         onLogChange={setDayLogs}
