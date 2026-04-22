@@ -3,6 +3,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/features/DashboardClient'
 import GroupBanner from '@/components/features/GroupBanner'
+import DailyMessage from '@/components/features/DailyMessage'
 import type { DayLog } from '@/components/features/DashboardClient'
 
 export default async function DashboardPage() {
@@ -80,6 +81,7 @@ export default async function DashboardPage() {
     <div className="p-4 space-y-6">
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
+        <DailyMessage />
       </div>
 
       {groupBannerData && (
