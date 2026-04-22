@@ -46,6 +46,26 @@ export default function OnboardingPage() {
         preferred_times: preferredTimes,
         push_enabled: pushEnabled,
       }).eq('id', user.id)
+
+      // Pre-registrer gårsdagens økt på "Mikro 30" — første ekte økt blir bonus
+      const yesterday = new Date()
+      yesterday.setDate(yesterday.getDate() - 1)
+      const yesterdayStr = yesterday.toISOString().slice(0, 10)
+
+      const { data: pkg } = await supabase
+        .from('workout_packages')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('name', 'Mikro 30')
+        .single()
+
+      if (pkg) {
+        await supabase.from('daily_logs').insert({
+          user_id: user.id,
+          package_id: pkg.id,
+          logged_date: yesterdayStr,
+        })
+      }
     }
     setLoading(false)
     setNotificationsDone(true)
