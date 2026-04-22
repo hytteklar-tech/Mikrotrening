@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
@@ -18,10 +18,25 @@ export default function OnboardingPage() {
   const [name, setName] = useState('')
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
   const [loading, setLoading] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [installed, setInstalled] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
-  async function finish(pushEnabled: boolean) {
+  useEffect(() => {
+    // Allerede installert som PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      setInstalled(true)
+    }
+    const handler = (e: Event) => {
+      e.preventDefault()
+      setDeferredPrompt(e)
+    }
+    window.addEventListener('beforeinstallprompt', handler)
+    return () => window.removeEventListener('beforeinstallprompt', handler)
+  }, [])
+
+  async function saveAndGoToInstall(pushEnabled: boolean) {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
@@ -31,14 +46,19 @@ export default function OnboardingPage() {
         push_enabled: pushEnabled,
       }).eq('id', user.id)
     }
-    router.push('/')
-    router.refresh()
+    setLoading(false)
+    if (installed) {
+      router.push('/')
+      router.refresh()
+    } else {
+      setStep(5)
+    }
   }
 
   async function handleNotifications(want: boolean) {
     setLoading(true)
     if (!want) {
-      await finish(false)
+      await saveAndGoToInstall(false)
       return
     }
     let granted = false
@@ -67,7 +87,17 @@ export default function OnboardingPage() {
     } catch {
       granted = false
     }
-    await finish(granted)
+    await saveAndGoToInstall(granted)
+  }
+
+  async function handleAndroidInstall() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt()
+      await deferredPrompt.userChoice
+      setDeferredPrompt(null)
+    }
+    router.push('/')
+    router.refresh()
   }
 
   function toggleTime(val: TimeOption) {
@@ -75,6 +105,9 @@ export default function OnboardingPage() {
       prev.includes(val) ? prev.filter(t => t !== val) : [...prev, val]
     )
   }
+
+  const isIos = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
+  const TOTAL_STEPS = installed ? 4 : 5
 
   // Steg 1: Velkomst
   if (step === 1) {
@@ -96,7 +129,7 @@ export default function OnboardingPage() {
         >
           Kom i gang
         </button>
-        <StepDots current={1} total={4} />
+        <StepDots current={1} total={TOTAL_STEPS} />
       </Screen>
     )
   }
@@ -126,12 +159,12 @@ export default function OnboardingPage() {
           Neste
         </button>
         <BackButton onClick={() => setStep(1)} />
-        <StepDots current={2} total={4} />
+        <StepDots current={2} total={TOTAL_STEPS} />
       </Screen>
     )
   }
 
-  // Steg 3: Habit-anker (multiselekt)
+  // Steg 3: Tidspunkt
   if (step === 3) {
     return (
       <Screen>
@@ -169,39 +202,96 @@ export default function OnboardingPage() {
           Neste
         </button>
         <BackButton onClick={() => setStep(2)} />
-        <StepDots current={3} total={4} />
+        <StepDots current={3} total={TOTAL_STEPS} />
       </Screen>
     )
   }
 
   // Steg 4: Varsler
+  if (step === 4) {
+    return (
+      <Screen>
+        <div className="text-center space-y-3">
+          <div className="text-5xl">🔔</div>
+          <h2 className="text-xl font-bold text-white">Daglig påminnelse?</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            En liten dytt på rett tidspunkt. Ikke stress — bare en invitasjon.
+          </p>
+        </div>
+        <div className="space-y-3">
+          <button
+            onClick={() => handleNotifications(true)}
+            disabled={loading}
+            className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+          >
+            {loading ? 'Lagrer...' : 'Ja, send meg påminnelser'}
+          </button>
+          <button
+            onClick={() => handleNotifications(false)}
+            disabled={loading}
+            className="w-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 font-medium rounded-xl py-3 transition"
+          >
+            Ikke nå
+          </button>
+        </div>
+        <BackButton onClick={() => setStep(3)} disabled={loading} />
+        <StepDots current={4} total={TOTAL_STEPS} />
+      </Screen>
+    )
+  }
+
+  // Steg 5: Installer på hjemskjerm
   return (
     <Screen>
       <div className="text-center space-y-3">
-        <div className="text-5xl">🔔</div>
-        <h2 className="text-xl font-bold text-white">Daglig påminnelse?</h2>
+        <div className="text-5xl">📲</div>
+        <h2 className="text-xl font-bold text-white">Legg til på hjemskjermen</h2>
         <p className="text-gray-400 text-sm leading-relaxed">
-          En liten dytt på rett tidspunkt. Ikke stress — bare en invitasjon.
+          Da er appen alltid ett trykk unna — akkurat som en vanlig app.
         </p>
       </div>
-      <div className="space-y-3">
+
+      {isIos ? (
+        <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">1</div>
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-gray-300 text-sm">Trykk på</span>
+              <svg className="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <span className="text-gray-300 text-sm">i Safari</span>
+            </div>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">2</div>
+            <p className="text-gray-300 text-sm pt-1">Scroll ned og trykk <span className="text-white font-medium">"Legg til på Hjem-skjerm"</span></p>
+          </div>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-full bg-orange-500/20 text-orange-400 flex items-center justify-center text-sm font-bold shrink-0">3</div>
+            <p className="text-gray-300 text-sm pt-1">Trykk <span className="text-white font-medium">"Legg til"</span> øverst til høyre</p>
+          </div>
+        </div>
+      ) : deferredPrompt ? (
         <button
-          onClick={() => handleNotifications(true)}
-          disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+          onClick={handleAndroidInstall}
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 transition"
         >
-          {loading ? 'Lagrer...' : 'Ja, send meg påminnelser'}
+          Installer appen
         </button>
-        <button
-          onClick={() => handleNotifications(false)}
-          disabled={loading}
-          className="w-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 font-medium rounded-xl py-3 transition"
-        >
-          Ikke nå
-        </button>
-      </div>
-      <BackButton onClick={() => setStep(3)} disabled={loading} />
-      <StepDots current={4} total={4} />
+      ) : (
+        <div className="bg-gray-800 rounded-2xl p-4">
+          <p className="text-gray-400 text-sm text-center">Åpne mikrotrening.no i Chrome og trykk "Legg til på startskjermen" i menyen.</p>
+        </div>
+      )}
+
+      <button
+        onClick={() => { router.push('/'); router.refresh() }}
+        className="w-full text-gray-500 hover:text-gray-300 text-sm py-1 transition"
+      >
+        {isIos ? 'Jeg gjør det senere →' : 'Hopp over →'}
+      </button>
+      <StepDots current={5} total={5} />
     </Screen>
   )
 }
