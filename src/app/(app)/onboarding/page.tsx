@@ -113,7 +113,7 @@ export default function OnboardingPage() {
   if (step === 1) {
     return (
       <Screen>
-        <div className="space-y-6">
+        <div className="space-y-6 text-center">
           <div className="space-y-1">
             <h1 className="text-3xl font-bold text-white leading-tight">
               Velkommen til Mikrotrening.
