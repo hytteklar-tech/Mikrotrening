@@ -38,9 +38,15 @@ export default function GroupBanner({ groupName, members }: Props) {
           </div>
         ))}
       </div>
-      <p className="text-sm text-gray-300 flex-1">
-        <span className="text-white font-medium">{trainedCount} av {total}</span> i {groupName} har trent
-      </p>
+      {trainedCount === 0 ? (
+        <p className="text-sm text-gray-300 flex-1">
+          Vær den første i <span className="text-white font-medium">{groupName}</span> til å trene i dag!
+        </p>
+      ) : (
+        <p className="text-sm text-gray-300 flex-1">
+          <span className="text-white font-medium">{trainedCount} av {total}</span> i {groupName} har trent i dag
+        </p>
+      )}
       <svg className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
