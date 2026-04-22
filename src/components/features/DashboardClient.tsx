@@ -142,12 +142,24 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
 
   const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
 
+  // Vis velkomstkort for nye brukere (kun pre-registrert økt fra onboarding)
+  const isNewUser = dayLogs.length === 1 && !uniqueDates.includes(today)
+
   const showMotivation = notificationsEnabled && dayLogs.length > 0 && dayLogs.length % 5 === 0
   const motivationMsg = ONELINERS[(Math.floor(dayLogs.length / 5) - 1) % ONELINERS.length]
 
   return (
     <>
       <StreakCard streak={streak} hasTrained={hasTrained} totalSessions={dayLogs.length} />
+      {isNewUser && (
+        <div className="bg-gradient-to-br from-orange-500/20 to-orange-700/10 border border-orange-500/40 rounded-2xl p-5 space-y-3">
+          <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide">En gave fra oss</p>
+          <p className="text-white font-bold text-lg leading-snug">
+            Din første mikroøkt er klar.<br />Nå er det din tur.
+          </p>
+          <p className="text-gray-400 text-sm">15 knebøy. 30 sekunder. Det er alt som skal til.</p>
+        </div>
+      )}
       {showMotivation && (
         <div className="bg-gradient-to-br from-orange-500/30 to-orange-700/20 border border-orange-500/60 rounded-2xl px-4 py-3 shadow shadow-orange-500/20">
           <p className="text-xs text-orange-300 font-semibold mb-1 tracking-wide uppercase">Visste du at...</p>
