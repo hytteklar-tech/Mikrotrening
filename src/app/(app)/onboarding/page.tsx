@@ -146,7 +146,7 @@ export default function OnboardingPage() {
       <Screen>
         <div className="text-center space-y-2">
           <h2 className="text-xl font-bold text-white">Hva skal vi kalle deg?</h2>
-          <p className="text-gray-400 text-sm">Navnet vises på resultattavlen.</p>
+          <p className="text-gray-400 text-sm">Vi bruker navnet ditt når du trener og følger fremgangen din.</p>
         </div>
         <input
           type="text"
