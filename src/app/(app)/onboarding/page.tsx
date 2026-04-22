@@ -209,7 +209,7 @@ export default function OnboardingPage() {
         </button>
         <button
           onClick={() => saveAndGoToInstall(false)}
-          className="w-full text-gray-500 hover:text-gray-300 text-sm py-1 transition"
+          className="w-full text-gray-400 hover:text-gray-200 text-sm py-1 transition"
         >
           Jeg vil ikke ha varsler
         </button>
@@ -299,7 +299,7 @@ export default function OnboardingPage() {
 
       <button
         onClick={() => { router.push('/'); router.refresh() }}
-        className="w-full text-gray-500 hover:text-gray-300 text-sm py-1 transition"
+        className="w-full text-gray-400 hover:text-gray-200 text-sm py-1 transition"
       >
         {isIos ? 'Jeg gjør det senere →' : 'Hopp over →'}
       </button>
@@ -323,7 +323,7 @@ function BackButton({ onClick, disabled }: { onClick: () => void; disabled?: boo
     <button
       onClick={onClick}
       disabled={disabled}
-      className="w-full text-gray-500 hover:text-gray-300 disabled:opacity-30 text-sm py-1 transition"
+      className="w-full text-gray-400 hover:text-gray-200 disabled:opacity-30 text-sm py-1 transition"
     >
       ← Tilbake
     </button>
