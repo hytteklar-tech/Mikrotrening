@@ -68,8 +68,6 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
       base += 'bg-green-500 text-white font-bold hover:bg-green-400'
     } else if (isToday) {
       base += 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
-    } else if (isPast && firstLogDate && dateStr >= firstLogDate) {
-      base += 'bg-red-900/40 text-red-400 hover:bg-red-900/60'
     } else {
       base += 'bg-gray-800/50 text-gray-500 hover:bg-gray-700/60'
     }
