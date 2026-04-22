@@ -18,6 +18,7 @@ export default function OnboardingPage() {
   const [name, setName] = useState('')
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
   const [loading, setLoading] = useState(false)
+  const [notificationsDone, setNotificationsDone] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [installed, setInstalled] = useState(false)
   const router = useRouter()
@@ -46,8 +47,8 @@ export default function OnboardingPage() {
         push_enabled: pushEnabled,
       }).eq('id', user.id)
     }
-    router.push('/')
-    router.refresh()
+    setLoading(false)
+    setNotificationsDone(true)
   }
 
   async function handleNotifications(want: boolean) {
@@ -225,31 +226,35 @@ export default function OnboardingPage() {
             Den enkleste måten å bygge en god vane på er å få en daglig påminnelse.
           </p>
         </div>
-        <div className="space-y-3">
+        {notificationsDone ? (
           <button
-            onClick={() => handleNotifications(true)}
-            disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+            onClick={() => { router.push('/'); router.refresh() }}
+            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl py-4 text-lg transition"
           >
-            {loading ? 'Lagrer...' : 'Ja, send meg påminnelser'}
+            Start din første mikroøkt nå →
           </button>
-          <button
-            onClick={() => handleNotifications(false)}
-            disabled={loading}
-            className="w-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 font-medium rounded-xl py-3 transition"
-          >
-            Ikke nå
-          </button>
-        </div>
-        <BackButton onClick={() => setStep(3)} disabled={loading} />
+        ) : (
+          <>
+            <div className="space-y-3">
+              <button
+                onClick={() => handleNotifications(true)}
+                disabled={loading}
+                className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+              >
+                {loading ? 'Lagrer...' : 'Ja, send meg påminnelser'}
+              </button>
+              <button
+                onClick={() => handleNotifications(false)}
+                disabled={loading}
+                className="w-full bg-gray-800 hover:bg-gray-700 disabled:opacity-50 text-gray-300 font-medium rounded-xl py-3 transition"
+              >
+                Ikke nå
+              </button>
+            </div>
+            <BackButton onClick={() => setStep(3)} disabled={loading} />
+          </>
+        )}
         <StepDots current={4} total={TOTAL_STEPS} />
-        <button
-          onClick={() => { router.push('/'); router.refresh() }}
-          disabled={loading}
-          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold rounded-xl py-4 text-lg transition mt-4"
-        >
-          Start din første mikroøkt nå →
-        </button>
       </Screen>
     )
   }
