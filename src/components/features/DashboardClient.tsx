@@ -67,8 +67,12 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
-    if (window.matchMedia('(display-mode: standalone)').matches) return
-    if (localStorage.getItem('install_prompt_dismissed')) return
+    const isPwa = window.matchMedia('(display-mode: standalone)').matches
+    if (isPwa) {
+      // Logg at brukeren kjører som PWA
+      createClient().from('users').update({ is_pwa: true }).eq('id', userId).then(() => {})
+      return
+    }
     const handler = (e: Event) => { e.preventDefault(); setDeferredPrompt(e) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
@@ -112,15 +116,18 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
     dayCounts[log.date] = (dayCounts[log.date] ?? 0) + 1
   }
 
-  // Vis installasjonsbanner etter første økt
+  // Vis installasjonsbanner ved 7, 14, 21... registreringer
   useEffect(() => {
-    if (dayLogs.length >= 1 && !window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('install_prompt_dismissed')) {
-      setShowInstallBanner(true)
-    }
+    if (dayLogs.length === 0) return
+    if (dayLogs.length % 7 !== 0) return
+    if (window.matchMedia('(display-mode: standalone)').matches) return
+    const dismissedAt = parseInt(localStorage.getItem('install_dismissed_at') ?? '0')
+    if (dismissedAt === dayLogs.length) return
+    setShowInstallBanner(true)
   }, [dayLogs.length])
 
   function dismissInstallBanner() {
-    localStorage.setItem('install_prompt_dismissed', '1')
+    localStorage.setItem('install_dismissed_at', String(dayLogs.length))
     setShowInstallBanner(false)
   }
 
