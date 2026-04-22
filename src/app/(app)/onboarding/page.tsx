@@ -222,7 +222,7 @@ export default function OnboardingPage() {
           <div className="text-5xl">🔔</div>
           <h2 className="text-xl font-bold text-white">Daglig påminnelse?</h2>
           <p className="text-gray-400 text-sm leading-relaxed">
-            En liten dytt på rett tidspunkt. Ikke stress — bare en invitasjon.
+            Den enkleste måten å bygge en god vane på er å få en daglig påminnelse.
           </p>
         </div>
         <div className="space-y-3">
@@ -243,6 +243,13 @@ export default function OnboardingPage() {
         </div>
         <BackButton onClick={() => setStep(3)} disabled={loading} />
         <StepDots current={4} total={TOTAL_STEPS} />
+        <button
+          onClick={() => { router.push('/'); router.refresh() }}
+          disabled={loading}
+          className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-bold rounded-xl py-4 text-lg transition mt-4"
+        >
+          Start din første mikroøkt nå →
+        </button>
       </Screen>
     )
   }
