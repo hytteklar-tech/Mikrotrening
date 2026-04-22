@@ -207,6 +207,12 @@ export default function OnboardingPage() {
         >
           Neste
         </button>
+        <button
+          onClick={() => saveAndGoToInstall(false)}
+          className="w-full text-gray-500 hover:text-gray-300 text-sm py-1 transition"
+        >
+          Jeg vil ikke ha varsler
+        </button>
         <BackButton onClick={() => setStep(2)} />
         <StepDots current={3} total={TOTAL_STEPS} />
       </Screen>
