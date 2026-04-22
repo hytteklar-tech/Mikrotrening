@@ -7,10 +7,14 @@ import { sendPushNotification } from '@/lib/onesignal'
 
 const STREAK_MILESTONES: Record<number, string> = {
   7:   '7 dager på rad! Du bygger en vane. 🔥',
+  14:  '14 dager! To uker uten å gi opp. 💪',
   30:  '30 dager! Forskning viser at vanen nå sitter. 🥈',
+  45:  '45 dager! Halvveis til to måneder. 🔥',
+  60:  '60 dager! To måneder på rad. Du er ikke til å stoppe. 💥',
   90:  '90 dager! Du er Maskinen. 🥇',
-  180: '180 dager! Ustoppelig. 💎',
-  270: '270 dager! Jernvilje. 🔥',
+  120: '120 dager! Fire måneder. Jernvilje. 💎',
+  180: '180 dager! Et halvt år! Ustoppelig. 🏆',
+  270: '270 dager! Tre av fire. Nesten der. 🔥',
   365: 'Et helt år! Du er Legenden. 👑',
 }
 

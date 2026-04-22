@@ -19,7 +19,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
-  const [hasOnesignalId, setHasOnesignalId] = useState(!!profile?.onesignal_id)
+  const [hasOnesignalId, setHasOnesignalId] = useState(!!(profile?.onesignal_id || profile?.push_subscription))
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
 
@@ -36,6 +36,8 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [saved, setSaved] = useState(false)
   const [confirmDelete, setConfirmDelete] = useState(false)
   const [deleting, setDeleting] = useState(false)
+  const [testResult, setTestResult] = useState<string | null>(null)
+  const [testing, setTesting] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
@@ -130,6 +132,21 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
     clearTimeout(safetyStop)
     if (!saved) setActivateError('Fikk ikke registrert enheten. Prøv igjen.')
     setActivating(false)
+  }
+
+  async function testPush() {
+    setTesting(true)
+    setTestResult(null)
+    try {
+      const res = await fetch('/api/push/test')
+      const text = await res.text()
+      let json: any
+      try { json = JSON.parse(text) } catch { setTestResult('Ugyldig svar: ' + text.slice(0, 200)); setTesting(false); return }
+      setTestResult(JSON.stringify(json, null, 2))
+    } catch (e: any) {
+      setTestResult('Nettverksfeil: ' + e.message)
+    }
+    setTesting(false)
   }
 
   function toggleTime(val: TimeOption) {
@@ -245,6 +262,19 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
               )
             })}
           </div>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <button
+          onClick={testPush}
+          disabled={testing}
+          className="w-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-gray-300 rounded-xl py-2 text-sm transition"
+        >
+          {testing ? 'Sender...' : '🔔 Send testvarsel nå'}
+        </button>
+        {testResult && (
+          <pre className="text-xs text-gray-300 bg-gray-900 rounded-xl p-3 overflow-auto whitespace-pre-wrap break-all">{testResult}</pre>
         )}
       </div>
 
