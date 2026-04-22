@@ -15,21 +15,23 @@
 - /api/milestones/check: lagt til autentisering (401/403 uten innlogging)
 - /api/exercises: limit begrenset til 1–100
 - next.config.ts: security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy)
-- Committet og deployet til prod
 
 ### Kontosikkerhet
-- 2FA aktivert på Google-konto (med Authenticator-appen)
-- 2FA aktivert på Supabase
-- 2FA aktivert på Vercel
+- 2FA aktivert på Google, Supabase og Vercel
+
+### Install-banner forbedret
+- Vises nå ved 3, 7 og 10 registreringer (tidligere: hver 7.)
+- Hvert tidspunkt huskes separat i localStorage
+- iPhone: viser Safari deleknapp-instruksjoner
+- Android: viser "Installer appen"-knapp
+
+### Ingrid onboardet
+- User-rad slettet fra users-tabellen → hun kjører onboarding på nytt
 
 ## Ventende
 - Sjekk iPhone kl 08 i morgen — kom push-varselet?
 - Øvelsesbibliotek i treningspakke-editor (avventer GIF-pakker)
 - Supabase-migrasjoner 011, 012, 013 — sjekk om kjørt i prod
-
-## Neste sesjon
-- Bekreft at kl 08-varselet kom
-- Vurder øvelsesbibliotek i pakke-editor
 
 ## Miljø
 - Vercel: www.mikrotrening.no

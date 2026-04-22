@@ -232,3 +232,14 @@ Sesjon 024 avsluttet.
 - Sikkerhetsfikser deployet: milestones auth, exercises limit, security headers
 - 2FA aktivert på Google, Supabase og Vercel
 - Ventende: verifiser kl 08-varsel på iPhone i morgen
+
+## 2026-04-22 | P7 | DONE — Install-banner: 3/7/10 registreringer
+- Trigger endret fra % 7 til eksakt [3, 7, 10]
+- Hvert tidspunkt huskes separat (install_dismissed array i localStorage)
+- iPhone får Safari-instruksjoner, Android får Installer-knapp
+
+## 2026-04-22 | P7 | DONE — Ingrid onboardet
+- User-rad slettet fra users-tabellen
+
+## 2026-04-22 | P7 | SESSION_END
+Sesjon 024 avsluttet.

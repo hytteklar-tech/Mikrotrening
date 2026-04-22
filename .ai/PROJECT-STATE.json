@@ -83,7 +83,7 @@
     "status": "completed",
     "startedAt": "2026-04-22T08:00:00Z",
     "sessionId": "sess-sommerkropp-024",
-    "lastSignificantAction": "OneSignal API-nøkkel fikset. Sikkerhetsgjennomgang: milestones autentisering, security headers, exercises validering. 2FA aktivert på Google, Supabase og Vercel."
+    "lastSignificantAction": "Install-banner: vises nå ved 3, 7 og 10 registreringer. iOS-instruksjoner på plass. Ingrid onboardet (user-rad slettet)."
   },
 
   "dataTypes": {
