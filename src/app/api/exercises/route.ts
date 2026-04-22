@@ -30,7 +30,7 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
   const bodyPart = searchParams.get('bodyPart')
   const name = searchParams.get('name')?.toLowerCase().trim()
-  const limit = parseInt(searchParams.get('limit') ?? '20', 10)
+  const limit = Math.min(Math.max(parseInt(searchParams.get('limit') ?? '20', 10) || 20, 1), 100)
 
   const res = await fetch(DB_URL, { next: { revalidate: 86400 } })
   if (!res.ok) {
