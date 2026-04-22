@@ -79,8 +79,7 @@ export default async function DashboardPage() {
   return (
     <div className="p-4 space-y-6">
       <div className="pt-4">
-        <p className="text-gray-400 text-sm">Hei, {profile.display_name} 👋</p>
-        <h1 className="text-2xl font-bold">La oss mikrotrene!</h1>
+        <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
       </div>
 
       {groupBannerData && (
