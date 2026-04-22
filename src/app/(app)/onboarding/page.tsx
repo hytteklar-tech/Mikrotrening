@@ -106,7 +106,7 @@ export default function OnboardingPage() {
     )
   }
 
-  const isIos = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
+  const isIos = true // MIDLERTIDIG: tving iOS-visning for testing
   const TOTAL_STEPS = installed ? 4 : 5
 
   // Steg 1: Velkomst
