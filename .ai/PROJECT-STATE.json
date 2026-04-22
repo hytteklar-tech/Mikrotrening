@@ -37,7 +37,7 @@
   "pendingTasks": [
     {
       "id": "test-cron-push-delivery",
-      "title": "Verifiser at push-varsler leveres fra cron — sjekk Vercel-logg etter kl 15/19"
+      "title": "Verifiser at push-varsler leveres — sjekk iPhone kl 08 i morgen"
     }
   ],
   "completedTasks": [
@@ -81,9 +81,9 @@
 
   "session": {
     "status": "completed",
-    "startedAt": "2026-04-22T00:00:00Z",
-    "sessionId": "sess-sommerkropp-023",
-    "lastSignificantAction": "Cron-fix (5→1 job, Hobby-plan). Onboarding 4-steg, Mikro 30 standardpakke, ny bruker-UX, gruppe-banner, daglig hilsemelding, kalender uten rød farge."
+    "startedAt": "2026-04-22T08:00:00Z",
+    "sessionId": "sess-sommerkropp-024",
+    "lastSignificantAction": "OneSignal API-nøkkel fikset. Sikkerhetsgjennomgang: milestones autentisering, security headers, exercises validering. 2FA aktivert på Google, Supabase og Vercel."
   },
 
   "dataTypes": {

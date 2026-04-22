@@ -226,3 +226,9 @@ Safe area inset: viewportFit=cover + pb-[env(safe-area-inset-bottom)] på Bottom
 
 ## 2026-04-17 | CLA | SESSION_END
 Sesjon 016 avsluttet.
+## 2026-04-22 | P7 | SESSION_END
+Sesjon 024 avsluttet.
+- OneSignal API-nøkkel fikset (rotert, ny os_v2-nøkkel i Vercel)
+- Sikkerhetsfikser deployet: milestones auth, exercises limit, security headers
+- 2FA aktivert på Google, Supabase og Vercel
+- Ventende: verifiser kl 08-varsel på iPhone i morgen

@@ -3,45 +3,33 @@
 **Fase:** 7 — Live / Post-launch
 **URL:** https://www.mikrotrening.no
 
-## Hva ble gjort denne økten (sess-023)
+## Hva ble gjort denne økten (sess-024)
 
-### Onboarding redesignet (4 steg)
-- Pre-registrerer gårsdagen → nye brukere ankommer med streak = 1
-- Steg 3: hopp-knapp for de som ikke vil ha varsler
-- Steg 4: viser startknapp først etter at push er aktivert
+### OneSignal push-varsler fikset
+- Roterte REST API Key i OneSignal (gammel nøkkel var ugyldig)
+- Ny nøkkel (os_v2_...) lagt inn i Vercel → ONESIGNAL_REST_API_KEY
+- Verifisert med /api/push/test → status 200
+- Kl 19-varselet ble 3 min for sent (redeploy ikke ferdig) — kl 08 i morgen er første reelle test
 
-### Mikro 30 standardpakke
-- Migration 013: `handle_new_user`-trigger oppretter "Mikro 30" + Knebøy-øvelse automatisk
+### Sikkerhetsgjennomgang og -fiks
+- /api/milestones/check: lagt til autentisering (401/403 uten innlogging)
+- /api/exercises: limit begrenset til 1–100
+- next.config.ts: security headers (X-Content-Type-Options, X-Frame-Options, Referrer-Policy, Permissions-Policy)
+- Committet og deployet til prod
 
-### Dashboard ny bruker-UX
-- `isNewUser` flagg: velkomstkort med oransje aksent i stedet for streak
-- StreakCard: "Du er i gang! 🚀" for nye brukere
-- Install-banner vises ved 7/14/21 registreringer (ikke ved første besøk)
-- `is_pwa` logges til DB (migration 012)
-
-### Kalender
-- Komprimert 2-ukersvisning som standard, knapp utvider til full måned
-- Rød farge fjernet — alle utrenede dager er grå
-
-### Gruppe-banner på hjemskjerm
-- Avatarer med grønn/grå farge basert på om de trente i dag
-- Hentes server-side med dagens logger for alle gruppemedlemmer
-
-### Daglig hilsemelding
-- 13 roterende meldinger, ny per dag, aldri samme som i går, låst i localStorage
-
-### Push-varsler
-- Streak-milepæler utvidet: 7/14/30/45/60/90/120/180/270/365 dager
-- Rate-limit: maks 5 push per bruker per dag (migration 011)
-- **Cron-fix**: Hobby-plan tillater bare 2 cron-jobs — 5 entries slått til 1: `0 6,9,13,17 * * *`
+### Kontosikkerhet
+- 2FA aktivert på Google-konto (med Authenticator-appen)
+- 2FA aktivert på Supabase
+- 2FA aktivert på Vercel
 
 ## Ventende
-- Sjekk Vercel Logs etter kl 15 eller 19 norsk tid — verifiser at push faktisk sendes
-- Supabase-migrasjoner 011, 012, 013 må kjøres hvis ikke allerede gjort
+- Sjekk iPhone kl 08 i morgen — kom push-varselet?
+- Øvelsesbibliotek i treningspakke-editor (avventer GIF-pakker)
+- Supabase-migrasjoner 011, 012, 013 — sjekk om kjørt i prod
 
 ## Neste sesjon
-- Bekreft at push-cron fungerer
-- Vurder å bygge "velg øvelser fra bibliotek" inn i treningspakke-editoren
+- Bekreft at kl 08-varselet kom
+- Vurder øvelsesbibliotek i pakke-editor
 
 ## Miljø
 - Vercel: www.mikrotrening.no
