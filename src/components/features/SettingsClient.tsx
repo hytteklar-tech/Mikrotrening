@@ -85,7 +85,6 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           new Promise(r => setTimeout(r, 3000)),
         ])
         const existing = await swReg.pushManager.getSubscription()
-        setActivateError(existing ? 'Eksisterende abonnement funnet...' : 'Abonnerer...')
         const sub = existing ?? await Promise.race([
           swReg.pushManager.subscribe({
             userVisibleOnly: true,
