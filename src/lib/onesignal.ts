@@ -3,12 +3,6 @@ import webpush from 'web-push'
 const APP_ID = process.env.NEXT_PUBLIC_ONESIGNAL_APP_ID!
 const API_KEY = process.env.ONESIGNAL_REST_API_KEY!
 
-webpush.setVapidDetails(
-  process.env.VAPID_SUBJECT!,
-  process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
-  process.env.VAPID_PRIVATE_KEY!,
-)
-
 export async function sendPushNotification({
   playerIds,
   nativeSubscriptions,
@@ -20,6 +14,12 @@ export async function sendPushNotification({
   title: string
   body: string
 }) {
+  webpush.setVapidDetails(
+    process.env.VAPID_SUBJECT!,
+    process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!,
+    process.env.VAPID_PRIVATE_KEY!,
+  )
+
   const promises: Promise<any>[] = []
 
   if (playerIds.length) {
