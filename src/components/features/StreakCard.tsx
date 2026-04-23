@@ -30,7 +30,7 @@ function ProgressRing({ streak, nextMilestone, alive }: { streak: number; nextMi
       <text x={cx} y={cx - 3} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="16" fontWeight="600" fontFamily="sans-serif">
         {streak}
       </text>
-      <text x={cx} y={cx + 12} textAnchor="middle" fill="#555" fontSize="8" fontFamily="sans-serif">
+      <text x={cx} y={cx + 12} textAnchor="middle" fill="#999" fontSize="8" fontFamily="sans-serif">
         av {nextMilestone}
       </text>
     </svg>
@@ -171,7 +171,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
             <span style={{ color: alive ? '#e85c00' : '#555' }}>{streak}</span>
             {' '}dager på rad.
           </p>
-          <p style={{ fontSize: 14, color: '#555', marginTop: 4 }}>{totalSessions} dager totalt.</p>
+          <p style={{ fontSize: 14, color: '#999', marginTop: 4 }}>{totalSessions} dager totalt.</p>
           {!alive && !isNewUser && (
             <button
               onClick={onScrollToToday}
