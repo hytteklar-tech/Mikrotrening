@@ -27,8 +27,9 @@ export async function proxy(request: NextRequest) {
 
   const isAuthPage = request.nextUrl.pathname.startsWith('/login')
   const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/')
 
-  if (!user && !isAuthPage && !isAuthCallback) {
+  if (!user && !isAuthPage && !isAuthCallback && !isApiRoute) {
     return NextResponse.redirect(new URL('/login', request.url))
   }
 
