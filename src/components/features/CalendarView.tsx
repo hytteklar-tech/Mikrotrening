@@ -30,8 +30,59 @@ function getLast14Days(today: string): string[] {
   return days
 }
 
+function WeekTrend({ dates }: { dates: string[] }) {
+  const today = new Date()
+  today.setHours(12, 0, 0, 0)
+  const dayOfWeek = (today.getDay() + 6) % 7
+
+  const thisMonday = new Date(today)
+  thisMonday.setDate(today.getDate() - dayOfWeek)
+  thisMonday.setHours(0, 0, 0, 0)
+
+  const lastMonday = new Date(thisMonday)
+  lastMonday.setDate(thisMonday.getDate() - 7)
+
+  const thisWeek = dates.filter(d => {
+    const date = new Date(d + 'T12:00:00')
+    return date >= thisMonday && date <= today
+  }).length
+
+  const lastWeekEnd = new Date(lastMonday)
+  lastWeekEnd.setDate(lastMonday.getDate() + dayOfWeek)
+  lastWeekEnd.setHours(23, 59, 59, 999)
+  const lastWeek = dates.filter(d => {
+    const date = new Date(d + 'T12:00:00')
+    return date >= lastMonday && date <= lastWeekEnd
+  }).length
+
+  if (thisWeek === 0) {
+    return (
+      <div className="py-4 space-y-1">
+        <p style={{ fontSize: 32, fontWeight: 600, color: '#555' }}>—</p>
+        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken</p>
+        {lastWeek > 0 && (
+          <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+        )}
+      </div>
+    )
+  }
+
+  const up = thisWeek >= lastWeek
+  const diff = lastWeek === 0 ? null : Math.round(((thisWeek - lastWeek) / lastWeek) * 100)
+  const pctText = diff === null ? (up ? '↑ ny uke' : '—') : `${up ? '↑' : '↓'} ${Math.abs(diff)}%`
+
+  return (
+    <div className="py-4 space-y-1">
+      <p style={{ fontSize: 32, fontWeight: 600, color: up ? '#33aa33' : '#aaa' }}>{pctText}</p>
+      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken</p>
+      <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+    </div>
+  )
+}
+
 export default function CalendarView({ dayCounts, selectedDate, onSelectDate, firstLogDate }: Props) {
   const today = toLocalDateStr(new Date())
+  const [tab, setTab] = useState<'calendar' | 'trend'>('calendar')
   const [expanded, setExpanded] = useState(false)
   const [viewYear, setViewYear] = useState(() => parseInt(today.slice(0, 4)))
   const [viewMonth, setViewMonth] = useState(() => parseInt(today.slice(5, 7)) - 1)
@@ -54,7 +105,6 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
 
   function getDayStyle(dateStr: string) {
     const count = dayCounts[dateStr] ?? 0
-    const isPast = dateStr < today
     const isToday = dateStr === today
     const isSelected = dateStr === selectedDate
 
@@ -63,13 +113,13 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     if (isSelected) base += 'ring-2 ring-orange-400 '
 
     if (count >= 2) {
-      base += 'text-white font-bold'
+      base += 'bg-orange-500 text-white font-bold hover:bg-orange-400'
     } else if (count === 1) {
-      base += 'text-white font-bold'
+      base += 'bg-green-500 text-white font-bold hover:bg-green-400'
     } else if (isToday) {
-      base += 'text-orange-300'
+      base += 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
     } else {
-      base += 'text-gray-500 hover:bg-gray-700/60'
+      base += 'bg-gray-800/50 text-gray-500 hover:bg-gray-700/60'
     }
 
     return base
@@ -77,23 +127,19 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
 
   function DayButton({ dateStr }: { dateStr: string }) {
     const count = dayCounts[dateStr] ?? 0
-    const isToday = dateStr === today
-    const bg = count >= 2 ? '#e85c00' : count === 1 ? '#3a1f00' : isToday ? 'rgba(232,92,0,0.15)' : '#1a1a1a'
-    const border = isToday ? '1.5px solid #e85c00' : '1.5px solid transparent'
     return (
       <button
         onClick={() => (dateStr <= today || count > 0) && onSelectDate(dateStr)}
         disabled={dateStr > today && !(count > 0)}
         className={getDayStyle(dateStr)}
-        style={{ background: bg, border }}
       >
         {parseInt(dateStr.slice(8))}
         {dateStr === today && (
           <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-orange-400" />
         )}
-        {(dayCounts[dateStr] ?? 0) >= 2 && (
+        {count >= 2 && (
           <span className="absolute top-0.5 right-1 text-[9px] font-bold text-white">
-            {dayCounts[dateStr]}
+            {count}
           </span>
         )}
       </button>
@@ -103,10 +149,10 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
   const legend = (
     <div className="flex items-center gap-3 mt-3 text-xs text-gray-500 justify-center flex-wrap">
       <span className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded inline-block" style={{ background: '#3a1f00' }} /> 1 trening
+        <span className="w-3 h-3 rounded bg-green-500 inline-block" /> 1 trening
       </span>
       <span className="flex items-center gap-1">
-        <span className="w-3 h-3 rounded inline-block" style={{ background: '#e85c00' }} /> 2+ treninger
+        <span className="w-3 h-3 rounded bg-orange-500 inline-block" /> 2+ treninger
       </span>
       {firstLogDate && (
         <span className="flex items-center gap-1">
@@ -116,6 +162,37 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     </div>
   )
 
+  const dates = Object.keys(dayCounts)
+
+  // Tab-rad
+  const tabRow = (
+    <div className="flex gap-4 mb-3" style={{ borderBottom: '1px solid #1f1f1f' }}>
+      {(['calendar', 'trend'] as const).map(t => (
+        <button
+          key={t}
+          onClick={() => setTab(t)}
+          className="pb-2 text-sm font-medium transition"
+          style={{
+            color: tab === t ? '#e85c00' : '#555',
+            borderBottom: tab === t ? '2px solid #e85c00' : '2px solid transparent',
+            marginBottom: -1,
+          }}
+        >
+          {t === 'calendar' ? 'Kalender' : 'Trend'}
+        </button>
+      ))}
+    </div>
+  )
+
+  if (tab === 'trend') {
+    return (
+      <div className="bg-gray-900 rounded-2xl p-4">
+        {tabRow}
+        <WeekTrend dates={dates} />
+      </div>
+    )
+  }
+
   // --- Komprimert: siste 14 dager ---
   if (!expanded) {
     const last14 = getLast14Days(today)
@@ -124,6 +201,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
 
     return (
       <div className="bg-gray-900 rounded-2xl p-4">
+        {tabRow}
         <div className="grid grid-cols-7 mb-1">
           {DAYS.map(d => (
             <div key={d} className="text-center text-xs text-gray-500 py-1">{d}</div>
@@ -161,6 +239,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
 
   return (
     <div className="bg-gray-900 rounded-2xl p-4">
+      {tabRow}
       <div className="flex items-center justify-between mb-4">
         <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition">‹</button>
         <span className="text-white font-semibold">{MONTHS[viewMonth]} {viewYear}</span>

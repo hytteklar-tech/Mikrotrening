@@ -209,22 +209,6 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         </div>
       )}
 
-      {/* Trend-tab */}
-      {!isNewUser && (
-        <>
-          <div style={{ borderBottom: '1px solid #1f1f1f' }}>
-            <button
-              className="pb-2 text-sm font-medium"
-              style={{ color: '#e85c00', borderBottom: '2px solid #e85c00', marginBottom: -1 }}
-            >
-              Trend
-            </button>
-          </div>
-          <div className="pt-1">
-            <WeekTrend dates={dates} />
-          </div>
-        </>
-      )}
     </div>
   )
 }
