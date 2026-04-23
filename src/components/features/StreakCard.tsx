@@ -49,7 +49,7 @@ function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
       <text x={cx} y={cx - 4} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="20" fontWeight="600" fontFamily="sans-serif">
         {streak}
       </text>
-      <text x={cx} y={cx + 13} textAnchor="middle" fill="#999" fontSize="9" fontFamily="sans-serif">
+      <text x={cx} y={cx + 15} textAnchor="middle" fill="#bbb" fontSize="12" fontFamily="sans-serif">
         av {nextMilestone}
       </text>
     </svg>
@@ -190,7 +190,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
             <span style={{ color: alive ? '#e85c00' : '#555' }}>{streak}</span>
             {' '}dager på rad.
           </p>
-          <p style={{ fontSize: 14, color: '#999', marginTop: 4 }}>{totalSessions} dager totalt.</p>
+          <p style={{ fontSize: 16, color: '#bbb', marginTop: 4 }}>{totalSessions} dager totalt.</p>
           {!alive && !isNewUser && (
             <button
               onClick={onScrollToToday}
@@ -214,11 +214,11 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
             return (
               <div
                 key={m}
-                className="flex items-center gap-1 rounded-full px-2 py-0.5 text-xs"
+                className="flex items-center gap-1 rounded-full px-3 py-1 text-sm"
                 style={{
                   background: reached ? '#e85c00' : 'transparent',
-                  border: reached ? 'none' : isNext ? '1.5px solid #e85c00' : '1.5px solid #1f1f1f',
-                  color: reached ? 'white' : isNext ? '#e85c00' : '#555',
+                  border: reached ? 'none' : isNext ? '1.5px solid #e85c00' : '1.5px solid #444',
+                  color: reached ? 'white' : isNext ? '#e85c00' : '#888',
                 }}
               >
                 {reached && '🔥'} {m}d
