@@ -19,7 +19,7 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
-  const [showActivateButton, setShowActivateButton] = useState(needsActivation)
+  const [showActivateButton, setShowActivateButton] = useState(true)
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
 
