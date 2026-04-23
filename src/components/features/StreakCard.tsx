@@ -5,32 +5,51 @@ import { useState } from 'react'
 const MILESTONES = [7, 14, 30, 50, 100]
 
 
-function ProgressRing({ streak, nextMilestone, alive }: { streak: number; nextMilestone: number; alive: boolean }) {
-  const r = 30
-  const cx = 36
+const MILESTONES_LIST = [0, ...MILESTONES]
+
+function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
+  const r = 42
+  const cx = 52
+  const size = 104
   const circumference = 2 * Math.PI * r
-  const percent = alive ? Math.min(streak / nextMilestone, 1) : 0
-  const offset = circumference * (1 - percent)
+
+  const prevMilestone = [...MILESTONES_LIST].reverse().find(m => streak >= m) ?? 0
+  const nextMilestone = MILESTONES.find(m => m > streak) ?? MILESTONES[MILESTONES.length - 1]
+  const passedAny = streak >= MILESTONES[0]
+
+  const progress = alive
+    ? Math.min((streak - prevMilestone) / (nextMilestone - prevMilestone), 1)
+    : 0
+  const orangeProgress = alive && !passedAny ? progress : (alive ? 1 : 0)
+  const whiteProgress = alive && passedAny ? progress : 0
 
   return (
-    <svg width={72} height={72} viewBox="0 0 72 72" style={{ flexShrink: 0 }}>
-      <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1f1f1f" strokeWidth="5" />
-      {alive && percent > 0 && (
+    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} style={{ flexShrink: 0 }}>
+      <circle cx={cx} cy={cx} r={r} fill="none" stroke="#1f1f1f" strokeWidth="6" />
+      {alive && orangeProgress > 0 && (
         <circle
           cx={cx} cy={cx} r={r}
-          fill="none"
-          stroke="#e85c00"
-          strokeWidth="5"
+          fill="none" stroke="#e85c00" strokeWidth="6"
           strokeDasharray={circumference}
-          strokeDashoffset={offset}
+          strokeDashoffset={circumference * (1 - orangeProgress)}
           strokeLinecap="round"
           transform={`rotate(-90 ${cx} ${cx})`}
         />
       )}
-      <text x={cx} y={cx - 3} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="16" fontWeight="600" fontFamily="sans-serif">
+      {alive && whiteProgress > 0 && (
+        <circle
+          cx={cx} cy={cx} r={r}
+          fill="none" stroke="white" strokeWidth="6"
+          strokeDasharray={circumference}
+          strokeDashoffset={circumference * (1 - whiteProgress)}
+          strokeLinecap="round"
+          transform={`rotate(-90 ${cx} ${cx})`}
+        />
+      )}
+      <text x={cx} y={cx - 4} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="20" fontWeight="600" fontFamily="sans-serif">
         {streak}
       </text>
-      <text x={cx} y={cx + 12} textAnchor="middle" fill="#999" fontSize="8" fontFamily="sans-serif">
+      <text x={cx} y={cx + 13} textAnchor="middle" fill="#999" fontSize="9" fontFamily="sans-serif">
         av {nextMilestone}
       </text>
     </svg>
@@ -182,7 +201,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
           )}
         </div>
         {!isNewUser && (
-          <ProgressRing streak={streak} nextMilestone={nextMilestone} alive={alive} />
+          <ProgressRing streak={streak} alive={alive} />
         )}
       </div>
 
