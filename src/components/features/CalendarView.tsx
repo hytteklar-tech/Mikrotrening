@@ -58,10 +58,10 @@ function WeekTrend({ dates }: { dates: string[] }) {
   if (thisWeek === 0) {
     return (
       <div className="py-4 space-y-1">
-        <p style={{ fontSize: 32, fontWeight: 600, color: '#555' }}>—</p>
-        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken</p>
+        <p style={{ fontSize: 32, fontWeight: 600, color: 'white' }}>—</p>
+        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken (man–i dag)</p>
         {lastWeek > 0 && (
-          <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+          <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke</p>
         )}
       </div>
     )
@@ -69,13 +69,13 @@ function WeekTrend({ dates }: { dates: string[] }) {
 
   const up = thisWeek >= lastWeek
   const diff = lastWeek === 0 ? null : Math.round(((thisWeek - lastWeek) / lastWeek) * 100)
-  const pctText = diff === null ? (up ? '↑ ny uke' : '—') : `${up ? '↑' : '↓'} ${Math.abs(diff)}%`
+  const pctText = diff === null ? '↑ ny uke' : `${up ? '↑' : '↓'} ${Math.abs(diff)}%`
 
   return (
     <div className="py-4 space-y-1">
-      <p style={{ fontSize: 32, fontWeight: 600, color: up ? '#33aa33' : '#aaa' }}>{pctText}</p>
-      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken</p>
-      <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+      <p style={{ fontSize: 32, fontWeight: 600, color: 'white' }}>{pctText}</p>
+      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken (man–i dag)</p>
+      <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke (man–{['man','tir','ons','tor','fre','lør','søn'][dayOfWeek]})</p>
     </div>
   )
 }
