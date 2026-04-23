@@ -12,7 +12,7 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
   const [{ data: profile }, { data: logs }, { data: packages }, { data: memberships }] = await Promise.all([
     supabase
