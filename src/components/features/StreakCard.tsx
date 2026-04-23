@@ -162,7 +162,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
   const nextMilestoneIdx = MILESTONES.findIndex(m => m > streak)
 
   return (
-    <div className="rounded-2xl p-4 space-y-3" style={{ background: '#111' }}>
+    <div className="rounded-2xl p-4 space-y-3 bg-gray-900">
       {/* Header: tekst venstre, ring høyre */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1">
