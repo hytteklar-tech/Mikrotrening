@@ -58,7 +58,7 @@ function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
   if (thisWeek === 0) {
     return (
       <div className="py-4 space-y-1">
-        <p style={{ fontSize: 32, fontWeight: 600, color: 'white' }}>—</p>
+        <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>—</p>
         <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken (man–i dag)</p>
         {lastWeek > 0 && (
           <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke</p>
@@ -73,7 +73,7 @@ function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
 
   return (
     <div className="py-4 space-y-1">
-      <p style={{ fontSize: 32, fontWeight: 600, color: 'white' }}>{pctText}</p>
+      <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>{pctText}</p>
       <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken (man–i dag)</p>
       <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke (man–{['man','tir','ons','tor','fre','lør','søn'][dayOfWeek]})</p>
     </div>

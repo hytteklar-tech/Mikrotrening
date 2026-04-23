@@ -46,10 +46,10 @@ function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
           transform={`rotate(-90 ${cx} ${cx})`}
         />
       )}
-      <text x={cx} y={cx - 4} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="20" fontWeight="600" fontFamily="sans-serif">
+      <text x={cx} y={cx - 2} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="26" fontWeight="700" fontFamily="sans-serif">
         {streak}
       </text>
-      <text x={cx} y={cx + 15} textAnchor="middle" fill="#bbb" fontSize="12" fontFamily="sans-serif">
+      <text x={cx} y={cx + 17} textAnchor="middle" fill="#bbb" fontSize="12" fontFamily="sans-serif">
         av {nextMilestone}
       </text>
     </svg>
