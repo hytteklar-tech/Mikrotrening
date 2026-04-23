@@ -4,7 +4,9 @@ import { NextResponse, type NextRequest } from 'next/server'
 export async function proxy(request: NextRequest) {
   // API-ruter håndterer sin egen auth — ikke omdiriger dem
   if (request.nextUrl.pathname.startsWith('/api/')) {
-    return NextResponse.next()
+    const res = NextResponse.next()
+    res.headers.set('x-proxy-version', '2')
+    return res
   }
 
   let supabaseResponse = NextResponse.next({ request })
