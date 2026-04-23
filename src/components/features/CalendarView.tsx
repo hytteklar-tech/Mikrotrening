@@ -30,11 +30,11 @@ function getLast14Days(today: string): string[] {
   return days
 }
 
-function WeekTrend({ dates }: { dates: string[] }) {
+function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
   const today = new Date()
-  today.setHours(12, 0, 0, 0)
   const dayOfWeek = (today.getDay() + 6) % 7
 
+  // Datostrenger for mandag denne uka og forrige uke
   const thisMonday = new Date(today)
   thisMonday.setDate(today.getDate() - dayOfWeek)
   thisMonday.setHours(0, 0, 0, 0)
@@ -42,18 +42,18 @@ function WeekTrend({ dates }: { dates: string[] }) {
   const lastMonday = new Date(thisMonday)
   lastMonday.setDate(thisMonday.getDate() - 7)
 
-  const thisWeek = dates.filter(d => {
-    const date = new Date(d + 'T12:00:00')
-    return date >= thisMonday && date <= today
-  }).length
-
   const lastWeekEnd = new Date(lastMonday)
   lastWeekEnd.setDate(lastMonday.getDate() + dayOfWeek)
   lastWeekEnd.setHours(23, 59, 59, 999)
-  const lastWeek = dates.filter(d => {
-    const date = new Date(d + 'T12:00:00')
-    return date >= lastMonday && date <= lastWeekEnd
-  }).length
+
+  // Summer antall økter (ikke unike dager) for perioden
+  let thisWeek = 0
+  let lastWeek = 0
+  for (const [d, count] of Object.entries(dayCounts)) {
+    const date = new Date(d + 'T00:00:00')
+    if (date >= thisMonday && date <= today) thisWeek += count
+    if (date >= lastMonday && date <= lastWeekEnd) lastWeek += count
+  }
 
   if (thisWeek === 0) {
     return (
@@ -188,7 +188,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     return (
       <div className="bg-gray-900 rounded-2xl p-4">
         {tabRow}
-        <WeekTrend dates={dates} />
+        <WeekTrend dayCounts={dayCounts} />
       </div>
     )
   }
