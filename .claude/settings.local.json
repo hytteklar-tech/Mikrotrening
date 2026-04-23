@@ -40,7 +40,27 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git branch:*)",
-      "Bash(git remote:*)"
+      "Bash(git remote:*)",
+      "Bash(git push:*)",
+      "Bash(/dev/null cat:*)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== CSS-VARIABLER ===' grep -rn -- src/ app/ --include=*.css)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== TAILWIND-KLASSER ===' grep -roP \"\\(bg|text|border|ring\\)-\\\\[?[a-zA-Z#0-9_-]+\\\\]?\" src/ app/ --include=*.tsx)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== FONTER ===' grep -rn \"font\\\\|Geist\\\\|Inter\\\\|next/font\" src/ app/ --include=*.tsx --include=*.ts --include=*.css)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== SIDER ===' find src/ app/ -name page.tsx)",
+      "Bash(sort __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== LAYOUTS ===' find src/ app/ -name layout.tsx)",
+      "Bash(sort __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== KOMPONENTER ===' find src/ app/ -name *.tsx -not -name page.tsx -not -name layout.tsx)",
+      "Bash(sort __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== API-RUTER ===' find src/ app/ -name route.ts)",
+      "Bash(sort __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== DATABASE \\(migrasjoner\\) ===' cat supabase/migrations/*.sql 2)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo -e '\\\\n=== DATABASE \\(typer\\) ===' find src/ app/ lib/ -name *.types.ts -o -name database.ts)",
+      "Bash(xargs cat:*)",
+      "Bash(/dev/null __NEW_LINE_e1873109db97c97a__ echo 'Ferdig: app-audit.txt')",
+      "Bash(grep -r \"OneSignal\\\\|FCM\\\\|firebase\\\\|web push\\\\|service.*worker\" /home/arild/sommerkropp/src --include=*.ts --include=*.tsx --include=*.js --include=*.jsx)",
+      "Bash(grep -E \"\\\\.\\(ts|tsx\\)$\")",
+      "Bash(grep -r \"notifications_enabled\\\\|push.*notification\\\\|sendNotification\" /home/arild/sommerkropp/src --include=*.ts --include=*.tsx)",
+      "Bash(npx next:*)",
+      "Bash(cd:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(grep:*)"
     ]
   }
 }

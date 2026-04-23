@@ -1,0 +1,412 @@
+=== GLOBALS.CSS ===
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+=== CSS-VARIABLER ===
+src/app/globals.css:10:  --color-foreground: var(--foreground);
+src/app/globals.css:11:  --font-sans: var(--font-geist-sans);
+src/app/globals.css:12:  --font-mono: var(--font-geist-mono);
+src/app/globals.css:17:    --background: #0a0a0a;
+src/app/globals.css:18:    --foreground: #ededed;
+src/app/globals.css:23:  background: var(--background);
+src/app/globals.css:24:  color: var(--foreground);
+src/app/globals.css:4:  --background: #ffffff;
+src/app/globals.css:5:  --foreground: #171717;
+src/app/globals.css:9:  --color-background: var(--background);
+
+=== FARGER (HEX) ===
+#0a0a0a
+#171717
+#1f2937
+#4ade80
+#ea580c
+#ededed
+#f87171
+#f97316
+#ffffff
+
+=== TAILWIND-KLASSER ===
+bg-black
+bg-blue-600
+bg-blue-700
+bg-gradient-to-br
+bg-gray-600
+bg-gray-700
+bg-gray-800
+bg-gray-900
+bg-gray-950
+bg-green-500
+bg-green-700
+bg-green-800
+bg-green-900
+bg-orange-400
+bg-orange-500
+bg-orange-600
+bg-red-400
+bg-red-600
+bg-red-700
+bg-red-900
+bg-white
+border-0
+border-2
+border-b
+border-dashed
+border-gray-500
+border-gray-700
+border-gray-800
+border-orange-500
+border-t
+border-t-transparent
+ring-2
+ring-orange-400
+ring-orange-500
+text-2xl
+text-3xl
+text-4xl
+text-5xl
+text-6xl
+text-[9px]
+text-blue-200
+text-center
+text-gray-100
+text-gray-300
+text-gray-400
+text-gray-500
+text-gray-600
+text-green-300
+text-green-400
+text-left
+text-lg
+text-orange-100
+text-orange-300
+text-orange-400
+text-orange-500
+text-red-300
+text-red-400
+text-red-500
+text-right
+text-sm
+text-white
+text-xl
+text-xs
+text-yellow-400
+
+=== FONTER ===
+src/components/features/GroupManager.tsx:79:              <h3 className="font-semibold">{group.name}</h3>
+src/components/features/GroupManager.tsx:106:          <p className="text-sm font-semibold text-gray-300">Toppliste</p>
+src/components/features/GroupManager.tsx:113:        <p className="text-sm font-semibold text-gray-300">Bli med i gruppe</p>
+src/components/features/GroupManager.tsx:126:            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl px-4 py-2 text-sm font-semibold"
+src/components/features/GroupManager.tsx:135:        <p className="text-sm font-semibold text-gray-300">Opprett ny gruppe</p>
+src/components/features/GroupManager.tsx:147:            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl px-4 py-2 text-sm font-semibold"
+src/components/features/SettingsClient.tsx:45:        <p className="text-sm font-semibold text-gray-300">Profil</p>
+src/components/features/SettingsClient.tsx:60:            <p className="text-sm font-semibold">Motivasjonsmeldinger</p>
+src/components/features/SettingsClient.tsx:75:        className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+src/components/features/SettingsClient.tsx:95:        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Farlig sone</p>
+src/components/features/SettingsClient.tsx:116:                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-xl py-2 text-sm font-semibold"
+src/components/features/DashboardClient.tsx:113:          <p className="text-xs text-orange-300 font-semibold mb-1 tracking-wide uppercase">Visste du at...</p>
+src/components/features/StreakCard.tsx:63:            <span className="text-5xl font-bold">{streak}</span>
+src/components/features/TestStatsView.tsx:38:        <a href="/test" className="text-orange-500 font-semibold text-sm">
+src/components/features/TestStatsView.tsx:71:                <p className="font-semibold text-white">{t.name}</p>
+src/components/features/TestStatsView.tsx:75:                <span className={`text-sm font-bold ${improving ? 'text-green-400' : 'text-red-400'}`}>
+src/components/features/TestStatsView.tsx:85:                <p className="text-white font-bold text-sm">{formatResult(best, t.unit)}</p>
+src/components/features/TestStatsView.tsx:89:                <p className="text-white font-bold text-sm">{formatResult(first, t.unit)}</p>
+src/components/features/TestStatsView.tsx:93:                <p className="text-white font-bold text-sm">{formatResult(last, t.unit)}</p>
+src/components/features/TestClient.tsx:76:        <text x={boxX + boxW / 2} y={textY} textAnchor="middle" fontSize="10" fill="white" fontWeight="600">
+src/components/features/TestClient.tsx:313:                <p className="font-semibold text-white">{t.name}</p>
+src/components/features/TestClient.tsx:323:                    <span className={`text-sm font-bold ${
+src/components/features/TestClient.tsx:345:                Viser fremgang fra din <span className="text-white font-medium">første</span> til din <span className="text-white font-medium">siste</span> registrerte test.
+src/components/features/TestClient.tsx:376:                      <p className="text-white font-bold">{formatResult(best.result, t.unit)}</p>
+src/components/features/TestClient.tsx:380:                      <p className="text-white font-bold">{typeResults.length}</p>
+src/components/features/TestClient.tsx:391:                          <span className="text-white text-sm font-medium">{formatResult(r.result, t.unit)}</span>
+src/components/features/TestClient.tsx:447:                        className="flex-1 bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-2.5 text-sm transition"
+src/components/features/TestClient.tsx:463:                      className="bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 font-semibold rounded-xl px-4 py-2 text-sm transition"
+src/components/features/TestClient.tsx:498:          <p className="text-sm font-semibold text-gray-300">Ny egendefinert test</p>
+src/components/features/TestClient.tsx:524:                className={`w-full rounded-xl px-3 py-2 text-sm font-medium transition ${
+
+=== SIDER ===
+src/app/(app)/group/page.tsx
+src/app/(app)/leaderboard/page.tsx
+src/app/(app)/mikrotrening/page.tsx
+src/app/(app)/onboarding/page.tsx
+src/app/(app)/page.tsx
+src/app/(app)/settings/page.tsx
+src/app/(app)/statistikk/page.tsx
+src/app/(app)/test/page.tsx
+src/app/(app)/workouts/page.tsx
+src/app/(auth)/login/page.tsx
+
+=== LAYOUTS ===
+src/app/(app)/layout.tsx
+src/app/layout.tsx
+
+=== KOMPONENTER ===
+src/app/error.tsx
+src/app/not-found.tsx
+src/components/features/CalendarView.tsx
+src/components/features/DashboardClient.tsx
+src/components/features/GroupManager.tsx
+src/components/features/SettingsClient.tsx
+src/components/features/StatsView.tsx
+src/components/features/StreakCard.tsx
+src/components/features/TestClient.tsx
+src/components/features/TestStatsView.tsx
+src/components/features/TrainTodayButton.tsx
+src/components/features/WorkoutList.tsx
+src/components/ui/BottomNav.tsx
+src/components/ui/Logo.tsx
+
+=== API-RUTER ===
+src/app/auth/callback/route.ts
+
+=== DATABASE (migrasjoner) ===
+-- Users (extends Supabase Auth)
+CREATE TABLE public.users (
+  id uuid PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+  display_name text,
+  notifications_enabled boolean DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Workout packages
+CREATE TABLE public.workout_packages (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Exercises within packages
+CREATE TABLE public.exercises (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  package_id uuid NOT NULL REFERENCES public.workout_packages(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  reps integer NOT NULL CHECK (reps > 0),
+  "order" integer NOT NULL DEFAULT 0
+);
+
+-- Daily training logs
+CREATE TABLE public.daily_logs (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  package_id uuid NOT NULL REFERENCES public.workout_packages(id) ON DELETE CASCADE,
+  logged_date date NOT NULL DEFAULT CURRENT_DATE,
+  created_at timestamptz DEFAULT now(),
+  UNIQUE(user_id, logged_date)
+);
+
+-- Groups
+CREATE TABLE public.groups (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  name text NOT NULL,
+  invite_code text UNIQUE NOT NULL DEFAULT upper(substring(md5(random()::text), 1, 6)),
+  created_by uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Group members
+CREATE TABLE public.group_members (
+  group_id uuid NOT NULL REFERENCES public.groups(id) ON DELETE CASCADE,
+  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  joined_at timestamptz DEFAULT now(),
+  PRIMARY KEY (group_id, user_id)
+);
+
+-- Auto-create user profile on signup
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger AS $$
+BEGIN
+  INSERT INTO public.users (id)
+  VALUES (new.id);
+  RETURN new;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- RLS
+ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.workout_packages ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.exercises ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.daily_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.groups ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.group_members ENABLE ROW LEVEL SECURITY;
+
+-- Users: kun seg selv
+CREATE POLICY "users_own" ON public.users
+  FOR ALL USING (id = auth.uid());
+
+-- Workout packages: kun egne
+CREATE POLICY "packages_own" ON public.workout_packages
+  FOR ALL USING (user_id = auth.uid());
+
+-- Exercises: via package-eierskap
+CREATE POLICY "exercises_own" ON public.exercises
+  FOR ALL USING (
+    package_id IN (SELECT id FROM public.workout_packages WHERE user_id = auth.uid())
+  );
+
+-- Daily logs: egne + gruppemedlemmers (kun SELECT for andre)
+CREATE POLICY "logs_own" ON public.daily_logs
+  FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "logs_group_read" ON public.daily_logs
+  FOR SELECT USING (
+    user_id IN (
+      SELECT gm.user_id FROM public.group_members gm
+      WHERE gm.group_id IN (
+        SELECT group_id FROM public.group_members WHERE user_id = auth.uid()
+      )
+    )
+  );
+
+-- Groups: alle innloggede kan lese, kun eier kan endre
+CREATE POLICY "groups_read" ON public.groups
+  FOR SELECT USING (auth.uid() IS NOT NULL);
+
+CREATE POLICY "groups_own" ON public.groups
+  FOR ALL USING (created_by = auth.uid());
+
+-- Group members: se alle i egne grupper
+CREATE POLICY "members_read" ON public.group_members
+  FOR SELECT USING (
+    group_id IN (SELECT group_id FROM public.group_members WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "members_join" ON public.group_members
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "members_leave" ON public.group_members
+  FOR DELETE USING (user_id = auth.uid());
+-- Fjern ALLE eksisterende policies på begge tabeller
+DROP POLICY IF EXISTS "members_read" ON public.group_members;
+DROP POLICY IF EXISTS "members_join" ON public.group_members;
+DROP POLICY IF EXISTS "members_leave" ON public.group_members;
+DROP POLICY IF EXISTS "logs_own" ON public.daily_logs;
+DROP POLICY IF EXISTS "logs_group_read" ON public.daily_logs;
+
+-- SECURITY DEFINER-funksjon: henter brukerens gruppe-IDer uten å trigge RLS
+CREATE OR REPLACE FUNCTION public.get_my_group_ids()
+RETURNS SETOF uuid
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = public
+STABLE
+AS $$
+  SELECT group_id FROM public.group_members WHERE user_id = auth.uid()
+$$;
+
+-- Gjenopprett group_members-policies (uten rekursjon)
+CREATE POLICY "members_read" ON public.group_members
+  FOR SELECT USING (
+    group_id IN (SELECT public.get_my_group_ids())
+  );
+
+CREATE POLICY "members_join" ON public.group_members
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "members_leave" ON public.group_members
+  FOR DELETE USING (user_id = auth.uid());
+
+-- Gjenopprett daily_logs-policies
+CREATE POLICY "logs_own" ON public.daily_logs
+  FOR ALL USING (user_id = auth.uid());
+
+CREATE POLICY "logs_group_read" ON public.daily_logs
+  FOR SELECT USING (
+    user_id IN (
+      SELECT user_id FROM public.group_members
+      WHERE group_id IN (SELECT public.get_my_group_ids())
+    )
+  );
+-- Tillat flere treninger per dag (én per pakke)
+-- Erstatter UNIQUE(user_id, logged_date) med UNIQUE(user_id, logged_date, package_id)
+
+ALTER TABLE public.daily_logs
+  DROP CONSTRAINT IF EXISTS daily_logs_user_id_logged_date_key;
+
+ALTER TABLE public.daily_logs
+  ADD CONSTRAINT daily_logs_user_id_logged_date_package_id_key
+  UNIQUE (user_id, logged_date, package_id);
+-- Test-typer (system: user_id=null, bruker-egne: user_id=uuid)
+CREATE TABLE public.test_types (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid REFERENCES public.users(id) ON DELETE CASCADE,
+  name text NOT NULL,
+  unit text NOT NULL DEFAULT 'reps',
+  higher_is_better boolean NOT NULL DEFAULT true,
+  created_at timestamptz DEFAULT now()
+);
+
+-- Ferdiglagde tester (deles av alle)
+INSERT INTO public.test_types (name, unit, higher_is_better) VALUES
+  ('Push-ups',  'reps',     true),
+  ('Sit-ups',   'reps',     true),
+  ('Knebøy',    'reps',     true),
+  ('Planken',   'sekunder', true),
+  ('Burpees',   'reps',     true),
+  ('Pull-ups',  'reps',     true);
+
+-- Testresultater
+CREATE TABLE public.test_results (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  test_type_id uuid NOT NULL REFERENCES public.test_types(id) ON DELETE CASCADE,
+  result numeric NOT NULL CHECK (result > 0),
+  tested_date date NOT NULL DEFAULT CURRENT_DATE,
+  notes text,
+  created_at timestamptz DEFAULT now()
+);
+
+-- RLS
+ALTER TABLE public.test_types ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.test_results ENABLE ROW LEVEL SECURITY;
+
+-- Alle kan lese systemtester, egne private tester kun for eier
+CREATE POLICY "test_types_read" ON public.test_types
+  FOR SELECT USING (user_id IS NULL OR user_id = auth.uid());
+
+CREATE POLICY "test_types_insert" ON public.test_types
+  FOR INSERT WITH CHECK (user_id = auth.uid());
+
+CREATE POLICY "test_types_delete" ON public.test_types
+  FOR DELETE USING (user_id = auth.uid());
+
+-- Testresultater: kun egne
+CREATE POLICY "test_results_own" ON public.test_results
+  FOR ALL USING (user_id = auth.uid());
+-- Tillat lesing av display_name for andre brukere i samme gruppe
+CREATE POLICY "users_group_members_read" ON public.users
+  FOR SELECT USING (
+    id IN (
+      SELECT user_id FROM public.group_members
+      WHERE group_id IN (SELECT public.get_my_group_ids())
+    )
+  );
+
+=== DATABASE (typer) ===

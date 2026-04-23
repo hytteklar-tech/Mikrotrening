@@ -80,9 +80,9 @@
   ],
 
   "session": {
-    "status": "completed",
-    "startedAt": "2026-04-22T08:00:00Z",
-    "sessionId": "sess-sommerkropp-024",
+    "status": "active",
+    "startedAt": "2026-04-23T00:00:00Z",
+    "sessionId": "sess-sommerkropp-025",
     "lastSignificantAction": "Install-banner: vises nå ved 3, 7 og 10 registreringer. iOS-instruksjoner på plass. Ingrid onboardet (user-rad slettet)."
   },
 

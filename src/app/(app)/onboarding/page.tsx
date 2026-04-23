@@ -41,23 +41,37 @@ export default function OnboardingPage() {
     setLoading(true)
     const { data: { user } } = await supabase.auth.getUser()
     if (user) {
-      await supabase.from('users').update({
+      await supabase.from('users').upsert({
+        id: user.id,
         display_name: name.trim(),
         preferred_times: preferredTimes,
         push_enabled: pushEnabled,
-      }).eq('id', user.id)
+      })
 
       // Pre-registrer gårsdagens økt på "Mikro 30" — første ekte økt blir bonus
       const yesterday = new Date()
       yesterday.setDate(yesterday.getDate() - 1)
       const yesterdayStr = yesterday.toISOString().slice(0, 10)
 
-      const { data: pkg } = await supabase
+      let { data: pkg } = await supabase
         .from('workout_packages')
         .select('id')
         .eq('user_id', user.id)
         .eq('name', 'Mikro 30')
         .single()
+
+      // Opprett Mikro 30 hvis den mangler (f.eks. bruker som ble re-slettet fra users-tabellen)
+      if (!pkg) {
+        const { data: newPkg } = await supabase
+          .from('workout_packages')
+          .insert({ user_id: user.id, name: 'Mikro 30', is_active: true })
+          .select('id')
+          .single()
+        if (newPkg) {
+          await supabase.from('exercises').insert({ package_id: newPkg.id, name: 'Knebøy', reps: 15, order: 1 })
+          pkg = newPkg
+        }
+      }
 
       if (pkg) {
         await supabase.from('daily_logs').insert({
