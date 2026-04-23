@@ -80,7 +80,7 @@ export async function GET(request: Request) {
 
   const playerIds = batch.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
   const nativeSubscriptions = batch.filter(u => u.push_subscription).map(u => u.push_subscription)
-  const message = pickMessage(MESSAGES['morning'])
+  const message = pickMessage(MESSAGES['afternoon'])
 
   await sendPushNotification({
     playerIds,
