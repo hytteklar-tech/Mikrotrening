@@ -173,7 +173,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
           onClick={() => setTab(t)}
           className="pb-2 text-sm font-medium transition"
           style={{
-            color: tab === t ? '#e85c00' : '#555',
+            color: tab === t ? '#e85c00' : 'white',
             borderBottom: tab === t ? '2px solid #e85c00' : '2px solid transparent',
             marginBottom: -1,
           }}
