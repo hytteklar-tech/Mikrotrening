@@ -155,7 +155,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
   dates: string[]
   onScrollToToday?: () => void
 }) {
-  const [tab, setTab] = useState<'month' | 'trend'>('month')
+  const [tab, setTab] = useState<'trend'>('trend')
 
   const alive = streak > 0
   const nextMilestone = MILESTONES.find(m => m > streak) ?? MILESTONES[MILESTONES.length - 1]
@@ -209,27 +209,19 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Trend-tab */}
       {!isNewUser && (
         <>
-          <div className="flex gap-4" style={{ borderBottom: '1px solid #1f1f1f' }}>
-            {(['month', 'trend'] as const).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className="pb-2 text-sm font-medium transition"
-                style={{
-                  color: tab === t ? '#e85c00' : '#555',
-                  borderBottom: tab === t ? '2px solid #e85c00' : '2px solid transparent',
-                  marginBottom: -1,
-                }}
-              >
-                {t === 'month' ? 'Måned' : 'Trend'}
-              </button>
-            ))}
+          <div style={{ borderBottom: '1px solid #1f1f1f' }}>
+            <button
+              className="pb-2 text-sm font-medium"
+              style={{ color: '#e85c00', borderBottom: '2px solid #e85c00', marginBottom: -1 }}
+            >
+              Trend
+            </button>
           </div>
           <div className="pt-1">
-            {tab === 'month' ? <TwoWeekCalendar dates={dates} /> : <WeekTrend dates={dates} />}
+            <WeekTrend dates={dates} />
           </div>
         </>
       )}
