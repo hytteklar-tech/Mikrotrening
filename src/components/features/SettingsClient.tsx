@@ -265,6 +265,13 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
         )}
       </div>
 
+      <a
+        href="/push-setup"
+        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 text-sm transition flex items-center justify-center"
+      >
+        🔔 Aktiver push på denne enheten
+      </a>
+
       <div className="space-y-2">
         <button
           onClick={testPush}
