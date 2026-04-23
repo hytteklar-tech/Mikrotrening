@@ -233,6 +233,8 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           </button>
         </div>
 
+        <p className="text-xs text-gray-600">dbg: push={String(pushEnabled)} show={String(showActivateButton)} sub={String(!!profile?.push_subscription)} os={String(!!profile?.onesignal_id)}</p>
+
         {pushEnabled && showActivateButton && (
           <div className="space-y-2">
             <button
