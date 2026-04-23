@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic'
+
 import { createClient } from '@supabase/supabase-js'
 import { sendPushNotification } from '@/lib/onesignal'
 import { NextResponse } from 'next/server'
