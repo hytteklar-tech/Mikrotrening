@@ -9,7 +9,7 @@ export default async function GroupPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const today = new Date().toISOString().split('T')[0]
+  const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
   const { data: memberships } = await supabase
     .from('group_members')
