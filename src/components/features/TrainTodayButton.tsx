@@ -323,7 +323,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                     disabled={loading}
                     className="flex-1 border border-gray-600 bg-gray-700 hover:bg-gray-600 text-white font-bold text-base rounded-xl py-4 transition"
                   >
-                    ⏱ Med tid
+                    ⏱ Tren med tid
                   </button>
                 </div>
               )}
