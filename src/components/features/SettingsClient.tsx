@@ -20,10 +20,12 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
   const [hasOnesignalId, setHasOnesignalId] = useState(!!(profile?.onesignal_id || profile?.push_subscription))
+  const [showActivateButton, setShowActivateButton] = useState(false)
 
   useEffect(() => {
     const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
-    setHasOnesignalId(isIos ? !!profile?.push_subscription : !!profile?.onesignal_id)
+    const needsActivation = isIos ? !profile?.push_subscription : !profile?.onesignal_id
+    setShowActivateButton(needsActivation)
   }, [])
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
@@ -106,7 +108,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           .update({ push_subscription: sub.toJSON() })
           .eq('id', userId)
         if (error) throw new Error('Kunne ikke lagre abonnement: ' + error.message)
-        setHasOnesignalId(true)
+        setShowActivateButton(false)
         saved = true
       } else {
         const os = (window as any).OneSignal
@@ -123,7 +125,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           })
           if (id) {
             await supabase.from('users').update({ onesignal_id: id }).eq('id', userId)
-            setHasOnesignalId(true)
+            setShowActivateButton(false)
             saved = true
           }
         }
@@ -231,7 +233,7 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
           </button>
         </div>
 
-        {pushEnabled && !hasOnesignalId && (
+        {pushEnabled && showActivateButton && (
           <div className="space-y-2">
             <button
               onClick={activatePush}
