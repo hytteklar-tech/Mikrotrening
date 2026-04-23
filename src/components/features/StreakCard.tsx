@@ -4,13 +4,6 @@ import { useState } from 'react'
 
 const MILESTONES = [7, 14, 30, 50, 100]
 
-function getWeekNumber(date: Date): number {
-  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()))
-  const dayNum = d.getUTCDay() || 7
-  d.setUTCDate(d.getUTCDate() + 4 - dayNum)
-  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1))
-  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7)
-}
 
 function ProgressRing({ streak, nextMilestone, alive }: { streak: number; nextMilestone: number; alive: boolean }) {
   const r = 30
@@ -44,27 +37,30 @@ function ProgressRing({ streak, nextMilestone, alive }: { streak: number; nextMi
   )
 }
 
-function MonthCalendar({ dates }: { dates: string[] }) {
+function TwoWeekCalendar({ dates }: { dates: string[] }) {
   const today = new Date()
-  const year = today.getFullYear()
-  const month = today.getMonth()
-  const daysInMonth = new Date(year, month + 1, 0).getDate()
-  const firstDay = new Date(year, month, 1).getDay()
-  const todayDate = today.getDate()
+  today.setHours(12, 0, 0, 0)
 
-  const countByDay: Record<number, number> = {}
-  for (const d of dates) {
-    const date = new Date(d + 'T12:00:00')
-    if (date.getFullYear() === year && date.getMonth() === month) {
-      const day = date.getDate()
-      countByDay[day] = (countByDay[day] || 0) + 1
-    }
+  // Mandag denne uken
+  const thisMonday = new Date(today)
+  thisMonday.setDate(today.getDate() - ((today.getDay() + 6) % 7))
+
+  // 14 dager: forrige mandag til søndag denne uken
+  const days: Date[] = []
+  for (let i = -7; i < 7; i++) {
+    const d = new Date(thisMonday)
+    d.setDate(thisMonday.getDate() + i)
+    days.push(d)
   }
 
-  const offset = (firstDay + 6) % 7
-  const cells: (number | null)[] = []
-  for (let i = 0; i < offset; i++) cells.push(null)
-  for (let d = 1; d <= daysInMonth; d++) cells.push(d)
+  const dateSet = new Set<string>()
+  const countMap: Record<string, number> = {}
+  for (const d of dates) {
+    dateSet.add(d)
+    countMap[d] = (countMap[d] || 0) + 1
+  }
+
+  const todayStr = today.toISOString().split('T')[0]
 
   return (
     <div>
@@ -74,10 +70,10 @@ function MonthCalendar({ dates }: { dates: string[] }) {
         ))}
       </div>
       <div className="grid grid-cols-7 gap-0.5">
-        {cells.map((day, i) => {
-          if (!day) return <div key={i} />
-          const count = countByDay[day] || 0
-          const isToday = day === todayDate
+        {days.map((day, i) => {
+          const str = day.toISOString().split('T')[0]
+          const count = countMap[str] || 0
+          const isToday = str === todayStr
           const bg = count >= 2 ? '#e85c00' : count === 1 ? '#3a1f00' : '#1a1a1a'
           return (
             <div
@@ -90,7 +86,7 @@ function MonthCalendar({ dates }: { dates: string[] }) {
                 fontSize: 10,
               }}
             >
-              {day}
+              {day.getDate()}
             </div>
           )
         })}
@@ -99,42 +95,54 @@ function MonthCalendar({ dates }: { dates: string[] }) {
   )
 }
 
-function TrendChart({ dates }: { dates: string[] }) {
+function WeekTrend({ dates }: { dates: string[] }) {
   const today = new Date()
-  const weeks = []
+  today.setHours(12, 0, 0, 0)
+  const dayOfWeek = (today.getDay() + 6) % 7 // 0=man, 6=søn
 
-  for (let w = 6; w >= 0; w--) {
-    const monday = new Date(today)
-    monday.setDate(today.getDate() - ((today.getDay() + 6) % 7) - w * 7)
-    monday.setHours(0, 0, 0, 0)
-    const sunday = new Date(monday)
-    sunday.setDate(monday.getDate() + 6)
-    sunday.setHours(23, 59, 59, 999)
+  const thisMonday = new Date(today)
+  thisMonday.setDate(today.getDate() - dayOfWeek)
+  thisMonday.setHours(0, 0, 0, 0)
 
-    const count = dates.filter(d => {
-      const date = new Date(d + 'T12:00:00')
-      return date >= monday && date <= sunday
-    }).length
+  const lastMonday = new Date(thisMonday)
+  lastMonday.setDate(thisMonday.getDate() - 7)
 
-    weeks.push({ weekNum: getWeekNumber(monday), count })
+  // Tell treninger mandag–i dag denne uken
+  const thisWeek = dates.filter(d => {
+    const date = new Date(d + 'T12:00:00')
+    return date >= thisMonday && date <= today
+  }).length
+
+  // Tell treninger forrige uke, samme antall dager (man–tilsvarende dag)
+  const lastWeekEnd = new Date(lastMonday)
+  lastWeekEnd.setDate(lastMonday.getDate() + dayOfWeek)
+  lastWeekEnd.setHours(23, 59, 59, 999)
+  const lastWeek = dates.filter(d => {
+    const date = new Date(d + 'T12:00:00')
+    return date >= lastMonday && date <= lastWeekEnd
+  }).length
+
+  if (thisWeek === 0) {
+    return (
+      <div className="py-2 space-y-1">
+        <p style={{ fontSize: 32, fontWeight: 600, color: '#555' }}>—</p>
+        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken</p>
+        {lastWeek > 0 && (
+          <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+        )}
+      </div>
+    )
   }
 
-  const maxCount = Math.max(...weeks.map(w => w.count), 1)
+  const diff = lastWeek === 0 ? 100 : Math.round(((thisWeek - lastWeek) / lastWeek) * 100)
+  const up = thisWeek >= lastWeek
+  const pctText = lastWeek === 0 ? '—' : `${up ? '↑' : '↓'} ${Math.abs(diff)}%`
 
   return (
-    <div className="flex items-end gap-1" style={{ height: 80 }}>
-      {weeks.map((w, i) => {
-        const isCurrentWeek = i === 6
-        const heightPct = w.count === 0 ? 5 : Math.max((w.count / maxCount) * 100, 10)
-        let color = '#1f1f1f'
-        if (w.count > 0) color = isCurrentWeek || w.count >= maxCount ? '#e85c00' : '#7a3000'
-        return (
-          <div key={i} className="flex-1 flex flex-col items-center gap-1" style={{ height: '100%', justifyContent: 'flex-end' }}>
-            <div style={{ width: '100%', height: `${heightPct}%`, background: color, borderRadius: 3 }} />
-            <span style={{ fontSize: 9, color: '#555' }}>{w.weekNum}</span>
-          </div>
-        )
-      })}
+    <div className="py-2 space-y-1">
+      <p style={{ fontSize: 32, fontWeight: 600, color: up ? '#33aa33' : '#aaa' }}>{pctText}</p>
+      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken</p>
+      <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
     </div>
   )
 }
@@ -221,7 +229,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
             ))}
           </div>
           <div className="pt-1">
-            {tab === 'month' ? <MonthCalendar dates={dates} /> : <TrendChart dates={dates} />}
+            {tab === 'month' ? <TwoWeekCalendar dates={dates} /> : <WeekTrend dates={dates} />}
           </div>
         </>
       )}
