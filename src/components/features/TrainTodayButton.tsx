@@ -310,23 +310,20 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   </button>
                 </div>
               ) : (
-                <div className="space-y-2">
+                <div className="flex gap-2">
                   <button
                     onClick={() => addLog(false)}
                     disabled={loading || !activePackage}
-                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-lg rounded-xl py-4 transition"
+                    className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition"
                   >
-                    {loading
-                      ? 'Registrerer...'
-                      : logsForDay.length > 0
-                      ? `➕ Legg til — ${activePackage?.name}`
-                      : `💪 Registrer — ${activePackage?.name}`}
+                    {loading ? 'Registrerer...' : logsForDay.length > 0 ? '➕ Uten tid' : '💪 Tren uten tid'}
                   </button>
                   <button
                     onClick={startTimer}
-                    className="w-full border border-gray-700 text-gray-400 hover:text-white hover:border-gray-500 rounded-xl py-2 text-sm transition"
+                    disabled={loading}
+                    className="flex-1 border border-gray-600 bg-gray-700 hover:bg-gray-600 text-white font-bold text-base rounded-xl py-4 transition"
                   >
-                    ⏱ Start med tidtaker
+                    ⏱ Med tid
                   </button>
                 </div>
               )}
