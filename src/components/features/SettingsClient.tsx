@@ -14,19 +14,12 @@ const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
   { value: 'evening', label: 'Kveld', hint: 'kl 19' },
 ]
 
-export default function SettingsClient({ profile, userId }: { profile: any; userId: string }) {
+export default function SettingsClient({ profile, userId, needsActivation }: { profile: any; userId: string; needsActivation: boolean }) {
   const [name, setName] = useState(profile?.display_name ?? '')
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
-  const [hasOnesignalId, setHasOnesignalId] = useState(!!(profile?.onesignal_id || profile?.push_subscription))
-  const [showActivateButton, setShowActivateButton] = useState(false)
-
-  useEffect(() => {
-    const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
-    const needsActivation = isIos ? !profile?.push_subscription : !profile?.onesignal_id
-    setShowActivateButton(needsActivation)
-  }, [])
+  const [showActivateButton, setShowActivateButton] = useState(needsActivation)
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
 
@@ -232,8 +225,6 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
         </div>
-
-        <p className="text-xs text-gray-600">dbg: push={String(pushEnabled)} show={String(showActivateButton)} sub={String(!!profile?.push_subscription)} os={String(!!profile?.onesignal_id)}</p>
 
         {pushEnabled && showActivateButton && (
           <div className="space-y-2">
