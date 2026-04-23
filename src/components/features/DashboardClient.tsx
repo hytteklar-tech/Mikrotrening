@@ -151,7 +151,14 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
 
   return (
     <>
-      <StreakCard streak={streak} hasTrained={hasTrained} totalSessions={dayLogs.length} isNewUser={isNewUser} />
+      <StreakCard
+        streak={streak}
+        hasTrained={hasTrained}
+        totalSessions={dayLogs.length}
+        isNewUser={isNewUser}
+        dates={uniqueDates}
+        onScrollToToday={() => document.getElementById('today-section')?.scrollIntoView({ behavior: 'smooth' })}
+      />
       {isNewUser && (
         <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl p-5 space-y-3">
           <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide">En gave fra oss</p>
@@ -190,6 +197,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         </div>
       )}
 
+      <div id="today-section">
       <TrainTodayButton
         dayLogs={dayLogs}
         onLogChange={setDayLogs}
@@ -197,6 +205,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         packages={packages}
         userId={userId}
       />
+      </div>
     </>
   )
 }
