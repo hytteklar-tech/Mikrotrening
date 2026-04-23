@@ -19,10 +19,12 @@ export default function SettingsClient({ profile, userId }: { profile: any; user
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
-  const isIosDevice = typeof navigator !== 'undefined' && /iPhone|iPad|iPod/.test(navigator.userAgent)
-  const [hasOnesignalId, setHasOnesignalId] = useState(
-    isIosDevice ? !!profile?.push_subscription : !!profile?.onesignal_id
-  )
+  const [hasOnesignalId, setHasOnesignalId] = useState(!!(profile?.onesignal_id || profile?.push_subscription))
+
+  useEffect(() => {
+    const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+    setHasOnesignalId(isIos ? !!profile?.push_subscription : !!profile?.onesignal_id)
+  }, [])
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
 
