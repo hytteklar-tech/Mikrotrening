@@ -187,7 +187,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         <div className="flex-1">
           <p style={{ fontSize: 28, fontWeight: 600, lineHeight: 1.2, color: 'white' }}>
             Du har trent{' '}
-            <span style={{ color: alive ? '#e85c00' : '#555' }}>{streak}</span>
+            <span style={{ color: alive ? '#e85c00' : '#555', verticalAlign: 'baseline' }}>{streak}</span>
             {' '}dager på rad.
           </p>
           <p style={{ fontSize: 16, color: '#bbb', marginTop: 4 }}>{totalSessions} dager totalt.</p>
