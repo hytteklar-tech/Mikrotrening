@@ -11,12 +11,20 @@ export default async function GroupPage() {
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
-  const { data: memberships } = await supabase
-    .from('group_members')
-    .select('group_id, groups(id, name, invite_code, created_by)')
-    .eq('user_id', user.id)
+  const [{ data: memberships }, { data: profile }] = await Promise.all([
+    supabase
+      .from('group_members')
+      .select('group_id, groups(id, name, invite_code, created_by)')
+      .eq('user_id', user.id),
+    supabase
+      .from('users')
+      .select('primary_group_id')
+      .eq('id', user.id)
+      .single(),
+  ])
 
   const groups = (memberships ?? []).map(m => m.groups as any).filter(Boolean)
+  const primaryGroupId = profile?.primary_group_id ?? groups[0]?.id ?? null
 
   // Get active-today status for all members in user's groups
   const groupIds = groups.map((g: any) => g.id)
@@ -52,6 +60,7 @@ export default async function GroupPage() {
         groups={groups}
         membersWithStatus={membersWithStatus}
         userId={user.id}
+        primaryGroupId={primaryGroupId}
       />
     </div>
   )

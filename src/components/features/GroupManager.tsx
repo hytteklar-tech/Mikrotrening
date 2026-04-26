@@ -4,17 +4,33 @@ import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-export default function GroupManager({ groups, membersWithStatus, userId }: {
+export default function GroupManager({ groups, membersWithStatus, userId, primaryGroupId: initialPrimaryGroupId }: {
   groups: any[]
   membersWithStatus: any[]
   userId: string
+  primaryGroupId: string | null
 }) {
   const [joinCode, setJoinCode] = useState('')
   const [newGroupName, setNewGroupName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [primaryGroupId, setPrimaryGroupId] = useState(initialPrimaryGroupId)
   const router = useRouter()
   const supabase = createClient()
+
+  async function deleteGroup(groupId: string) {
+    setLoading(true)
+    await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+    await supabase.from('groups').delete().eq('id', groupId)
+    setLoading(false)
+    router.refresh()
+  }
+
+  async function setFocusGroup(groupId: string) {
+    setPrimaryGroupId(groupId)
+    await supabase.from('users').update({ primary_group_id: groupId }).eq('id', userId)
+    router.refresh()
+  }
 
   async function createGroup() {
     if (!newGroupName.trim()) return
@@ -73,25 +89,41 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
     <div className="space-y-4">
       {groups.map((group: any) => {
         const members = membersWithStatus.filter((m: any) => m.group_id === group.id)
+        const canDelete = members.length === 1 && members[0]?.user_id === userId
         return (
           <div key={group.id} className="bg-gray-800 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold">{group.name}</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-semibold">{group.name}</h3>
+                {group.id === primaryGroupId
+                  ? <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">I fokus</span>
+                  : groups.length > 1 && (
+                    <button
+                      onClick={() => setFocusGroup(group.id)}
+                      className="text-xs text-gray-300 hover:text-white transition"
+                    >
+                      Sett som fokus
+                    </button>
+                  )
+                }
+              </div>
               <button
-                onClick={() => {
-                  const url = `${window.location.origin}/join/${group.invite_code}`
-                  const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
-                  if (navigator.share) {
-                    navigator.share({ title: 'Mikrotrening', text })
-                  } else {
-                    navigator.clipboard.writeText(url)
-                  }
-                }}
-                className="text-sm bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl font-semibold transition"
+                onClick={() => navigator.clipboard.writeText(group.invite_code)}
+                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-bold tracking-widest"
               >
-                Inviter 📲
+                Kode: {group.invite_code} 📋
               </button>
             </div>
+            {canDelete && (
+              <button
+                onClick={() => deleteGroup(group.id)}
+                disabled={loading}
+                className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
+              >
+                Slett gruppe
+              </button>
+            )}
+
             <div className="space-y-2">
               {members.map((m: any) => (
                 <div key={m.user_id} className="flex items-center justify-between">
@@ -116,6 +148,34 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
         </div>
         <span className="text-xl">🏆</span>
       </a>
+
+      {groups.length > 0 && (
+        <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
+          <div>
+            <p className="text-sm font-semibold text-white">Inviter en venn til gruppen</p>
+            <p className="text-xs text-gray-300 mt-0.5">Del en lenke på SMS — de er med etter innlogging</p>
+          </div>
+          <div className="space-y-2">
+            {groups.map((group: any) => (
+              <button
+                key={group.id}
+                onClick={() => {
+                  const url = `${window.location.origin}/join/${group.invite_code}`
+                  const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
+                  if (navigator.share) {
+                    navigator.share({ title: 'Mikrotrening', text })
+                  } else {
+                    navigator.clipboard.writeText(url)
+                  }
+                }}
+                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition"
+              >
+                Inviter til {group.name} 📲
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
         <p className="text-sm font-semibold text-white">Bli med i gruppe</p>

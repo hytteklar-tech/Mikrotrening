@@ -17,7 +17,7 @@ export default async function DashboardPage() {
   const [{ data: profile }, { data: logs }, { data: packages }, { data: memberships }] = await Promise.all([
     supabase
       .from('users')
-      .select('display_name, notifications_enabled')
+      .select('display_name, notifications_enabled, primary_group_id')
       .eq('id', user.id)
       .single(),
     supabase
@@ -34,14 +34,17 @@ export default async function DashboardPage() {
     supabase
       .from('group_members')
       .select('group_id, groups(id, name)')
-      .eq('user_id', user.id)
-      .limit(1),
+      .eq('user_id', user.id),
   ])
 
   if (!profile?.display_name) redirect('/onboarding')
 
-  // Gruppe-banner
-  const firstGroup = memberships?.[0]?.groups as any
+  // Gruppe-banner — bruk fokus-gruppe, fallback til første
+  const primaryGroupId = profile?.primary_group_id
+  const firstGroup = (
+    (memberships ?? []).find(m => (m.groups as any)?.id === primaryGroupId)
+    ?? memberships?.[0]
+  )?.groups as any
   let groupBannerData: { groupName: string; members: { userId: string; name: string; activeToday: boolean }[] } | null = null
 
   if (firstGroup) {
