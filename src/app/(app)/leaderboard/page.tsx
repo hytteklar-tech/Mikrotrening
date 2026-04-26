@@ -32,7 +32,7 @@ async function getLeaderboard(userId: string, supabase: Awaited<ReturnType<typeo
     .order('logged_date', { ascending: false })
 
   const today = new Date()
-  today.setHours(0, 0, 0, 0)
+  today.setHours(12, 0, 0, 0)
 
   return uniqueUsers.map(member => {
     const uniqueDates = [...new Set(
@@ -41,20 +41,27 @@ async function getLeaderboard(userId: string, supabase: Awaited<ReturnType<typeo
         .map(l => l.logged_date)
     )].sort().reverse()
 
-    const totalDays = uniqueDates.length
+    const totalDays = (logs ?? []).filter(l => l.user_id === member.user_id).length
+
+    const toStr = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const streakStart = new Date(today)
+    if (!uniqueDates.includes(toStr(today))) {
+      streakStart.setDate(today.getDate() - 1)
+    }
 
     let streak = 0
     for (let i = 0; i < uniqueDates.length; i++) {
-      const logDate = new Date(uniqueDates[i])
-      const expected = new Date(today)
-      expected.setDate(today.getDate() - i)
+      const logDate = new Date(uniqueDates[i] + 'T12:00:00')
+      const expected = new Date(streakStart)
+      expected.setDate(streakStart.getDate() - i)
       if (logDate.toDateString() === expected.toDateString()) {
         streak++
       } else break
     }
 
     const points = streak * 2 + totalDays
-    const activeToday = uniqueDates[0] === today.toISOString().split('T')[0]
+    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+    const activeToday = uniqueDates[0] === todayStr
 
     return {
       userId: member.user_id,
@@ -80,12 +87,12 @@ export default async function LeaderboardPage() {
     <div className="p-4 space-y-4">
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Leaderboard 🏆</h1>
-        <p className="text-gray-400 text-sm mt-1">Poeng = streak × 2 + totale dager</p>
+        <p className="text-gray-300 text-sm mt-1">Poeng = streak × 2 + totale dager</p>
       </div>
 
       {board.length === 0 ? (
         <div className="bg-gray-800 rounded-2xl p-6 text-center">
-          <p className="text-gray-400">Bli med i en gruppe for å se leaderboard</p>
+          <p className="text-gray-300">Bli med i en gruppe for å se leaderboard</p>
           <a href="/group" className="text-orange-500 font-semibold text-sm mt-2 block">
             Gå til Gruppe →
           </a>
@@ -99,7 +106,7 @@ export default async function LeaderboardPage() {
                 entry.isMe ? 'bg-orange-500' : 'bg-gray-800'
               }`}
             >
-              <span className="text-2xl font-bold w-8 text-center">
+              <span className="text-4xl w-10 text-center">
                 {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}`}
               </span>
               <div className="flex-1">
@@ -107,7 +114,7 @@ export default async function LeaderboardPage() {
                   <span className="font-semibold">{entry.name}</span>
                   {entry.activeToday && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-0.5 rounded-full">Aktiv i dag</span>}
                 </div>
-                <p className={`text-xs mt-0.5 ${entry.isMe ? 'text-orange-100' : 'text-gray-400'}`}>
+                <p className={`text-xs mt-0.5 ${entry.isMe ? 'text-orange-100' : 'text-gray-300'}`}>
                   🔥 {entry.streak} streak · 📅 {entry.totalDays} dager totalt
                 </p>
               </div>

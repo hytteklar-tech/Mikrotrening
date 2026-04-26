@@ -79,16 +79,16 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
               <h3 className="font-semibold">{group.name}</h3>
               <button
                 onClick={() => navigator.clipboard.writeText(group.invite_code)}
-                className="text-xs bg-gray-700 text-orange-400 px-3 py-1 rounded-full"
+                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-bold tracking-widest"
               >
-                Kode: {group.invite_code} 📋
+                {group.invite_code} 📋
               </button>
             </div>
             <div className="space-y-2">
               {members.map((m: any) => (
                 <div key={m.user_id} className="flex items-center justify-between">
                   <span className="text-sm">{m.users?.display_name ?? 'Ukjent'}{m.isMe ? ' (meg)' : ''}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${m.activeToday ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-400'}`}>
+                  <span className={`text-xs px-2 py-0.5 rounded-full ${m.activeToday ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-300'}`}>
                     {m.activeToday ? '✅ Trent i dag' : '💤 Ikke trent i dag'}
                   </span>
                 </div>
@@ -103,14 +103,14 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
         className="flex items-center justify-between bg-gray-800 rounded-2xl p-4 hover:bg-gray-700 transition"
       >
         <div>
-          <p className="text-sm font-semibold text-gray-300">Toppliste</p>
-          <p className="text-xs text-gray-500">Se hvem som trener mest</p>
+          <p className="text-sm font-semibold text-white">Toppliste</p>
+          <p className="text-xs text-gray-300">Se hvem som trener mest</p>
         </div>
         <span className="text-xl">🏆</span>
       </a>
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-sm font-semibold text-gray-300">Bli med i gruppe</p>
+        <p className="text-sm font-semibold text-white">Bli med i gruppe</p>
         <div className="flex gap-2">
           <input
             type="text"
@@ -132,7 +132,7 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
       </div>
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-sm font-semibold text-gray-300">Opprett ny gruppe</p>
+        <p className="text-sm font-semibold text-white">Opprett ny gruppe</p>
         <div className="flex gap-2">
           <input
             type="text"

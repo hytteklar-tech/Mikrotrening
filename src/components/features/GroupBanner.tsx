@@ -32,7 +32,7 @@ export default function GroupBanner({ groupName, members }: Props) {
             key={m.userId}
             title={m.name}
             className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold border-2 border-gray-950 shrink-0
-              ${m.activeToday ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-400'}`}
+              ${m.activeToday ? 'bg-green-500 text-white' : 'bg-gray-700 text-gray-300'}`}
           >
             {initials(m.name)}
           </div>
@@ -47,7 +47,7 @@ export default function GroupBanner({ groupName, members }: Props) {
           <span className="text-white font-medium">{trainedCount} av {total}</span> i {groupName} har trent i dag
         </p>
       )}
-      <svg className="w-4 h-4 text-gray-500 group-hover:text-gray-300 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg className="w-4 h-4 text-gray-300 group-hover:text-gray-300 transition shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
       </svg>
     </Link>

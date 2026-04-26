@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import StreakCard from './StreakCard'
 import TrainTodayButton from './TrainTodayButton'
 
@@ -64,6 +65,12 @@ function calcStreak(uniqueDates: string[]): number {
 export default function DashboardClient({ initialDayLogs, packages, userId, notificationsEnabled }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const router = useRouter()
+
+  useEffect(() => {
+    const interval = setInterval(() => router.refresh(), 5 * 60 * 1000)
+    return () => clearInterval(interval)
+  }, [])
   const [showInstallSteps, setShowInstallSteps] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
