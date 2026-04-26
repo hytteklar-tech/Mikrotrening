@@ -78,10 +78,18 @@ export default function GroupManager({ groups, membersWithStatus, userId }: {
             <div className="flex items-center justify-between">
               <h3 className="font-semibold">{group.name}</h3>
               <button
-                onClick={() => navigator.clipboard.writeText(group.invite_code)}
-                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-bold tracking-widest"
+                onClick={() => {
+                  const url = `${window.location.origin}/join/${group.invite_code}`
+                  const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
+                  if (navigator.share) {
+                    navigator.share({ title: 'Mikrotrening', text })
+                  } else {
+                    navigator.clipboard.writeText(url)
+                  }
+                }}
+                className="text-sm bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-xl font-semibold transition"
               >
-                {group.invite_code} 📋
+                Inviter 📲
               </button>
             </div>
             <div className="space-y-2">

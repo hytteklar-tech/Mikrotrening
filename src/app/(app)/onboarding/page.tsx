@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
@@ -13,7 +13,7 @@ const TIME_OPTIONS: { value: TimeOption; label: string; hint: string; emoji: str
   { value: 'evening', label: 'Kveld', hint: 'kl 19', emoji: '🌙' },
 ]
 
-export default function OnboardingPage() {
+function OnboardingForm() {
   const [step, setStep] = useState(1)
   const [name, setName] = useState('')
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>([])
@@ -22,6 +22,8 @@ export default function OnboardingPage() {
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
   const [installed, setInstalled] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const inviteCode = searchParams.get('invite')
   const supabase = createClient()
 
   useEffect(() => {
@@ -79,6 +81,16 @@ export default function OnboardingPage() {
           package_id: pkg.id,
           logged_date: yesterdayStr,
         })
+      }
+
+      // Auto-join group if coming from invite
+      if (inviteCode) {
+        const { data: group } = await supabase
+          .from('groups').select('id').eq('invite_code', inviteCode).single()
+        if (group) {
+          await supabase.from('group_members')
+            .insert({ group_id: group.id, user_id: user.id })
+        }
       }
     }
     setLoading(false)
@@ -293,6 +305,14 @@ export default function OnboardingPage() {
     )
   }
 
+}
+
+export default function OnboardingPage() {
+  return (
+    <Suspense>
+      <OnboardingForm />
+    </Suspense>
+  )
 }
 
 function Screen({ children }: { children: React.ReactNode }) {

@@ -13,6 +13,7 @@ function LoginForm() {
   const [error, setError] = useState('')
   const searchParams = useSearchParams()
   const authError = searchParams.get('error') === 'auth'
+  const inviteCode = searchParams.get('invite')
   const router = useRouter()
   const supabase = createClient()
 
@@ -31,11 +32,31 @@ function LoginForm() {
   async function verifyCode() {
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
+    const { data, error } = await supabase.auth.verifyOtp({ email, token: code.trim(), type: 'email' })
     if (error) {
       setError('Feil kode. Prøv igjen eller be om ny kode.')
     } else {
-      router.replace('/')
+      const userId = data.user?.id
+      // Check if existing user (has display_name set)
+      const { data: userData } = userId
+        ? await supabase.from('users').select('display_name').eq('id', userId).single()
+        : { data: null }
+
+      if (userData?.display_name) {
+        // Existing user — join group if invite code, then go home
+        if (inviteCode && userId) {
+          const { data: group } = await supabase
+            .from('groups').select('id').eq('invite_code', inviteCode).single()
+          if (group) {
+            await supabase.from('group_members')
+              .insert({ group_id: group.id, user_id: userId })
+          }
+        }
+        router.replace(inviteCode ? '/group' : '/')
+      } else {
+        // New user — go to onboarding
+        router.replace(inviteCode ? `/onboarding?invite=${inviteCode}` : '/onboarding')
+      }
     }
     setLoading(false)
   }
@@ -50,6 +71,12 @@ function LoginForm() {
           <h1 className="text-3xl font-bold text-white">Mikrotrening</h1>
           <p className="text-gray-400 mt-2">Mikrotrening hver dag</p>
         </div>
+
+        {inviteCode && (
+          <div className="bg-orange-500/10 border border-orange-500/30 rounded-xl px-4 py-3 text-orange-300 text-sm text-center mb-4">
+            Logg inn for å bli med i gruppen
+          </div>
+        )}
 
         {authError && (
           <div className="bg-red-900/40 border border-red-700 rounded-xl px-4 py-3 text-red-300 text-sm text-center mb-4">
