@@ -429,7 +429,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                           value={formDate}
                           max={todayStr()}
                           onChange={e => setFormDate(e.target.value)}
-                          className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+                          className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm [color-scheme:dark]"
                         />
                       </div>
                     </div>
@@ -467,7 +467,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                     {t.isOwn && (
                       <button
                         onClick={() => deleteCustomType(t.id)}
-                        className="text-gray-600 hover:text-red-400 text-xs transition"
+                        className="text-gray-400 hover:text-red-400 text-xs transition"
                       >
                         Slett test
                       </button>
@@ -495,7 +495,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
       {/* Add custom test type */}
       {showCustomForm ? (
         <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-          <p className="text-sm font-semibold text-gray-300">Ny egendefinert test</p>
+          <p className="text-sm font-semibold text-white">Ny egendefinert test</p>
           <input
             type="text"
             placeholder="Navn (f.eks. Dips)"
@@ -548,7 +548,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
       ) : (
         <button
           onClick={() => setShowCustomForm(true)}
-          className="w-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-2xl py-3 text-sm transition"
+          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-2xl py-3 text-sm transition"
         >
           + Legg til egendefinert test
         </button>

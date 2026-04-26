@@ -174,17 +174,17 @@ export default function WorkoutList({ packages, userId, durationStats }: { packa
                 </div>
                 <div className="flex gap-3">
                   {pkg.is_active && (
-                    <button onClick={() => startEdit(pkg)} className="text-gray-400 hover:text-white text-sm">
+                    <button onClick={() => startEdit(pkg)} className="text-gray-300 hover:text-white text-sm font-medium">
                       Rediger
                     </button>
                   )}
                   <button
                     onClick={() => toggleActive(pkg.id, pkg.is_active)}
-                    className={`text-sm ${pkg.is_active ? 'text-gray-500 hover:text-yellow-400' : 'text-orange-500 hover:text-orange-400'}`}
+                    className={`text-sm ${pkg.is_active ? 'text-gray-400 hover:text-white' : 'text-orange-400 hover:text-orange-300 font-medium'}`}
                   >
                     {pkg.is_active ? 'Deaktiver' : 'Aktiver'}
                   </button>
-                  <button onClick={() => deletePackage(pkg.id)} className="text-gray-500 hover:text-red-400 text-sm">
+                  <button onClick={() => deletePackage(pkg.id)} className="text-gray-400 hover:text-red-400 text-sm">
                     Slett
                   </button>
                 </div>
@@ -206,7 +206,7 @@ export default function WorkoutList({ packages, userId, durationStats }: { packa
                   <div className="mt-3 pt-3 border-t border-gray-700 space-y-2">
                     <p className="text-xs text-gray-400">
                       ⏱ Snitt: <span className="text-orange-400 font-semibold">{formatDuration(stat.avgSeconds)}</span>
-                      <span className="text-gray-600"> · basert på {stat.timedCount} {stat.timedCount === 1 ? 'økt' : 'økter'}</span>
+                      <span className="text-gray-500"> · basert på {stat.timedCount} {stat.timedCount === 1 ? 'økt' : 'økter'}</span>
                     </p>
                     {stat.untimedCount > 0 && (
                       <button
@@ -231,7 +231,7 @@ export default function WorkoutList({ packages, userId, durationStats }: { packa
 
       {inactivePackages.length > 0 && (
         <>
-          <p className="text-gray-600 text-xs font-semibold uppercase tracking-wide pt-2">Inaktive</p>
+          <p className="text-white text-xs font-semibold uppercase tracking-wide pt-2">Inaktive</p>
           {inactivePackages.map(pkg => renderPackage(pkg))}
         </>
       )}
