@@ -231,7 +231,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
             key={t}
             onClick={() => setTab(t)}
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition capitalize ${
-              tab === t ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
+              tab === t ? 'bg-orange-500 text-white' : 'text-gray-300 hover:text-white'
             }`}
           >
             {t === 'uke' ? 'Uke' : t === 'mnd' ? 'Måned' : 'År'}
@@ -243,10 +243,10 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-800 rounded-2xl p-4">
           <div className="flex justify-between items-start mb-1">
-            <p className="text-gray-400 text-xs">Treninger</p>
+            <p className="text-gray-300 text-xs">Treninger</p>
             <button
               onClick={() => setInfoOpen(v => !v)}
-              className="text-gray-500 hover:text-white text-xs leading-none"
+              className="text-gray-300 hover:text-white text-xs leading-none"
             >
               {infoOpen ? '✕' : 'ⓘ'}
             </button>
@@ -257,23 +257,23 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
             <>
               <p className="text-2xl font-bold text-white">{trainedDays} av {possibleDays}</p>
               <p className="text-orange-400 font-bold text-lg leading-tight">{trainedPct}%</p>
-              <p className="text-gray-500 text-xs mt-1">{periodLabel}</p>
+              <p className="text-gray-300 text-xs mt-1">{periodLabel}</p>
             </>
           )}
         </div>
         <div className="bg-gray-800 rounded-2xl p-4">
-          <p className="text-gray-400 text-xs mb-1">Reps</p>
+          <p className="text-gray-300 text-xs mb-1">Reps</p>
           <p className="text-2xl font-bold text-white">{periodReps.toLocaleString('nb-NO')}</p>
           <p className="text-orange-400 font-bold text-lg leading-tight">
             {trainedDays > 0 ? Math.round(periodReps / trainedDays) : 0} /dag
           </p>
-          <p className="text-gray-500 text-xs mt-1">{periodLabel}</p>
+          <p className="text-gray-300 text-xs mt-1">{periodLabel}</p>
         </div>
       </div>
 
       {/* Graf */}
       <div className="bg-gray-800 rounded-2xl p-4">
-        <p className="text-gray-400 text-xs mb-4">
+        <p className="text-gray-300 text-xs mb-4">
           {tab === 'uke' ? 'Siste 7 dager' : tab === 'mnd' ? 'Siste 8 uker' : 'Siste 12 måneder'}
         </p>
         <div className="flex items-end gap-1">
@@ -288,7 +288,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                       ? 'bg-gray-700'
                       : bar.isToday
                       ? 'bg-orange-500'
-                      : 'bg-orange-400/70'
+                      : 'bg-orange-500'
                   }`}
                   style={{ height: `${barHeight}px` }}
                 >
@@ -296,7 +296,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                     <span className="text-white text-xs font-semibold leading-none self-start mt-1">{bar.value}</span>
                   )}
                 </div>
-                <span className="text-gray-500 text-xs leading-none">{bar.label}</span>
+                <span className="text-gray-300 text-xs leading-none">{bar.label}</span>
               </div>
             )
           })}
@@ -306,18 +306,18 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       {/* Streak-kort */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-gray-800 rounded-2xl p-4">
-          <p className="text-gray-400 text-xs mb-1">Nåværende streak</p>
+          <p className="text-gray-300 text-xs mb-1">Nåværende streak</p>
           <p className="text-3xl font-bold text-orange-400">{currentStreak} 🔥</p>
-          <p className="text-gray-500 text-xs mt-1">dager på rad</p>
-          <p className="text-gray-600 text-xs mt-1">
+          <p className="text-gray-300 text-xs mt-1">dager på rad</p>
+          <p className="text-gray-300 text-xs mt-1">
             {currentStreak > 0 ? `${formatDate(currentStreakStart)} – ${formatDate(currentStreakEnd)}` : '–'}
           </p>
         </div>
         <div className="bg-gray-800 rounded-2xl p-4">
-          <p className="text-gray-400 text-xs mb-1">Lengste streak</p>
-          <p className="text-3xl font-bold text-yellow-400">{longestStreak} 🏆</p>
-          <p className="text-gray-500 text-xs mt-1">dager på rad</p>
-          <p className="text-gray-600 text-xs mt-1">
+          <p className="text-gray-300 text-xs mb-1">Lengste streak</p>
+          <p className="text-3xl font-bold text-green-400">{longestStreak} 🏆</p>
+          <p className="text-gray-300 text-xs mt-1">dager på rad</p>
+          <p className="text-gray-300 text-xs mt-1">
             {topStreaks[0] ? `${formatDate(topStreaks[0].start)} – ${formatDate(topStreaks[0].end)}` : '–'}
           </p>
         </div>
@@ -326,7 +326,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       {/* Topp 3 streak-badges */}
       {periodTopStreaks.length > 0 && (
         <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-          <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Beste streaks {periodLabel2}</p>
+          <p className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Beste streaks {periodLabel2}</p>
           {periodTopStreaks.map((s, i) => {
             const badge = [...STREAK_BADGES].reverse().find(b => s.days >= b.days)
             const rank = ['#1', '#2', '#3'][i]
@@ -335,13 +335,13 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                 {i > 0 && <div className="h-px bg-gray-700" />}
                 <div className="flex justify-between items-center py-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-gray-500 text-xs w-5">{rank}</span>
+                    <span className="text-gray-300 text-xs w-5">{rank}</span>
                     <div>
                       <p className="text-white text-sm font-semibold">
                         {badge ? `${badge.emoji} ${badge.name}` : '–'}{' '}
                         <span className="text-orange-400 font-bold">{s.days} dager</span>
                       </p>
-                      <p className="text-gray-400 text-xs">
+                      <p className="text-gray-300 text-xs">
                         {formatDate(s.start)} – {formatDate(s.end)}
                       </p>
                     </div>
@@ -358,7 +358,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         const allDates = [...new Set(logs.map(l => l.logged_date))].sort()
         if (allDates.length < 2) return (
           <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-            <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
+            <p className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
             <p className="text-white font-bold">{totalTrainings} treninger · {totalReps.toLocaleString('nb-NO')} reps</p>
           </div>
         )
@@ -403,7 +403,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
         return (
           <div className="bg-gray-800 rounded-2xl p-4">
             <div className="flex justify-between items-baseline mb-3">
-              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
+              <p className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Totalt noensinne</p>
               <p className="text-white text-sm font-bold">{totalTrainings} treninger · {totalReps.toLocaleString('nb-NO')} reps</p>
             </div>
             <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: 120 }}>
@@ -425,7 +425,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
               <circle cx={last[0]} cy={last[1]} r="3.5" fill="#f97316" />
               {/* Månedsetiketter */}
               {visibleLabels.map(({ x, label }) => (
-                <text key={label} x={x} y={H - 4} textAnchor="middle" fontSize="9" fill="#6b7280">{label}</text>
+                <text key={label} x={x} y={H - 4} textAnchor="middle" fontSize="9" fill="#9ca3af">{label}</text>
               ))}
             </svg>
           </div>
@@ -464,7 +464,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
 
           return (
             <>
-              <p className="text-gray-400 text-xs font-semibold uppercase tracking-wide">Treningspakke — {periodLabel2}</p>
+              <p className="text-gray-300 text-xs font-semibold uppercase tracking-wide">Treningspakke — {periodLabel2}</p>
               <div className={`grid gap-2 ${totalPeriodTime > 0 ? 'grid-cols-3' : 'grid-cols-2'}`}>
                 <div className="border border-orange-500 rounded-xl px-2 py-1.5 text-center">
                   <p className="text-orange-400 text-base font-bold leading-tight">{totalPeriodTrainings}</p>
@@ -485,7 +485,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
                 <div key={name} className="space-y-1">
                   <div className="flex justify-between items-baseline">
                     <span className="text-white text-sm font-medium">{name}</span>
-                    <span className="text-gray-400 text-xs">
+                    <span className="text-gray-300 text-xs">
                       {stats.count} tr · {stats.reps.toLocaleString('nb-NO')} reps
                       {totalTimeByPackage[name] != null && (
                         <span className="text-orange-400"> · ⏱ {fmtTotal(totalTimeByPackage[name]!)}</span>

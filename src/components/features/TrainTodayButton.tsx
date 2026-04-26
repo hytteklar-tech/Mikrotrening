@@ -233,11 +233,11 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
         firstLogDate={dayLogs.length > 0 ? [...dayLogs].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined}
       />
 
-      <p className="text-center text-sm text-gray-400 capitalize">{labelDate}</p>
+      <p className="text-center text-sm text-gray-300 capitalize">{labelDate}</p>
 
       {packages.length === 0 ? (
         <div className="bg-gray-800 rounded-2xl p-4 text-center">
-          <p className="text-gray-400 text-sm">Du har ingen treningspakker ennå.</p>
+          <p className="text-gray-300 text-sm">Du har ingen treningspakker ennå.</p>
           <a href="/workouts" className="text-orange-500 font-semibold text-sm mt-1 block">
             Opprett din første pakke →
           </a>
@@ -281,7 +281,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                       className={`flex-1 min-w-0 px-3 py-2 rounded-xl text-sm font-medium transition truncate ${
                         activePackage?.id === pkg.id
                           ? 'bg-orange-500 text-white'
-                          : 'bg-gray-700 text-gray-400 hover:text-white'
+                          : 'bg-gray-700 text-gray-300 hover:text-white'
                       }`}
                     >
                       {pkg.name}

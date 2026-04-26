@@ -34,7 +34,7 @@ export default function TestStatsView({ testTypes, testResults }: Props) {
     return (
       <div className="flex flex-col items-center justify-center py-16 space-y-3 text-center">
         <p className="text-4xl">📏</p>
-        <p className="text-gray-400">Ingen testresultater ennå.</p>
+        <p className="text-gray-300">Ingen testresultater ennå.</p>
         <a href="/test" className="text-orange-500 font-semibold text-sm">
           Gå til Tester →
         </a>
@@ -81,15 +81,15 @@ export default function TestStatsView({ testTypes, testResults }: Props) {
             {/* Best + first/last */}
             <div className="grid grid-cols-3 gap-2">
               <div className="bg-gray-700/50 rounded-xl p-2.5 text-center">
-                <p className="text-xs text-gray-400">Beste</p>
-                <p className="text-white font-bold text-sm">{formatResult(best, t.unit)}</p>
+                <p className="text-xs text-white font-medium">Beste</p>
+                <p className="text-green-400 font-bold text-sm">{formatResult(best, t.unit)}</p>
               </div>
               <div className="bg-gray-700/50 rounded-xl p-2.5 text-center">
-                <p className="text-xs text-gray-400">Første</p>
+                <p className="text-xs text-gray-300">Første</p>
                 <p className="text-white font-bold text-sm">{formatResult(first, t.unit)}</p>
               </div>
               <div className="bg-gray-700/50 rounded-xl p-2.5 text-center">
-                <p className="text-xs text-gray-400">Siste</p>
+                <p className="text-xs text-gray-300">Siste</p>
                 <p className="text-white font-bold text-sm">{formatResult(last, t.unit)}</p>
               </div>
             </div>
@@ -118,13 +118,16 @@ export default function TestStatsView({ testTypes, testResults }: Props) {
                     <span className="text-white text-sm">{formatResult(r.result, t.unit)}</span>
                     {r.notes && <span className="text-gray-500 text-xs">— {r.notes}</span>}
                   </div>
-                  <span className="text-gray-400 text-xs">{formatDate(r.testedDate)}</span>
+                  <span className="text-gray-300 text-xs">{formatDate(r.testedDate)}</span>
                 </div>
               ))}
             </div>
           </div>
         )
       })}
+      <a href="/test" className="block text-center text-orange-400 hover:text-orange-300 text-sm font-medium py-2 transition">
+        Legg til testresultat →
+      </a>
     </div>
   )
 }

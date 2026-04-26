@@ -241,9 +241,9 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     <div className="bg-gray-900 rounded-2xl p-4">
       {tabRow}
       <div className="flex items-center justify-between mb-4">
-        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition">‹</button>
+        <button onClick={prevMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">‹</button>
         <span className="text-white font-semibold">{MONTHS[viewMonth]} {viewYear}</span>
-        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition">›</button>
+        <button onClick={nextMonth} className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-300 hover:text-white hover:bg-gray-800 transition">›</button>
       </div>
       <div className="grid grid-cols-7 mb-1">
         {DAYS.map(d => (

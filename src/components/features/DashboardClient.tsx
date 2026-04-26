@@ -167,7 +167,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
           <p className="text-white font-bold text-lg leading-snug">
             Din første mikroøkt er klar.<br />Nå er det din tur.
           </p>
-          <p className="text-gray-400 text-sm">15 knebøy. 30 sekunder. Det er alt som skal til.</p>
+          <p className="text-gray-300 text-sm">15 knebøy. 30 sekunder. Det er alt som skal til.</p>
         </div>
       )}
       {showMotivation && (
@@ -180,7 +180,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-4 space-y-3">
           <div>
             <p className="text-sm font-semibold text-white">📲 Legg til på hjemskjermen</p>
-            <p className="text-xs text-gray-400 mt-0.5">Da er appen alltid ett trykk unna — akkurat som en vanlig app.</p>
+            <p className="text-xs text-gray-300 mt-0.5">Da er appen alltid ett trykk unna — akkurat som en vanlig app.</p>
           </div>
           {(isIos || isDesktopSafari) ? (
             <>
@@ -189,7 +189,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
                 className="w-full flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2 text-xs text-white hover:bg-gray-700 transition"
               >
                 <span className="font-medium">Slik gjør du det</span>
-                <span className="text-gray-400">{showInstallSteps ? '▲' : '▼'}</span>
+                <span className="text-gray-300">{showInstallSteps ? '▲' : '▼'}</span>
               </button>
               {showInstallSteps && (
                 <div className="space-y-3 px-1">
@@ -215,7 +215,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
               Legg til på hjemskjermen
             </button>
           ) : null}
-          <button onClick={dismissInstallBanner} className="w-full text-gray-400 hover:text-gray-200 text-xs py-1 transition">
+          <button onClick={dismissInstallBanner} className="w-full text-gray-300 hover:text-gray-200 text-xs py-1 transition">
             Ikke nå
           </button>
         </div>

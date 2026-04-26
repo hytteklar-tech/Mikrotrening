@@ -99,7 +99,7 @@ export default function StatistikkClient({ logs, testTypes, testResults }: Props
             key={t}
             onClick={() => setMainTab(t)}
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${
-              mainTab === t ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
+              mainTab === t ? 'bg-orange-500 text-white' : 'text-gray-300 hover:text-white'
             }`}
           >
             {t === 'trend' ? 'Trend' : t === 'trening' ? 'Trening' : 'Tester'}

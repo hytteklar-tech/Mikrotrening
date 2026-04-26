@@ -372,11 +372,11 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                 {best && (
                   <div className="flex gap-3">
                     <div className="flex-1 bg-gray-700/50 rounded-xl p-3">
-                      <p className="text-xs text-gray-400">Beste</p>
-                      <p className="text-white font-bold">{formatResult(best.result, t.unit)}</p>
+                      <p className="text-xs text-white font-medium">Beste</p>
+                      <p className="text-green-400 font-bold">{formatResult(best.result, t.unit)}</p>
                     </div>
                     <div className="flex-1 bg-gray-700/50 rounded-xl p-3">
-                      <p className="text-xs text-gray-400">Antall tester</p>
+                      <p className="text-xs text-gray-300">Antall tester</p>
                       <p className="text-white font-bold">{typeResults.length}</p>
                     </div>
                   </div>
@@ -392,11 +392,11 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                           {r.notes && <p className="text-gray-500 text-xs">{r.notes}</p>}
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="text-gray-400 text-xs">{formatDate(r.testedDate)}</span>
+                          <span className="text-gray-300 text-xs">{formatDate(r.testedDate)}</span>
                           <button
                             onClick={() => deleteResult(r.id)}
                             disabled={deletingId === r.id}
-                            className="text-gray-400 hover:text-red-400 text-xs transition disabled:opacity-40 px-2 py-1 rounded-lg hover:bg-red-400/10"
+                            className="text-gray-300 hover:text-red-400 text-xs transition disabled:opacity-40 px-2 py-1 rounded-lg hover:bg-red-400/10"
                           >
                             {deletingId === r.id ? '...' : 'Slett'}
                           </button>
@@ -411,7 +411,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                   <div className="space-y-2 pt-1">
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <label className="text-xs text-gray-400">Resultat ({t.unit})</label>
+                        <label className="text-xs text-gray-300">Resultat ({t.unit})</label>
                         <input
                           type="number"
                           inputMode="decimal"
@@ -423,7 +423,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                         />
                       </div>
                       <div className="flex-1">
-                        <label className="text-xs text-gray-400">Dato</label>
+                        <label className="text-xs text-gray-300">Dato</label>
                         <input
                           type="date"
                           value={formDate}
@@ -467,7 +467,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
                     {t.isOwn && (
                       <button
                         onClick={() => deleteCustomType(t.id)}
-                        className="text-gray-400 hover:text-red-400 text-xs transition"
+                        className="text-gray-300 hover:text-red-400 text-xs transition"
                       >
                         Slett test
                       </button>
@@ -506,7 +506,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
           />
           <div className="flex gap-2">
             <div className="flex-1">
-              <label className="text-xs text-gray-400 mb-1 block">Enhet</label>
+              <label className="text-xs text-gray-300 mb-1 block">Enhet</label>
               <select
                 value={customUnit}
                 onChange={e => setCustomUnit(e.target.value)}
@@ -518,7 +518,7 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
               </select>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-gray-400 mb-1 block">Høyere = bedre?</label>
+              <label className="text-xs text-gray-300 mb-1 block">Høyere = bedre?</label>
               <button
                 onClick={() => setCustomHigher(h => !h)}
                 className={`w-full rounded-xl px-3 py-2 text-sm font-medium transition ${

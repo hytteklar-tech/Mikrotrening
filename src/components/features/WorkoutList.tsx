@@ -180,11 +180,11 @@ export default function WorkoutList({ packages, userId, durationStats }: { packa
                   )}
                   <button
                     onClick={() => toggleActive(pkg.id, pkg.is_active)}
-                    className={`text-sm ${pkg.is_active ? 'text-gray-400 hover:text-white' : 'text-orange-400 hover:text-orange-300 font-medium'}`}
+                    className={`text-sm ${pkg.is_active ? 'text-gray-300 hover:text-white' : 'text-orange-400 hover:text-orange-300 font-medium'}`}
                   >
                     {pkg.is_active ? 'Deaktiver' : 'Aktiver'}
                   </button>
-                  <button onClick={() => deletePackage(pkg.id)} className="text-gray-400 hover:text-red-400 text-sm">
+                  <button onClick={() => deletePackage(pkg.id)} className="text-gray-300 hover:text-red-400 text-sm">
                     Slett
                   </button>
                 </div>

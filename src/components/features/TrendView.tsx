@@ -53,11 +53,11 @@ function PctArrow({ thisVal, prevVal }: { thisVal: number; prevVal: number }) {
   const pct = prevVal > 0 ? Math.round((diff / prevVal) * 100) : null
   const noData = thisVal === 0 && prevVal === 0
 
-  if (noData) return <span className="text-gray-600 text-xl font-black leading-none">→</span>
+  if (noData) return <span className="text-gray-400 text-xl font-black leading-none">→</span>
 
   const same = diff === 0
   const better = diff > 0
-  const color = same ? 'text-gray-400' : better ? 'text-green-400' : 'text-red-400'
+  const color = same ? 'text-gray-300' : better ? 'text-green-400' : 'text-red-400'
   const arrow = same ? '→' : better ? '↑' : '↓'
   const pctStr = pct !== null ? `${better ? '+' : ''}${pct}%` : better ? 'ny' : '–'
 
@@ -90,7 +90,7 @@ function StatCard({
   return (
     <div className="bg-gray-800 rounded-2xl p-4">
       <div className="flex justify-between items-start mb-3">
-        <p className="text-xs text-gray-400 font-medium">{label}</p>
+        <p className="text-xs text-gray-300 font-medium">{label}</p>
         <PctArrow thisVal={thisVal} prevVal={prevVal} />
       </div>
       <div className="flex gap-4">
@@ -98,13 +98,13 @@ function StatCard({
           <p className={`text-3xl font-bold leading-none ${thisWins ? 'text-green-400' : 'text-white'}`}>
             {format(thisVal)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">{thisLabel}</p>
+          <p className="text-xs text-gray-300 mt-1">{thisLabel}</p>
         </div>
         <div>
           <p className={`text-3xl font-bold leading-none ${prevWins ? 'text-green-400' : 'text-white'}`}>
             {format(prevVal)}
           </p>
-          <p className="text-xs text-gray-500 mt-1">{prevLabel}</p>
+          <p className="text-xs text-gray-300 mt-1">{prevLabel}</p>
         </div>
       </div>
     </div>
@@ -141,8 +141,8 @@ function PackageCompare({
   return (
     <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
       <div className="flex justify-between items-baseline">
-        <p className="text-xs text-gray-400 font-semibold uppercase tracking-wide">Treningspakker</p>
-        <p className="text-xs text-gray-500">denne / {prevLabel}</p>
+        <p className="text-xs text-gray-300 font-semibold uppercase tracking-wide">Treningspakker</p>
+        <p className="text-xs text-gray-300">denne / {prevLabel}</p>
       </div>
       {allNames.map(name => {
         const t = thisMap[name] ?? { count: 0, reps: 0 }
@@ -155,14 +155,14 @@ function PackageCompare({
             <div className="flex justify-between items-center">
               <span className="text-white text-sm font-medium">{name}</span>
               <div className="flex items-center gap-2 text-xs">
-                <span className={better ? 'text-green-400 font-bold' : same ? 'text-gray-400' : 'text-red-400 font-bold'}>
+                <span className={better ? 'text-green-400 font-bold' : same ? 'text-gray-300' : 'text-red-400 font-bold'}>
                   {better ? '↑' : same ? '→' : '↓'}
                 </span>
                 <span className="text-white font-semibold">{t.count} tr</span>
-                <span className="text-gray-500">/ {p.count} tr</span>
+                <span className="text-gray-300">/ {p.count} tr</span>
               </div>
             </div>
-            <div className="flex justify-between text-xs text-gray-500">
+            <div className="flex justify-between text-xs text-gray-300">
               <span>{t.reps.toLocaleString('nb-NO')} reps</span>
               <span>forrige: {p.reps.toLocaleString('nb-NO')} reps</span>
             </div>
@@ -201,7 +201,7 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
             key={p}
             onClick={() => setPeriod(p)}
             className={`flex-1 py-2 rounded-xl text-sm font-semibold transition ${
-              period === p ? 'bg-orange-500 text-white' : 'text-gray-400 hover:text-white'
+              period === p ? 'bg-orange-500 text-white' : 'text-gray-300 hover:text-white'
             }`}
           >
             {p === 'uken' ? 'Denne uken' : 'Siste 7 dager'}
@@ -209,7 +209,7 @@ export default function TrendView({ logs }: { logs: StatLog[] }) {
         ))}
       </div>
 
-      <div className="flex justify-between text-xs text-gray-500 px-1">
+      <div className="flex justify-between text-xs text-gray-300 px-1">
         <span>{periodLabel.this}</span>
         <span>vs {periodLabel.prev}</span>
       </div>
