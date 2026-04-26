@@ -59,9 +59,9 @@ function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
     return (
       <div className="py-4 space-y-1">
         <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>—</p>
-        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken (man–i dag)</p>
+        <p style={{ fontSize: 14, color: '#9ca3af' }}>treninger denne uken (man–i dag)</p>
         {lastWeek > 0 && (
-          <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke</p>
+          <p style={{ fontSize: 14, color: '#6b7280' }}>{lastWeek} treninger forrige uke</p>
         )}
       </div>
     )
@@ -74,8 +74,8 @@ function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
   return (
     <div className="py-4 space-y-1">
       <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>{pctText}</p>
-      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken (man–i dag)</p>
-      <p style={{ fontSize: 14, color: '#999' }}>{lastWeek} treninger forrige uke (man–{['man','tir','ons','tor','fre','lør','søn'][dayOfWeek]})</p>
+      <p style={{ fontSize: 14, color: '#9ca3af' }}>{thisWeek} treninger denne uken (man–i dag)</p>
+      <p style={{ fontSize: 14, color: '#6b7280' }}>{lastWeek} treninger forrige uke (man–{['man','tir','ons','tor','fre','lør','søn'][dayOfWeek]})</p>
     </div>
   )
 }
@@ -117,7 +117,7 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     } else if (count === 1) {
       base += 'bg-green-500 text-white font-bold hover:bg-green-400'
     } else if (isToday) {
-      base += 'bg-orange-500/20 text-orange-300 hover:bg-orange-500/30'
+      base += 'bg-gray-700 text-white ring-1 ring-orange-500 hover:bg-gray-600'
     } else {
       base += 'bg-gray-800/50 text-gray-500 hover:bg-gray-700/60'
     }
@@ -173,8 +173,8 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
           onClick={() => setTab(t)}
           className="pb-2 text-sm font-medium transition"
           style={{
-            color: tab === t ? '#e85c00' : 'white',
-            borderBottom: tab === t ? '2px solid #e85c00' : '2px solid transparent',
+            color: tab === t ? 'white' : '#6b7280',
+            borderBottom: tab === t ? '2px solid #f97316' : '2px solid transparent',
             marginBottom: -1,
           }}
         >

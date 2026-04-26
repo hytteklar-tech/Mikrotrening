@@ -56,7 +56,7 @@ export default function OneSignalProvider() {
 // Minimal type-deklarasjon for window
 declare global {
   interface Window {
-    OneSignalDeferred: ((os: OneSignalType) => void)[]
+    OneSignalDeferred: ((os: OneSignalType) => void | Promise<void>)[]
     OneSignal: OneSignalType
   }
 }

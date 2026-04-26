@@ -29,7 +29,7 @@ function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
       {alive && orangeProgress > 0 && (
         <circle
           cx={cx} cy={cx} r={r}
-          fill="none" stroke="#e85c00" strokeWidth="6"
+          fill="none" stroke="#f97316" strokeWidth="6"
           strokeDasharray={circumference}
           strokeDashoffset={circumference * (1 - orangeProgress)}
           strokeLinecap="round"
@@ -46,10 +46,10 @@ function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
           transform={`rotate(-90 ${cx} ${cx})`}
         />
       )}
-      <text x={cx} y={cx + 7} textAnchor="middle" fill={alive ? 'white' : '#555'} fontSize="26" fontWeight="700" fontFamily="sans-serif">
+      <text x={cx} y={cx + 7} textAnchor="middle" fill={alive ? 'white' : '#6b7280'} fontSize="26" fontWeight="700" fontFamily="sans-serif">
         {streak}
       </text>
-      <text x={cx} y={cx + 22} textAnchor="middle" fill="#bbb" fontSize="12" fontFamily="sans-serif">
+      <text x={cx} y={cx + 22} textAnchor="middle" fill="#9ca3af" fontSize="12" fontFamily="sans-serif">
         av {nextMilestone}
       </text>
     </svg>
@@ -85,7 +85,7 @@ function TwoWeekCalendar({ dates }: { dates: string[] }) {
     <div>
       <div className="grid grid-cols-7 gap-0.5 mb-1">
         {['M', 'T', 'O', 'T', 'F', 'L', 'S'].map((d, i) => (
-          <div key={i} className="text-center" style={{ fontSize: 9, color: '#555' }}>{d}</div>
+          <div key={i} className="text-center" style={{ fontSize: 9, color: '#6b7280' }}>{d}</div>
         ))}
       </div>
       <div className="grid grid-cols-7 gap-0.5">
@@ -93,15 +93,15 @@ function TwoWeekCalendar({ dates }: { dates: string[] }) {
           const str = day.toISOString().split('T')[0]
           const count = countMap[str] || 0
           const isToday = str === todayStr
-          const bg = count >= 2 ? '#e85c00' : count === 1 ? '#3a1f00' : '#1a1a1a'
+          const bg = count >= 2 ? '#f97316' : count === 1 ? '#3a1f00' : '#1a1a1a'
           return (
             <div
               key={i}
               className="aspect-square flex items-center justify-center rounded"
               style={{
                 background: bg,
-                border: isToday ? '1.5px solid #e85c00' : '1.5px solid transparent',
-                color: count > 0 ? 'white' : '#555',
+                border: isToday ? '1.5px solid #f97316' : '1.5px solid transparent',
+                color: count > 0 ? 'white' : '#6b7280',
                 fontSize: 10,
               }}
             >
@@ -144,10 +144,10 @@ function WeekTrend({ dates }: { dates: string[] }) {
   if (thisWeek === 0) {
     return (
       <div className="py-2 space-y-1">
-        <p style={{ fontSize: 32, fontWeight: 600, color: '#555' }}>—</p>
-        <p style={{ fontSize: 14, color: '#ccc' }}>treninger denne uken</p>
+        <p style={{ fontSize: 32, fontWeight: 600, color: '#6b7280' }}>—</p>
+        <p style={{ fontSize: 14, color: '#9ca3af' }}>treninger denne uken</p>
         {lastWeek > 0 && (
-          <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+          <p style={{ fontSize: 12, color: '#6b7280' }}>{lastWeek} treninger forrige uke</p>
         )}
       </div>
     )
@@ -159,9 +159,9 @@ function WeekTrend({ dates }: { dates: string[] }) {
 
   return (
     <div className="py-2 space-y-1">
-      <p style={{ fontSize: 32, fontWeight: 600, color: up ? '#33aa33' : '#aaa' }}>{pctText}</p>
-      <p style={{ fontSize: 14, color: '#ccc' }}>{thisWeek} treninger denne uken</p>
-      <p style={{ fontSize: 12, color: '#444' }}>{lastWeek} treninger forrige uke</p>
+      <p style={{ fontSize: 32, fontWeight: 600, color: up ? '#22c55e' : '#9ca3af' }}>{pctText}</p>
+      <p style={{ fontSize: 14, color: '#9ca3af' }}>{thisWeek} treninger denne uken</p>
+      <p style={{ fontSize: 12, color: '#6b7280' }}>{lastWeek} treninger forrige uke</p>
     </div>
   )
 }
@@ -187,14 +187,14 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         <div className="flex-1">
           <p style={{ fontSize: 28, fontWeight: 600, lineHeight: 1.2, color: 'white' }}>
             Du har trent{' '}
-            <span style={{ color: alive ? '#e85c00' : '#555', verticalAlign: 'baseline' }}>{streak}</span>
+            <span style={{ color: alive ? '#f97316' : '#6b7280', verticalAlign: 'baseline' }}>{streak}</span>
             {' '}dager på rad.
           </p>
-          <p style={{ fontSize: 16, color: '#bbb', marginTop: 4 }}>{totalSessions} dager totalt.</p>
+          <p style={{ fontSize: 16, color: '#9ca3af', marginTop: 4 }}>{totalSessions} dager totalt.</p>
           {!alive && !isNewUser && (
             <button
               onClick={onScrollToToday}
-              style={{ color: '#e85c00', fontSize: 14, marginTop: 6, display: 'block' }}
+              style={{ color: '#f97316', fontSize: 14, marginTop: 6, display: 'block' }}
             >
               Start en ny streak i dag →
             </button>
@@ -216,9 +216,9 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
                 key={m}
                 className="flex items-center gap-1 rounded-full px-3 py-1 text-sm"
                 style={{
-                  background: reached ? '#e85c00' : 'transparent',
-                  border: reached ? 'none' : isNext ? '1.5px solid #e85c00' : '1.5px solid #444',
-                  color: reached ? 'white' : isNext ? '#e85c00' : '#888',
+                  background: reached ? '#f97316' : 'transparent',
+                  border: reached ? 'none' : isNext ? '1.5px solid #f97316' : '1.5px solid #374151',
+                  color: reached ? 'white' : isNext ? '#f97316' : '#9ca3af',
                 }}
               >
                 {reached && '🔥'} {m}d

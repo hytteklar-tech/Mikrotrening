@@ -316,7 +316,10 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                     disabled={loading || !activePackage}
                     className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition"
                   >
-                    {loading ? 'Registrerer...' : logsForDay.length > 0 ? '➕ Uten tid' : '💪 Tren uten tid'}
+                    {loading ? 'Registrerer...' : logsForDay.length > 0
+  ? <><span className="text-xl font-black leading-none">+</span> Uten tid</>
+  : <><span className="text-xl font-black leading-none">+</span> Tren uten tid</>
+}
                   </button>
                   <button
                     onClick={startTimer}

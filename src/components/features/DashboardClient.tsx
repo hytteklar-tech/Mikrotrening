@@ -64,6 +64,7 @@ function calcStreak(uniqueDates: string[]): number {
 export default function DashboardClient({ initialDayLogs, packages, userId, notificationsEnabled }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
+  const [showInstallSteps, setShowInstallSteps] = useState(false)
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
@@ -117,7 +118,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
   }
 
   // Vis installasjonsbanner ved 3, 7 og 10 registreringer
-  const INSTALL_MILESTONES = [3, 7, 10]
+  const INSTALL_MILESTONES = [1, 2, 3, 7, 10]
   useEffect(() => {
     if (!INSTALL_MILESTONES.includes(dayLogs.length)) return
     if (window.matchMedia('(display-mode: standalone)').matches) return
@@ -142,6 +143,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
   }
 
   const isIos = /iPhone|iPad|iPod/.test(navigator.userAgent)
+  const isDesktopSafari = !isIos && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS|Edg/.test(navigator.userAgent)
 
   // Vis velkomstkort for nye brukere (kun pre-registrert økt fra onboarding)
   const isNewUser = dayLogs.length === 1 && !uniqueDates.includes(today)
@@ -169,8 +171,8 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         </div>
       )}
       {showMotivation && (
-        <div className="bg-gradient-to-br from-orange-500/30 to-orange-700/20 border border-orange-500/60 rounded-2xl px-4 py-3 shadow shadow-orange-500/20">
-          <p className="text-xs text-orange-300 font-semibold mb-1 tracking-wide uppercase">Visste du at...</p>
+        <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl px-4 py-3">
+          <p className="text-xs text-orange-400 font-semibold mb-1 tracking-wide uppercase">Visste du at...</p>
           <p className="text-sm text-gray-100 leading-relaxed">{motivationMsg}</p>
         </div>
       )}
@@ -178,17 +180,39 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         <div className="bg-gray-800 border border-gray-700 rounded-2xl p-4 space-y-3">
           <div>
             <p className="text-sm font-semibold text-white">📲 Legg til på hjemskjermen</p>
-            <p className="text-xs text-gray-400 mt-0.5">Alltid ett trykk unna — akkurat som en vanlig app.</p>
+            <p className="text-xs text-gray-400 mt-0.5">Da er appen alltid ett trykk unna — akkurat som en vanlig app.</p>
           </div>
-          {isIos ? (
-            <div className="space-y-2 text-xs text-gray-300">
-              <p>1. Trykk på <span className="text-blue-400">deleknappen</span> nederst i Safari</p>
-              <p>2. Velg <span className="text-white font-medium">"Legg til på Hjem-skjerm"</span></p>
-              <p>3. Trykk <span className="text-white font-medium">"Legg til"</span></p>
-            </div>
+          {(isIos || isDesktopSafari) ? (
+            <>
+              <button
+                onClick={() => setShowInstallSteps(s => !s)}
+                className="w-full flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2 text-xs text-white hover:bg-gray-700 transition"
+              >
+                <span className="font-medium">Slik gjør du det</span>
+                <span className="text-gray-400">{showInstallSteps ? '▲' : '▼'}</span>
+              </button>
+              {showInstallSteps && (
+                <div className="space-y-3 px-1">
+                  {(isIos ? [
+                    <>Trykk på <span className="text-white font-medium">del-ikonet</span> <span className="text-white">⎋</span> nederst i Safari</>,
+                    <>Scroll ned og trykk <span className="text-white font-medium">"Legg til på Hjem-skjerm"</span></>,
+                    <>Trykk <span className="text-white font-medium">"Legg til"</span> øverst til høyre</>,
+                  ] : [
+                    <>Trykk på <span className="text-white font-medium">Fil</span> i menylinjen øverst</>,
+                    <>Velg <span className="text-white font-medium">"Legg til i Dock…"</span></>,
+                    <>Trykk <span className="text-white font-medium">"Legg til"</span></>,
+                  ]).map((text, i) => (
+                    <div key={i} className="flex items-start gap-3">
+                      <span className="flex-shrink-0 w-6 h-6 rounded-full border border-orange-500 text-orange-500 flex items-center justify-center text-xs font-bold">{i + 1}</span>
+                      <span className="text-xs text-gray-300 pt-0.5">{text}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
           ) : deferredPrompt ? (
             <button onClick={handleInstall} className="w-full bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold rounded-xl py-2 transition">
-              Installer appen
+              Legg til på hjemskjermen
             </button>
           ) : null}
           <button onClick={dismissInstallBanner} className="w-full text-gray-400 hover:text-gray-200 text-xs py-1 transition">
