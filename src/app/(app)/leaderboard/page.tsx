@@ -86,13 +86,13 @@ export default async function LeaderboardPage() {
   return (
     <div className="p-4 space-y-4">
       <div className="pt-4">
-        <h1 className="text-2xl font-bold">Leaderboard 🏆</h1>
+        <h1 className="text-2xl font-bold">Toppliste 🏆</h1>
         <p className="text-gray-300 text-sm mt-1">Poeng = streak × 2 + totale dager</p>
       </div>
 
       {board.length === 0 ? (
         <div className="bg-gray-800 rounded-2xl p-6 text-center">
-          <p className="text-gray-300">Bli med i en gruppe for å se leaderboard</p>
+          <p className="text-gray-300">Bli med i en gruppe for å se topplisten</p>
           <a href="/group" className="text-orange-500 font-semibold text-sm mt-2 block">
             Gå til Gruppe →
           </a>
