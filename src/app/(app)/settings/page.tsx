@@ -26,15 +26,7 @@ export default async function SettingsPage() {
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
-      {needsActivation && (
-        <a
-          href="/push-setup"
-          className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 text-sm transition flex items-center justify-center"
-        >
-          🔔 Aktiver push på denne enheten
-        </a>
-      )}
-      <SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
+<SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
     </div>
   )
 }

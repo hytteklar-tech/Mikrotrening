@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
+import confetti from 'canvas-confetti'
 import CalendarView from './CalendarView'
 import type { DayLog } from './DashboardClient'
 
@@ -97,9 +98,28 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [timerRunning, setTimerRunning] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(0)
   const [averageSeconds, setAverageSeconds] = useState<number | null>(null)
+  const [repsByDate, setRepsByDate] = useState<Record<string, number>>({})
+  const [packageExercises, setPackageExercises] = useState<{ name: string; reps: number }[]>([])
+  const [milestoneToast, setMilestoneToast] = useState<string | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const supabase = createClient()
+
+  useEffect(() => {
+    supabase
+      .from('daily_logs')
+      .select('logged_date, workout_packages(exercises(reps))')
+      .eq('user_id', userId)
+      .then(({ data }) => {
+        const map: Record<string, number> = {}
+        for (const row of data ?? []) {
+          const reps = ((row.workout_packages as any)?.exercises ?? [])
+            .reduce((s: number, e: { reps: number }) => s + (e.reps ?? 0), 0)
+          map[row.logged_date] = (map[row.logged_date] ?? 0) + reps
+        }
+        setRepsByDate(map)
+      })
+  }, [userId])
 
   // Correct for SSR/hydration timezone mismatch: server runs UTC, user is in local time.
   // useState(today) uses the server's date during SSR and stays stuck after hydration.
@@ -125,6 +145,14 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
 
   useEffect(() => {
     if (!activePackage) return
+    supabase
+      .from('exercises')
+      .select('name, reps, order')
+      .eq('package_id', activePackage.id)
+      .order('order')
+      .then(({ data }) => {
+        setPackageExercises((data ?? []).map(e => ({ name: e.name as string, reps: e.reps as number })))
+      })
     supabase
       .from('daily_logs')
       .select('duration_seconds')
@@ -191,10 +219,28 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       onLogChange(dayLogs)
     } else if (data) {
       onLogChange([...dayLogs, { ...optimisticLog, id: data.id as string }])
+      const colors = ['#e85c00', '#f97316', '#ffffff', '#fbbf24', '#facc15']
+      confetti({ particleCount: 40, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors })
+      confetti({ particleCount: 40, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors })
       fetch('/api/milestones/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ userId }),
+      }).then(r => r.json()).then(data => {
+        if (data.milestone) {
+          const messages: Record<number, string> = {
+            7:   '7 treninger! Vanedanneren er i gang 🔥',
+            14:  '14 treninger! To uker med mikrotrening 💥',
+            30:  '30 treninger! Du er offisielt en mikrotrener 💪',
+            50:  '50 treninger! Halvveis til 100 — sterk innsats 🌟',
+            100: '100 treninger! Legenden er bekreftet 🏆',
+          }
+          setMilestoneToast(messages[data.milestone] ?? `${data.milestone} treninger! 🎉`)
+          setTimeout(() => setMilestoneToast(null), 5000)
+          confetti({ particleCount: 80, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors })
+          confetti({ particleCount: 80, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors })
+          setTimeout(() => confetti({ particleCount: 60, spread: 90, origin: { y: 0.5 }, colors }), 300)
+        }
       })
     }
 
@@ -226,8 +272,21 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
 
   return (
     <div className="space-y-3">
+      {milestoneToast && (
+        <div
+          className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300"
+          style={{ background: '#1a1a1a', border: '1.5px solid #e85c00', maxWidth: '90vw' }}
+        >
+          <div>
+            <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide mb-0.5">Milepæl nådd!</p>
+            <p className="text-white text-sm font-medium">{milestoneToast}</p>
+          </div>
+          <button onClick={() => setMilestoneToast(null)} className="text-gray-500 hover:text-gray-300 text-lg leading-none ml-2">×</button>
+        </div>
+      )}
       <CalendarView
         dayCounts={dayCounts}
+        repsByDate={repsByDate}
         selectedDate={selectedDate}
         onSelectDate={handleDateChange}
         firstLogDate={dayLogs.length > 0 ? [...dayLogs].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined}
@@ -287,6 +346,20 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                       {pkg.name}
                     </button>
                   ))}
+                </div>
+              )}
+
+              {packageExercises.length > 0 && (
+                <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl px-4 py-3 space-y-2">
+                  <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide">{activePackage?.name}</p>
+                  <div className="space-y-1">
+                    {packageExercises.map((e, i) => (
+                      <div key={i} className="flex items-center justify-between">
+                        <span className="text-sm text-gray-100">{e.name}</span>
+                        <span className="text-sm text-orange-400 font-semibold">{e.reps} reps</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 

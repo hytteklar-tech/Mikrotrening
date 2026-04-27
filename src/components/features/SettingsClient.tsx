@@ -19,7 +19,7 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
-  const [showActivateButton, setShowActivateButton] = useState(true)
+  const [showActivateButton, setShowActivateButton] = useState(needsActivation)
   const [activating, setActivating] = useState(false)
   const [activateError, setActivateError] = useState('')
 
@@ -185,7 +185,7 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
   return (
     <div className="space-y-4">
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-sm font-semibold text-gray-300">Profil</p>
+        <p className="text-sm font-semibold text-white">Profil</p>
         <div>
           <label className="text-xs text-gray-400">Visningsnavn</label>
           <input
@@ -265,26 +265,6 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
         )}
       </div>
 
-      <a
-        href="/push-setup"
-        className="w-full bg-orange-500 hover:bg-orange-600 text-white font-semibold rounded-xl py-3 text-sm transition flex items-center justify-center"
-      >
-        🔔 Aktiver push på denne enheten
-      </a>
-
-      <div className="space-y-2">
-        <button
-          onClick={testPush}
-          disabled={testing}
-          className="w-full bg-gray-700 hover:bg-gray-600 disabled:opacity-50 text-gray-300 rounded-xl py-2 text-sm transition"
-        >
-          {testing ? 'Sender...' : '🔔 Send testvarsel nå'}
-        </button>
-        {testResult && (
-          <pre className="text-xs text-gray-300 bg-gray-900 rounded-xl p-3 overflow-auto whitespace-pre-wrap break-all">{testResult}</pre>
-        )}
-      </div>
-
       <button
         onClick={save}
         disabled={saving}
@@ -302,7 +282,7 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
 
       <button
         onClick={signOut}
-        className="w-full bg-gray-800 hover:bg-gray-700 text-gray-400 hover:text-white rounded-xl py-3 text-sm transition"
+        className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-xl py-3 text-sm transition"
       >
         Logg ut
       </button>

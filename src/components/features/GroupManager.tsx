@@ -26,6 +26,18 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     router.refresh()
   }
 
+  async function leaveGroup(groupId: string) {
+    if (!confirm('Er du sikker på at du vil melde deg ut av gruppen?')) return
+    setLoading(true)
+    await supabase.from('group_members').delete().eq('group_id', groupId).eq('user_id', userId)
+    if (primaryGroupId === groupId) {
+      await supabase.from('users').update({ primary_group_id: null }).eq('id', userId)
+      setPrimaryGroupId(null)
+    }
+    setLoading(false)
+    router.refresh()
+  }
+
   async function setFocusGroup(groupId: string) {
     setPrimaryGroupId(groupId)
     await supabase.from('users').update({ primary_group_id: groupId }).eq('id', userId)
@@ -89,7 +101,8 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     <div className="space-y-4">
       {groups.map((group: any) => {
         const members = membersWithStatus.filter((m: any) => m.group_id === group.id)
-        const canDelete = members.length === 1 && members[0]?.user_id === userId
+        const isAlone = members.length === 1 && members[0]?.user_id === userId
+        const canLeave = members.some((m: any) => m.user_id === userId) && !isAlone
         return (
           <div key={group.id} className="bg-gray-800 rounded-2xl p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -114,15 +127,6 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
                 Kode: {group.invite_code} 📋
               </button>
             </div>
-            {canDelete && (
-              <button
-                onClick={() => deleteGroup(group.id)}
-                disabled={loading}
-                className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
-              >
-                Slett gruppe
-              </button>
-            )}
 
             <div className="space-y-2">
               {members.map((m: any) => (
@@ -134,6 +138,29 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
                 </div>
               ))}
             </div>
+
+            {(canLeave || isAlone) && (
+              <div className="flex justify-end">
+                {isAlone && (
+                  <button
+                    onClick={() => deleteGroup(group.id)}
+                    disabled={loading}
+                    className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
+                  >
+                    Slett gruppe
+                  </button>
+                )}
+                {canLeave && (
+                  <button
+                    onClick={() => leaveGroup(group.id)}
+                    disabled={loading}
+                    className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
+                  >
+                    Meld deg ut
+                  </button>
+                )}
+              </div>
+            )}
           </div>
         )
       })}

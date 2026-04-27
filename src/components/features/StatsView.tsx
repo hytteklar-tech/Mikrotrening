@@ -81,16 +81,15 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
     return { days, label }
   })
 
-  // -- Års-data: siste 12 måneder --
-  const yearMonths = Array.from({ length: 12 }, (_, i) => {
-    const d = new Date(today.getFullYear(), today.getMonth() - (11 - i), 1)
-    const year = d.getFullYear()
-    const month = d.getMonth()
+  // -- Års-data: januar til og med denne måneden --
+  const yearMonths = Array.from({ length: today.getMonth() + 1 }, (_, i) => {
+    const year = today.getFullYear()
+    const month = i
     const daysInMonth = new Date(year, month + 1, 0).getDate()
     const days = Array.from({ length: daysInMonth }, (_, j) =>
       `${year}-${String(month + 1).padStart(2, '0')}-${String(j + 1).padStart(2, '0')}`
     )
-    const label = d.toLocaleDateString('nb-NO', { month: 'short' })
+    const label = new Date(year, month, 1).toLocaleDateString('nb-NO', { month: 'short' })
     return { days, label }
   })
 
@@ -274,7 +273,7 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
       {/* Graf */}
       <div className="bg-gray-800 rounded-2xl p-4">
         <p className="text-gray-300 text-xs mb-4">
-          {tab === 'uke' ? 'Siste 7 dager' : tab === 'mnd' ? 'Siste 8 uker' : 'Siste 12 måneder'}
+          {tab === 'uke' ? 'Siste 7 dager' : tab === 'mnd' ? 'Siste 8 uker' : `Januar–${today.toLocaleDateString('nb-NO', { month: 'long' })} ${today.getFullYear()}`}
         </p>
         <div className="flex items-end gap-1">
           {bars.map((bar, i) => {
@@ -302,6 +301,14 @@ export default function StatsView({ logs, currentStreak, longestStreak, topStrea
           })}
         </div>
       </div>
+
+      {/* Tom tilstand for nye brukere på År-fanen */}
+      {tab === 'år' && trainedDays < 7 && (
+        <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl px-4 py-3">
+          <p className="text-sm text-white font-semibold">Du er i gang!</p>
+          <p className="text-xs text-gray-300 mt-1">Bygg din årshistorikk én økt av gangen. Her vil du se fremgangen din måned for måned.</p>
+        </div>
+      )}
 
       {/* Streak-kort */}
       <div className="grid grid-cols-2 gap-3">

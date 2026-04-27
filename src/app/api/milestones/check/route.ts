@@ -5,9 +5,10 @@ import { NextResponse } from 'next/server'
 
 const MILESTONES: Record<number, string> = {
   7:   '7 treninger! Vanedanneren er i gang 🔥',
+  14:  '14 treninger! To uker med mikrotrening 💥',
   30:  '30 treninger! Du er offisielt en mikrotrener 💪',
+  50:  '50 treninger! Halvveis til 100 — sterk innsats 🌟',
   100: '100 treninger! Legenden er bekreftet 🏆',
-  365: '365 treninger! Et helt år med mikrotrening ⭐',
 }
 
 export async function POST(request: Request) {
@@ -28,25 +29,25 @@ export async function POST(request: Request) {
     supabase.from('users').select('onesignal_id, milestones_reached, push_enabled').eq('id', userId).single(),
   ])
 
-  if (!count || !profile?.onesignal_id || !profile?.push_enabled) {
-    return NextResponse.json({ ok: true, sent: false })
-  }
+  if (!count || !profile) return NextResponse.json({ ok: true, sent: false })
 
   const reached: number[] = profile.milestones_reached ?? []
   const hit = Object.keys(MILESTONES).map(Number).find(m => count >= m && !reached.includes(m))
 
   if (!hit) return NextResponse.json({ ok: true, sent: false })
 
+  const canPush = !!profile.onesignal_id && !!profile.push_enabled
+
   await Promise.all([
-    sendPushNotification({
-      playerIds: [profile.onesignal_id],
+    canPush ? sendPushNotification({
+      playerIds: [profile.onesignal_id!],
       title: 'Mikrotrening',
       body: MILESTONES[hit],
-    }),
+    }) : Promise.resolve(),
     supabase.from('users').update({
       milestones_reached: [...reached, hit],
     }).eq('id', userId),
   ])
 
-  return NextResponse.json({ ok: true, sent: true, milestone: hit })
+  return NextResponse.json({ ok: true, sent: canPush, milestone: hit })
 }
