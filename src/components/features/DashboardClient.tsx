@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import StreakCard from './StreakCard'
 import TrainTodayButton from './TrainTodayButton'
 
@@ -95,7 +96,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
 
       const { data, error } = await supabase
         .from('daily_logs')
-        .select('id, logged_date, package_id, workout_packages(name)')
+        .select('id, logged_date, package_id, duration_seconds, workout_packages(name)')
         .eq('user_id', session.user.id)
         .order('logged_date', { ascending: false })
 
@@ -106,6 +107,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         date: row.logged_date as string,
         packageId: row.package_id as string,
         packageName: ((row.workout_packages as any)?.name ?? 'Ukjent') as string,
+        durationSeconds: row.duration_seconds as number | null,
       }))
       setDayLogs(mapped)
     }
@@ -178,9 +180,14 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         </div>
       )}
       {showMotivation && (
-        <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl px-4 py-3">
+        <div className="bg-gray-800/60 border border-orange-500/20 border-l-4 border-l-orange-500 rounded-2xl px-4 py-3 space-y-2">
           <p className="text-xs text-orange-400 font-semibold mb-1 tracking-wide uppercase">Visste du at...</p>
           <p className="text-sm text-gray-100 leading-relaxed">{motivationMsg}</p>
+          <div className="flex justify-end">
+            <Link href="/mikrotrening" style={{ fontSize: 12, color: '#9ca3af' }} className="hover:text-gray-300 transition-colors">
+              Les mer om mikrotrening →
+            </Link>
+          </div>
         </div>
       )}
       {showInstallBanner && (
