@@ -165,7 +165,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
       <StreakCard
         streak={streak}
         hasTrained={hasTrained}
-        totalSessions={dayLogs.length}
+        totalSessions={uniqueDates.length}
         isNewUser={isNewUser}
         dates={uniqueDates}
         onScrollToToday={() => document.getElementById('today-section')?.scrollIntoView({ behavior: 'smooth' })}
