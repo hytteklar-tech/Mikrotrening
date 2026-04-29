@@ -32,10 +32,19 @@ export default async function JoinPage({ params }: { params: Promise<{ code: str
   // Already logged in → join directly and go to group
   const { data: { user } } = await supabase.auth.getUser()
   if (user) {
-    const { error } = await supabase
+    await supabase
       .from('group_members')
       .insert({ group_id: group.id, user_id: user.id })
     // Ignore duplicate error (23505)
+    // Set as primary group if user has none
+    const { data: userData } = await supabase
+      .from('users')
+      .select('primary_group_id')
+      .eq('id', user.id)
+      .single()
+    if (!userData?.primary_group_id) {
+      await supabase.from('users').update({ primary_group_id: group.id }).eq('id', user.id)
+    }
     redirect('/group')
   }
 

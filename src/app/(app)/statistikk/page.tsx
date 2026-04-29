@@ -1,6 +1,7 @@
 import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { Suspense } from 'react'
 import StatistikkClient from '@/components/features/StatistikkClient'
 
 export default async function StatistikkPage() {
@@ -55,5 +56,9 @@ export default async function StatistikkPage() {
     notes: r.notes as string | null,
   }))
 
-  return <StatistikkClient logs={logs} testTypes={testTypes} testResults={testResults} />
+  return (
+    <Suspense>
+      <StatistikkClient logs={logs} testTypes={testTypes} testResults={testResults} />
+    </Suspense>
+  )
 }

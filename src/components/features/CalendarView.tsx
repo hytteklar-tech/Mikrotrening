@@ -1,9 +1,11 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 
 type Props = {
   dayCounts: Record<string, number>
+  repsByDate: Record<string, number>
   selectedDate: string
   onSelectDate: (date: string) => void
   firstLogDate?: string
@@ -20,21 +22,50 @@ const MONTHS = [
   'Juli', 'August', 'September', 'Oktober', 'November', 'Desember',
 ]
 
-function getLast14Days(today: string): string[] {
-  const days: string[] = []
-  for (let i = 13; i >= 0; i--) {
-    const d = new Date(today)
-    d.setDate(d.getDate() - i)
-    days.push(toLocalDateStr(d))
-  }
-  return days
+function getLastTwoCalendarWeeks(): [string[], string[]] {
+  const now = new Date()
+  const dayOfWeek = (now.getDay() + 6) % 7 // 0=Man, 6=Søn
+  const thisMonday = new Date(now.getFullYear(), now.getMonth(), now.getDate() - dayOfWeek)
+  const prevMonday = new Date(thisMonday.getFullYear(), thisMonday.getMonth(), thisMonday.getDate() - 7)
+  const week1 = Array.from({ length: 7 }, (_, i) =>
+    toLocalDateStr(new Date(prevMonday.getFullYear(), prevMonday.getMonth(), prevMonday.getDate() + i))
+  )
+  const week2 = Array.from({ length: 7 }, (_, i) =>
+    toLocalDateStr(new Date(thisMonday.getFullYear(), thisMonday.getMonth(), thisMonday.getDate() + i))
+  )
+  return [week1, week2]
 }
 
-function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
+function PctArrow({ thisVal, prevVal }: { thisVal: number; prevVal: number }) {
+  if (thisVal === 0 && prevVal === 0) return <span style={{ color: '#9ca3af', fontSize: 13 }}>→</span>
+  const diff = thisVal - prevVal
+  const pct = prevVal > 0 ? Math.round((diff / prevVal) * 100) : null
+  const up = diff > 0
+  const same = diff === 0
+  const color = same ? '#9ca3af' : up ? '#22c55e' : '#f87171'
+  const arrow = same ? '→' : up ? '↑' : '↓'
+  const pctStr = pct !== null ? `${up ? '+' : ''}${pct}%` : up ? 'ny' : '–'
+  return <span style={{ color, fontSize: 13, fontWeight: 700 }}>{arrow} {pctStr}</span>
+}
+
+function TrendStat({ label, thisVal, prevVal, format }: { label: string; thisVal: number; prevVal: number; format?: (n: number) => string }) {
+  const fmt = format ?? ((n: number) => String(n))
+  return (
+    <div className="flex-1 bg-gray-800 rounded-2xl p-3 space-y-1">
+      <div className="flex items-center justify-between">
+        <p style={{ fontSize: 11, color: '#9ca3af', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.05em' }}>{label}</p>
+        <PctArrow thisVal={thisVal} prevVal={prevVal} />
+      </div>
+      <p style={{ fontSize: 36, fontWeight: 700, color: thisVal > prevVal ? '#22c55e' : 'white', lineHeight: 1 }}>{fmt(thisVal)}</p>
+      <p style={{ fontSize: 12, color: '#9ca3af' }}>forrige uke: {fmt(prevVal)}</p>
+    </div>
+  )
+}
+
+function WeekTrend({ dayCounts, repsByDate }: { dayCounts: Record<string, number>; repsByDate: Record<string, number> }) {
   const today = new Date()
   const dayOfWeek = (today.getDay() + 6) % 7
 
-  // Datostrenger for mandag denne uka og forrige uke
   const thisMonday = new Date(today)
   thisMonday.setDate(today.getDate() - dayOfWeek)
   thisMonday.setHours(0, 0, 0, 0)
@@ -46,41 +77,34 @@ function WeekTrend({ dayCounts }: { dayCounts: Record<string, number> }) {
   lastWeekEnd.setDate(lastMonday.getDate() + dayOfWeek)
   lastWeekEnd.setHours(23, 59, 59, 999)
 
-  // Summer antall økter (ikke unike dager) for perioden
-  let thisWeek = 0
-  let lastWeek = 0
+  let thisSessions = 0, lastSessions = 0, thisReps = 0, lastReps = 0
   for (const [d, count] of Object.entries(dayCounts)) {
     const date = new Date(d + 'T00:00:00')
-    if (date >= thisMonday && date <= today) thisWeek += count
-    if (date >= lastMonday && date <= lastWeekEnd) lastWeek += count
+    if (date >= thisMonday && date <= today) thisSessions += count
+    if (date >= lastMonday && date <= lastWeekEnd) lastSessions += count
   }
-
-  if (thisWeek === 0) {
-    return (
-      <div className="py-4 space-y-1">
-        <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>—</p>
-        <p style={{ fontSize: 14, color: '#9ca3af' }}>treninger denne uken (man–i dag)</p>
-        {lastWeek > 0 && (
-          <p style={{ fontSize: 14, color: '#6b7280' }}>{lastWeek} treninger forrige uke</p>
-        )}
-      </div>
-    )
+  for (const [d, reps] of Object.entries(repsByDate)) {
+    const date = new Date(d + 'T00:00:00')
+    if (date >= thisMonday && date <= today) thisReps += reps
+    if (date >= lastMonday && date <= lastWeekEnd) lastReps += reps
   }
-
-  const up = thisWeek >= lastWeek
-  const diff = lastWeek === 0 ? null : Math.round(((thisWeek - lastWeek) / lastWeek) * 100)
-  const pctText = diff === null ? '↑ ny uke' : `${up ? '↑' : '↓'} ${Math.abs(diff)}%`
 
   return (
-    <div className="py-4 space-y-1">
-      <p style={{ fontSize: 48, fontWeight: 700, color: 'white' }}>{pctText}</p>
-      <p style={{ fontSize: 14, color: '#9ca3af' }}>{thisWeek} treninger denne uken (man–i dag)</p>
-      <p style={{ fontSize: 14, color: '#6b7280' }}>{lastWeek} treninger forrige uke (man–{['man','tir','ons','tor','fre','lør','søn'][dayOfWeek]})</p>
+    <div className="py-2 space-y-2">
+      <div className="flex gap-2">
+        <TrendStat label="Treninger" thisVal={thisSessions} prevVal={lastSessions} />
+        <TrendStat label="Reps" thisVal={thisReps} prevVal={lastReps} />
+      </div>
+      <div className="flex justify-end">
+        <Link href="/statistikk?tab=trend" style={{ fontSize: 12, color: '#9ca3af' }} className="hover:text-gray-300 transition-colors">
+          Se full trend →
+        </Link>
+      </div>
     </div>
   )
 }
 
-export default function CalendarView({ dayCounts, selectedDate, onSelectDate, firstLogDate }: Props) {
+export default function CalendarView({ dayCounts, repsByDate, selectedDate, onSelectDate, firstLogDate }: Props) {
   const today = toLocalDateStr(new Date())
   const [tab, setTab] = useState<'calendar' | 'trend'>('calendar')
   const [expanded, setExpanded] = useState(false)
@@ -188,16 +212,14 @@ export default function CalendarView({ dayCounts, selectedDate, onSelectDate, fi
     return (
       <div className="bg-gray-900 rounded-2xl p-4">
         {tabRow}
-        <WeekTrend dayCounts={dayCounts} />
+        <WeekTrend dayCounts={dayCounts} repsByDate={repsByDate} />
       </div>
     )
   }
 
-  // --- Komprimert: siste 14 dager ---
+  // --- Komprimert: siste 2 kalenderuker ---
   if (!expanded) {
-    const last14 = getLast14Days(today)
-    const week1 = last14.slice(0, 7)
-    const week2 = last14.slice(7, 14)
+    const [week1, week2] = getLastTwoCalendarWeeks()
 
     return (
       <div className="bg-gray-900 rounded-2xl p-4">

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, Suspense } from 'react'
+import { useState, Suspense, useEffect } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import Logo from '@/components/ui/Logo'
@@ -11,20 +11,35 @@ function LoginForm() {
   const [step, setStep] = useState<'email' | 'code'>('email')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [resendCooldown, setResendCooldown] = useState(0)
+  const [resendMessage, setResendMessage] = useState('')
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return
+    const t = setTimeout(() => setResendCooldown(c => c - 1), 1000)
+    return () => clearTimeout(t)
+  }, [resendCooldown])
+
   const searchParams = useSearchParams()
   const authError = searchParams.get('error') === 'auth'
   const inviteCode = searchParams.get('invite')
   const router = useRouter()
   const supabase = createClient()
 
-  async function sendCode() {
+  async function sendCode(isResend = false) {
     setLoading(true)
     setError('')
+    setResendMessage('')
     const { error } = await supabase.auth.signInWithOtp({ email })
     if (error) {
       setError(error.message)
     } else {
       setStep('code')
+      setResendCooldown(60)
+      if (isResend) {
+        setCode('')
+        setResendMessage('Ny kode sendt — den gamle er nå ugyldig.')
+      }
     }
     setLoading(false)
   }
@@ -101,7 +116,7 @@ function LoginForm() {
               </div>
               {error && <p className="text-red-400 text-sm">{error}</p>}
               <button
-                onClick={sendCode}
+                onClick={() => sendCode()}
                 disabled={loading || !email.includes('@')}
                 className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
               >
@@ -123,8 +138,8 @@ function LoginForm() {
                   type="text"
                   inputMode="numeric"
                   pattern="[0-9]*"
-                  placeholder="12345678"
-                  maxLength={8}
+                  placeholder="123456"
+                  maxLength={6}
                   value={code}
                   onChange={e => setCode(e.target.value.replace(/\D/g, ''))}
                   onKeyDown={e => e.key === 'Enter' && code.length >= 6 && verifyCode()}
@@ -140,13 +155,16 @@ function LoginForm() {
               >
                 {loading ? 'Verifiserer...' : 'Logg inn'}
               </button>
+              {resendMessage && (
+                <p className="text-green-400 text-sm text-center">{resendMessage}</p>
+              )}
               <div className="flex flex-col items-center gap-2">
                 <button
-                  onClick={sendCode}
-                  disabled={loading}
+                  onClick={() => sendCode(true)}
+                  disabled={loading || resendCooldown > 0}
                   className="text-orange-400 text-sm hover:text-orange-300 transition disabled:opacity-50"
                 >
-                  Send koden på nytt
+                  {resendCooldown > 0 ? `Send på nytt (${resendCooldown}s)` : 'Send koden på nytt'}
                 </button>
                 <button
                   onClick={() => { setStep('email'); setCode(''); setError('') }}

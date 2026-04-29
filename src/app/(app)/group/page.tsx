@@ -18,10 +18,12 @@ export default async function GroupPage() {
       .eq('user_id', user.id),
     supabase
       .from('users')
-      .select('primary_group_id')
+      .select('primary_group_id, display_name')
       .eq('id', user.id)
       .single(),
   ])
+
+  if (!profile?.display_name) redirect('/onboarding')
 
   const groups = (memberships ?? []).map(m => m.groups as any).filter(Boolean)
   const primaryGroupId = profile?.primary_group_id ?? groups[0]?.id ?? null

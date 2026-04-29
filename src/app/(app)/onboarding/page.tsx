@@ -129,7 +129,7 @@ function OnboardingForm() {
     } catch {
       granted = false
     }
-    await saveAndGoToInstall(granted)
+    await saveAndGoToInstall(true)
   }
 
   async function handleAndroidInstall() {
@@ -273,12 +273,54 @@ function OnboardingForm() {
           </p>
         </div>
         {notificationsDone ? (
-          <button
-            onClick={() => { router.push('/'); router.refresh() }}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl py-4 text-lg transition"
-          >
-            Start din første mikroøkt nå →
-          </button>
+          <div className="space-y-5">
+            {!installed && (
+              <div className="space-y-3">
+                <p className="text-white font-semibold text-center">Legg til på hjemskjermen</p>
+                {isIos ? (
+                  <ol className="space-y-2">
+                    {[
+                      { icon: '1', text: 'Trykk på del-ikonet (□↑) nederst i Safari' },
+                      { icon: '2', text: 'Scroll ned og velg «Legg til på Hjem-skjerm»' },
+                      { icon: '3', text: 'Trykk «Legg til» øverst til høyre' },
+                    ].map(s => (
+                      <li key={s.icon} className="flex items-start gap-3 bg-gray-800 rounded-xl px-4 py-3">
+                        <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{s.icon}</span>
+                        <span className="text-gray-300 text-sm">{s.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <ol className="space-y-2">
+                    {[
+                      { icon: '1', text: 'Trykk på ⋮ øverst til høyre i Chrome' },
+                      { icon: '2', text: 'Velg «Legg til på startskjerm»' },
+                      { icon: '3', text: 'Trykk «Legg til»' },
+                    ].map(s => (
+                      <li key={s.icon} className="flex items-start gap-3 bg-gray-800 rounded-xl px-4 py-3">
+                        <span className="w-6 h-6 rounded-full bg-orange-500 text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">{s.icon}</span>
+                        <span className="text-gray-300 text-sm">{s.text}</span>
+                      </li>
+                    ))}
+                  </ol>
+                )}
+                {!isIos && deferredPrompt && (
+                  <button
+                    onClick={handleAndroidInstall}
+                    className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium rounded-xl py-3 transition text-sm"
+                  >
+                    Legg til automatisk
+                  </button>
+                )}
+              </div>
+            )}
+            <button
+              onClick={() => { router.push('/'); router.refresh() }}
+              className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl py-4 text-lg transition"
+            >
+              Start din første mikroøkt nå →
+            </button>
+          </div>
         ) : (
           <>
             <div className="space-y-3">

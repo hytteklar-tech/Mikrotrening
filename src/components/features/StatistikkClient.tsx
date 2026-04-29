@@ -1,6 +1,7 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { useSearchParams } from 'next/navigation'
 import StatsView from './StatsView'
 import TestStatsView from './TestStatsView'
 import TrendView from './TrendView'
@@ -80,7 +81,10 @@ function calcCurrentStreak(dates: string[]): number {
 }
 
 export default function StatistikkClient({ logs, testTypes, testResults }: Props) {
-  const [mainTab, setMainTab] = useState<MainTab>('trening')
+  const searchParams = useSearchParams()
+  const [mainTab, setMainTab] = useState<MainTab>(
+    (searchParams.get('tab') as MainTab) ?? 'trening'
+  )
 
   const dates = [...new Set(logs.map(l => l.logged_date))]
   const currentStreak = calcCurrentStreak(dates)

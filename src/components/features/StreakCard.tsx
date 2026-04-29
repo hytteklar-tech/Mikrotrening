@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Link from 'next/link'
 
 const MILESTONES = [7, 14, 30, 50, 100]
 
@@ -205,27 +206,34 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         )}
       </div>
 
-      {/* Milepæl-piller */}
+      {/* Milepæl-piller + stats-lenke */}
       {!isNewUser && (
-        <div className="flex gap-1.5 flex-wrap">
-          {MILESTONES.map((m, i) => {
-            const reached = streak >= m
-            const isNext = i === nextMilestoneIdx
-            return (
-              <div
-                key={m}
-                className="flex items-center gap-1 rounded-full px-3 py-1 text-sm"
-                style={{
-                  background: reached ? '#f97316' : 'transparent',
-                  border: reached ? 'none' : isNext ? '1.5px solid #f97316' : '1.5px solid #374151',
-                  color: reached ? 'white' : isNext ? '#f97316' : '#9ca3af',
-                }}
-              >
-                {reached && '🔥'} {m}d
-              </div>
-            )
-          })}
-        </div>
+        <>
+          <div className="flex gap-1.5 flex-wrap">
+            {MILESTONES.map((m, i) => {
+              const reached = streak >= m
+              const isNext = i === nextMilestoneIdx
+              return (
+                <div
+                  key={m}
+                  className="flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+                  style={{
+                    background: reached ? '#f97316' : 'transparent',
+                    border: reached ? 'none' : isNext ? '1.5px solid #f97316' : '1.5px solid #374151',
+                    color: reached ? 'white' : isNext ? '#f97316' : '#9ca3af',
+                  }}
+                >
+                  {reached && '🔥'} {m}d
+                </div>
+              )
+            })}
+          </div>
+          <div className="flex justify-end">
+            <Link href="/statistikk" style={{ fontSize: 12, color: '#9ca3af' }} className="hover:text-gray-300 transition-colors">
+              Se statistikk →
+            </Link>
+          </div>
+        </>
       )}
 
     </div>

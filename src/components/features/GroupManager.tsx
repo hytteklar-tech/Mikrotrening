@@ -15,6 +15,7 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [primaryGroupId, setPrimaryGroupId] = useState(initialPrimaryGroupId)
+  const [copiedGroupId, setCopiedGroupId] = useState<string | null>(null)
   const router = useRouter()
   const supabase = createClient()
 
@@ -36,6 +37,18 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     }
     setLoading(false)
     router.refresh()
+  }
+
+  async function shareGroup(group: any) {
+    const url = `${window.location.origin}/join/${group.invite_code}`
+    const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
+    if (navigator.share) {
+      navigator.share({ title: 'Mikrotrening', text })
+    } else {
+      navigator.clipboard.writeText(text)
+      setCopiedGroupId(group.id)
+      setTimeout(() => setCopiedGroupId(null), 2000)
+    }
   }
 
   async function setFocusGroup(groupId: string) {
@@ -82,12 +95,21 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
       .insert({ group_id: group.id, user_id: userId })
 
     if (insertError) {
+      console.error('[joinGroup] code:', insertError.code, insertError.message)
       if (insertError.code === '23505') {
-        setError('Du er allerede medlem av denne gruppen.')
-      } else {
-        setError('Kunne ikke melde deg inn. Prøv igjen.')
-        console.error('[joinGroup]', insertError)
+        // Already a member — just refresh to show the group
+        setJoinCode('')
+        setLoading(false)
+        router.refresh()
+        return
       }
+      if (insertError.code === '23503') {
+        // FK violation — user row missing in public.users, needs to complete onboarding
+        setError('Profilen din er ikke fullført. Logg ut og logg inn på nytt.')
+        setLoading(false)
+        return
+      }
+      setError(`Kunne ikke melde deg inn. Prøv igjen. (${insertError.code})`)
       setLoading(false)
       return
     }
@@ -121,10 +143,10 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
                 }
               </div>
               <button
-                onClick={() => navigator.clipboard.writeText(group.invite_code)}
-                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-bold tracking-widest"
+                onClick={() => shareGroup(group)}
+                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-semibold transition"
               >
-                Kode: {group.invite_code} 📋
+                {copiedGroupId === group.id ? 'Kopiert! ✓' : 'Del invite 📲'}
               </button>
             </div>
 
@@ -175,34 +197,6 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
         </div>
         <span className="text-xl">🏆</span>
       </a>
-
-      {groups.length > 0 && (
-        <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-          <div>
-            <p className="text-sm font-semibold text-white">Inviter en venn til gruppen</p>
-            <p className="text-xs text-gray-300 mt-0.5">Del en lenke på SMS — de er med etter innlogging</p>
-          </div>
-          <div className="space-y-2">
-            {groups.map((group: any) => (
-              <button
-                key={group.id}
-                onClick={() => {
-                  const url = `${window.location.origin}/join/${group.invite_code}`
-                  const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
-                  if (navigator.share) {
-                    navigator.share({ title: 'Mikrotrening', text })
-                  } else {
-                    navigator.clipboard.writeText(url)
-                  }
-                }}
-                className="w-full bg-orange-500 hover:bg-orange-600 text-white rounded-xl px-4 py-2.5 text-sm font-semibold transition"
-              >
-                Inviter til {group.name} 📲
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
         <p className="text-sm font-semibold text-white">Bli med i gruppe</p>
