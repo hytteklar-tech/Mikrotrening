@@ -191,7 +191,7 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
             <span style={{ color: alive ? '#f97316' : '#6b7280', verticalAlign: 'baseline' }}>{streak}</span>
             {' '}dager på rad.
           </p>
-          <p style={{ fontSize: 16, color: '#9ca3af', marginTop: 4 }}>{totalSessions} dager totalt.</p>
+          <p style={{ fontSize: 16, color: '#9ca3af', marginTop: 4 }}>{totalSessions} dager totalt i år.</p>
           {!alive && !isNewUser && (
             <button
               onClick={onScrollToToday}

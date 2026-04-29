@@ -116,7 +116,9 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
   }, [userId])
 
   const today = toLocalDateStr(new Date())
+  const thisYear = new Date().getFullYear()
   const uniqueDates = [...new Set(dayLogs.map(l => l.date))]
+  const uniqueDatesThisYear = uniqueDates.filter(d => d.startsWith(`${thisYear}-`))
   const hasTrained = uniqueDates.includes(today)
   const streak = calcStreak(uniqueDates)
 
@@ -165,7 +167,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
       <StreakCard
         streak={streak}
         hasTrained={hasTrained}
-        totalSessions={uniqueDates.length}
+        totalSessions={uniqueDatesThisYear.length}
         isNewUser={isNewUser}
         dates={uniqueDates}
         onScrollToToday={() => document.getElementById('today-section')?.scrollIntoView({ behavior: 'smooth' })}
