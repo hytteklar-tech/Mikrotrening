@@ -60,7 +60,12 @@
       "Bash(npx next:*)",
       "Bash(cd:*)",
       "Bash(git check-ignore:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(ls \"/home/arild/sommerkropp/src/app/\\(app\\)/push-setup/\")",
+      "Bash(vercel:*)",
+      "Bash(npm i:*)",
+      "Bash(sudo npm:*)",
+      "Bash(git rm:*)"
     ]
   }
 }

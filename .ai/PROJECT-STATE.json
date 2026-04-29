@@ -1,7 +1,7 @@
 {
   "projectName": "Sommerkropp",
   "createdAt": "2026-04-01T07:00:00Z",
-  "lastModified": "2026-04-04T00:00:00Z",
+  "lastModified": "2026-04-26T00:00:00Z",
   "currentPhase": 7,
 
   "classification": {
@@ -36,54 +36,67 @@
 
   "pendingTasks": [
     {
-      "id": "test-cron-push-delivery",
-      "title": "Verifiser at push-varsler leveres — sjekk iPhone kl 08 i morgen"
+      "id": "cron-job-org-4-jobber",
+      "title": "Sett opp 4 cron-jobber på cron-job.org: 08/11/15/19 Oslo. Én er satt (18:00 test). Resten settes senere."
+    },
+    {
+      "id": "event-driven-push",
+      "title": "Bygg event-drevet push i log.ts: etter trening og ved milepæl (milestone-confetti fungerer, men push-varslet mangler for iOS-brukere uten onesignal_id)"
     }
   ],
   "completedTasks": [
     {
-      "id": "bug-magic-link-scanner",
-      "title": "Magic link brukes opp av e-postscanner — FIKSET",
-      "completedAt": "2026-04-12",
-      "solution": "Lagt til /auth/confirm mellomside. emailRedirectTo peker nå dit. verifyOtp kalles kun når bruker klikker knappen."
+      "id": "nav-ikoner",
+      "title": "Navigasjonsbar: emojier → SVG linjikoner, oransje aktiv (#e85c00), grå inaktiv (#aaa) — DEPLOYET",
+      "completedAt": "2026-04-26"
     },
     {
-      "id": "bug-timer-sleep",
-      "title": "Tidtaker stoppet når skjermen sov — FIKSET",
-      "completedAt": "2026-04-16",
-      "solution": "Byttet fra setInterval-teller til Date.now()-diff. startTimeRef lagrer starttidspunkt, elapsed = Date.now() - startTimeRef."
+      "id": "gruppe-meld-ut",
+      "title": "Meld deg ut av gruppe — knapp ved siden av fokus-badge — DEPLOYET",
+      "completedAt": "2026-04-26"
     },
     {
-      "id": "feature-ring-timer",
-      "title": "Ring-tidtaker med snitt og overtidsring — BYGGET",
-      "completedAt": "2026-04-16",
-      "solution": "SVG-ring: oransje fyller mot snitt (hentet fra Supabase), hvit ring fyller på overtid. Tekst skifter til 'over snittet ditt'. B-modus (grå ring) når ingen historikk."
+      "id": "streak-stats-lenke",
+      "title": "Se statistikk-lenke i StreakCard og Se full trend-lenke i CalendarView Trend-tab — DEPLOYET",
+      "completedAt": "2026-04-26"
     },
     {
-      "id": "bug-kalender-dato",
-      "title": "Kalender viste feil dato ved midnatt — FIKSET",
-      "completedAt": "2026-04-16",
-      "solution": "SSR/hydration timezone-mismatch (server UTC, bruker UTC+2). useEffect korrigerer selectedDate til klientens lokale dato etter mount. CalendarView synkroniserer viewMonth/viewYear."
+      "id": "trend-to-kolonner",
+      "title": "Trend-tab i kalender: to kolonner (Treninger + Reps) med pil/%, grønt tall når foran forrige uke — DEPLOYET",
+      "completedAt": "2026-04-26"
     },
     {
-      "id": "perf-responstid",
-      "title": "Forbedret responstid mellom sider — GJORT",
-      "completedAt": "2026-04-16",
-      "solution": "staleTimes.dynamic 0→30s. Hjemside: profil+logger+pakker parallellisert i ett Promise.all. Statistikk konvertert fra klientkomponent til serverkomponent (fjerner spinner)."
+      "id": "konfetti-milestone",
+      "title": "Milepæl-konfetti (kanoner) + toast ved 7/30/100/365 treninger. Vanlig konfetti fjernet. — DEPLOYET",
+      "completedAt": "2026-04-26"
     },
     {
-      "id": "stats-forbedringer",
-      "title": "Stats-side: layout og innhold forbedret — GJORT",
-      "completedAt": "2026-04-16",
-      "solution": "Treningspakke-seksjon: overskrift med periode, tre like bokser (treninger/reps/totaltid), totaltid per pakke i stedet for snitt."
+      "id": "pakke-oevelser-kort",
+      "title": "Øvelseskort vises under pakkeknapper ved trening (oransje venstrekant-stil) — DEPLOYET",
+      "completedAt": "2026-04-26"
+    },
+    {
+      "id": "pwa-ikon",
+      "title": "PWA-ikon: apple-icon.tsx + icon.tsx med hvit M på oransje bakgrunn (Georgia serif, scaleX 1.3) — DEPLOYET",
+      "completedAt": "2026-04-26"
+    },
+    {
+      "id": "vercel-prosjekt-feil",
+      "title": "Fikset feil Vercel-prosjekt: lokalt var koblet til sommerkropp, men www.mikrotrening.no tilhører mikrotrening-prosjektet. Re-linket med vercel link.",
+      "completedAt": "2026-04-26"
+    },
+    {
+      "id": "visste-du-at-lenke",
+      "title": "Les mer om mikrotrening-lenke på Visste du at-kortene — DEPLOYET",
+      "completedAt": "2026-04-26"
     }
   ],
 
   "session": {
     "status": "active",
-    "startedAt": "2026-04-23T00:00:00Z",
-    "sessionId": "sess-sommerkropp-025",
-    "lastSignificantAction": "Install-banner: vises nå ved 3, 7 og 10 registreringer. iOS-instruksjoner på plass. Ingrid onboardet (user-rad slettet)."
+    "startedAt": "2026-04-29T08:00:00Z",
+    "sessionId": "sess-sommerkropp-033",
+    "lastSignificantAction": "Sentry satt opp (javascript-nextjs prosjekt). Login: 60s cooldown på resend. Sentry DSN oppdatert og deployet."
   },
 
   "dataTypes": {

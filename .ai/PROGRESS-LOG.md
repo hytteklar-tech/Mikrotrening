@@ -2,6 +2,109 @@
 
 ---
 
+## 2026-04-28 | P7 | SESSION_START (031)
+Fokus: invitasjonsflyt gruppe, del-knapp, re-registrering bug.
+
+## 2026-04-28 | P7 | DONE — join/[code] forenklet
+Fjernet kode-seksjonen som forvirret brukere. Én tydelig CTA: "Bli med i gruppen →". Server-siden setter nå også primary_group_id hvis bruker mangler det.
+
+## 2026-04-28 | P7 | DONE — Del invite-knapp i gruppe
+Erstattet "Kode: XXXXX 📋"-knapp og separat "Inviter en venn"-seksjon med én "Del invite 📲"-knapp. Åpner deleark på mobil, kopierer ferdig tekst på desktop. Viser "Kopiert! ✓" i 2 sek.
+
+## 2026-04-28 | P7 | DONE — Re-registrering bug fikset
+Bug: bruker med auth-sesjon men NULL display_name (ufullført onboarding) fikk "Kunne ikke melde deg inn" på gruppe. Fix: gruppe-siden redirecter til /onboarding hvis display_name er NULL (hjemmesiden hadde allerede denne sjekken). GroupManager viser nå feilkode i parentes for debugging.
+
+## 2026-04-28 | P7 | SESSION_END (031)
+
+## 2026-04-26 | P7 | SESSION_START
+Sesjon 028. Fokus: UI-forbedringer, PWA-ikon, konfetti/milepæl, cron-feilsøking.
+
+## 2026-04-26 | P7 | DONE — Navigasjonsbar redesign
+SVG linjikoner (flatdesign), aktiv oransje (#e85c00), inaktiv (#aaa), bakgrunn #111. Oppdaget og fikset feil Vercel-prosjekt (sommerkropp → mikrotrening).
+
+## 2026-04-26 | P7 | DONE — Gruppe: meld deg ut
+Knapp ved siden av fokus-badge, bekreftelsdialog, nullstiller primary_group_id ved utmelding.
+
+## 2026-04-26 | P7 | DONE — UI-lenker
+Se statistikk i StreakCard, Se full trend i CalendarView Trend-tab, Les mer om mikrotrening på Visste du at-kort.
+
+## 2026-04-26 | P7 | DONE — Trend-tab to kolonner
+Treninger + Reps side om side med pil/% og grønt tall når foran forrige uke. Reps hentes fra exercises-tabellen i TrainTodayButton.
+
+## 2026-04-26 | P7 | DONE — Øvelseskort ved trening
+Henter exercises per pakke fra Supabase. Vises som oransje venstrekant-kort under pakkeknapper.
+
+## 2026-04-26 | P7 | DONE — Konfetti + milepæl-toast
+canvas-confetti installert. Vanlig konfetti fjernet. Kanoner + burst ved milepæl (7/30/100/365). Toast med melding i 5 sek. Krever push_enabled + onesignal_id for trigger.
+
+## 2026-04-26 | P7 | DONE — PWA-ikon
+apple-icon.tsx + icon.tsx med ImageResponse. Hvit M (Georgia serif, 900 weight, scaleX 1.3) på oransje bakgrunn med avrundede hjørner.
+
+## 2026-04-26 | P7 | BESLUTNING — Cron-test kl 14
+Morgenvarselet kl 08 kom ikke (feil prosjekt). Cron endret til 0 12 * * * UTC (kl 14 Oslo) for test i dag. Tilbake til 0 6 * * * etter bekreftelse.
+
+## 2026-04-26 | P7 | SESSION_START (029)
+Fokus: push-varsel feilsøking, cron-job.org, settings-opprydding, trend-lenke.
+
+## 2026-04-26 | P7 | DONE — CRON_SECRET lagt til i mikrotrening-prosjektet
+Variabelen manglet — rotårsak til at cron aldri kjørte. Lagt til som sensitive i Vercel.
+
+## 2026-04-26 | P7 | DONE — cron-job.org satt opp
+Vercel Cron krever Pro-plan. Bruker cron-job.org (gratis). Push bekreftet fungerende manuelt og via cron-test kl 16:30. Authorization-header satt korrekt.
+
+## 2026-04-26 | P7 | DONE — Cron filtrerer på preferred_times
+Bug: cron sendte til alle, ikke bare de med riktig tidspunkt. Fikset med .contains('preferred_times', [timeKey]). Bug: kolonnen heter preferred_times (array), ikke preferred_time.
+
+## 2026-04-26 | P7 | DONE — Settings-opprydding
+Fjernet duplikat "Aktiver push"-knapp og testvarsel-knapp fra innstillingssiden.
+
+## 2026-04-27 | P7 | SESSION_START (030)
+Fokus: Android-ikon-fiks, kalender-bug, OTP-lengde, onboarding-forbedringer, invitasjonslenke.
+
+## 2026-04-27 | P7 | DONE — Android PWA-ikon
+manifest.json pekte på gamle statiske PNG-er uten M. Byttet til dynamisk /icon-rute (Next.js). Georgia-font fjernet (ikke støttet i Satori → M forsvant). transform: scaleX også fjernet. icon.tsx oppgradert til 512px.
+
+## 2026-04-27 | P7 | DONE — Kalender 2-ukers visning
+getLast14Days ga feil dag-kolonne-plassering fordi new Date("2026-04-27") parstes som UTC. Erstattet med getLastTwoCalendarWeeks() som bruker new Date(y, m-1, d) (lokal tid) og viser faktiske man-søn kalenderuker.
+
+## 2026-04-27 | P7 | DONE — OTP-kodelengde 6 sifre
+Supabase Dashboard: Authentication → Configuration → Email OTP length satt til 6. maxLength, placeholder og validering i login/page.tsx oppdatert til 6.
+
+## 2026-04-27 | P7 | DONE — Onboarding Android-installguide
+Etter notificationsDone: viser 3-stegs installguide for Android (⋮ → Legg til på startskjerm → Legg til) og iOS (del-ikon → Legg til på Hjem-skjerm → Legg til). Hoppes over hvis allerede installert.
+
+## 2026-04-27 | P7 | DONE — Invitasjonslenke: kode synlig
+join/[code]/page.tsx viser kode tydelig (stor oransje tekst) for brukere som ikke er innlogget: "Åpne appen og skriv inn koden ABC123 under Gruppe". Løser problemet med at lenker åpner i nettleser, ikke PWA.
+
+## 2026-04-27 | P7 | DONE — push_enabled-logikk i onboarding
+saveAndGoToInstall(granted) → saveAndGoToInstall(true) når bruker sier JA. Notification.permission-sjekken ga false på iOS og trege enheter → push_enabled ble lagret som false. push_enabled reflekterer nå brukerens intensjon, ikke OS-tillatelse.
+
+## 2026-04-26 | P7 | DONE — Trend-lenke peker til Trend-tab
+"Se full trend →" i CalendarView peker nå til /statistikk?tab=trend. StatistikkClient leser searchParams og starter på riktig tab. Suspense-grense lagt til i page.tsx.
+
+## 2026-04-26 | P7 | SESSION_END
+
+---
+
+## 2026-04-25 | P7 | SESSION_START
+Sesjon 027. Fokus: push-varsel feilsøking og strategi.
+
+## 2026-04-25 | P7 | DONE — Push-diagnose og rotårsak funnet
+- /api/push/test bekreftet: onesignal_id OK, men push_subscription manglet (iOS ikke lagt til hjemskjerm)
+- Bård la til appen på hjemskjermen i Safari → push_subscription registrert
+- Ny test: begge kanaler leverte (OneSignal status 200 + webpush ok), 2 varsler kom på iPhone
+- Rotårsak: iOS krever hjemskjerm-installasjon før VAPID kan registreres — ikke en kodefeil
+
+## 2026-04-25 | P7 | BESLUTNING — Push-strategi
+- Beholder nåværende løsning (OneSignal + native VAPID), ikke SMS/e-post nå
+- Event-drevet push (etter trening / milepæl) bygges etter at morgenvarselet er bekreftet
+- cron-job.org for flere tidspunkt (gratis), ikke Vercel Pro
+- Venter på test i morgen kl 08 for å bekrefte cron fungerer
+
+## 2026-04-25 | P7 | SESSION_END
+
+---
+
 ## 2026-04-22 | P7 | SESSION_START
 Sesjon 022. Fokus: OneSignal push-varsler.
 
@@ -243,3 +346,18 @@ Sesjon 024 avsluttet.
 
 ## 2026-04-22 | P7 | SESSION_END
 Sesjon 024 avsluttet.
+
+## 2026-04-24 | P7 | SESSION_START
+Sesjon 026 startet.
+
+## 2026-04-24 | P7 | DONE — Cron og push-fiks deployet
+- vercel.json: schedule endret fra '0 13 * * *' → '0 6 * * *' (kl 08:00 norsk)
+- Cron-ruten: message-valg hardkodet til 'afternoon' → bruker nå HOUR_TO_TIME basert på faktisk UTC-time
+- Årsak til manglende morgenvarsel: cron kjørte aldri kl 08, bare kl 15
+- Deploy: READY — dpl_AxLNmhKeZAxGhnkwp6S2QrifWAnZ
+
+## 2026-04-24 | P7 | SESSION_END
+Sesjon 026 avsluttet.
+- Push-fix deployet: cron '0 6 * * *' (kl 08 norsk), message-valg basert på time
+- Funnet: iOS-brukere mangler gruppevarsler (onesignal_id only på linje 147 i log.ts)
+- Funnet: cron-job.org anbefalt for kveldsvarsler (kl 19) siden Hobby kun tillater 1 cron
