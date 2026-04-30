@@ -66,8 +66,8 @@ export async function POST(req: NextRequest) {
     await sendPushNotification({
       playerIds: u.onesignal_id ? [u.onesignal_id] : [],
       nativeSubscriptions: u.push_subscription ? [u.push_subscription] : [],
-      title: 'Du har fatt svar',
-      body: 'Arild har svart på meldingen din i Mikrotrening',
+      title: 'Du har fått svar',
+      body: 'Du har fått svar på meldingen din i Mikrotrening',
     })
   }
 

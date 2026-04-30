@@ -44,7 +44,7 @@ export default function FeedbackSection({ userId }: { userId: string }) {
   return (
     <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
       <p className="text-sm font-semibold text-white">Spørsmål og tilbakemelding</p>
-      <p className="text-xs text-gray-400">Send en melding til Arild — du får svar i appen.</p>
+      <p className="text-xs text-gray-400">Har du spørsmål eller tilbakemeldinger? Vi svarer deg her i appen.</p>
 
       <div className="flex gap-2">
         <textarea
@@ -77,7 +77,6 @@ export default function FeedbackSection({ userId }: { userId: string }) {
               </div>
               {item.feedback_replies.map(r => (
                 <div key={r.id} className="bg-orange-500/10 border border-orange-500/20 rounded-xl px-3 py-2 ml-4">
-                  <p className="text-xs text-orange-400 font-medium mb-1">Arild</p>
                   <p className="text-sm text-gray-200">{r.message}</p>
                 </div>
               ))}
