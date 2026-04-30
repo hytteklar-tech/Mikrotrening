@@ -17,7 +17,7 @@ export default async function FeedbackBanner({ userId }: { userId: string }) {
 
   return (
     <Link
-      href="/settings"
+      href="/meldinger"
       className="flex items-center justify-between bg-orange-500/10 border border-orange-500/30 rounded-2xl px-4 py-3 text-sm"
     >
       <div className="flex items-center gap-2">

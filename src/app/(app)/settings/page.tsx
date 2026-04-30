@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import SettingsClient from '@/components/features/SettingsClient'
+import FeedbackSection from '@/components/features/FeedbackSection'
 
 export default async function SettingsPage() {
   const supabase = await createClient()
@@ -27,6 +28,7 @@ export default async function SettingsPage() {
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
 <SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
+      <FeedbackSection userId={user.id} />
       {isAdmin && (
         <a
           href="/admin"

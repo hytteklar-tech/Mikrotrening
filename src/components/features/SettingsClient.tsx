@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
-import FeedbackSection from './FeedbackSection'
 
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
@@ -280,8 +279,6 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
       >
         <span>🧠</span> Hvorfor mikrotrening?
       </a>
-
-      <FeedbackSection userId={userId} />
 
       <button
         onClick={signOut}
