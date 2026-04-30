@@ -18,10 +18,10 @@ export default async function FeedbackBanner({ userId }: { userId: string }) {
   return (
     <Link
       href="/meldinger"
-      className="flex items-center gap-1.5 bg-orange-500/15 border border-orange-500/30 rounded-full px-3 py-1.5 shrink-0"
+      className="flex items-center gap-1.5 bg-orange-500 rounded-full px-3 py-1.5 shrink-0"
     >
-      <span className="w-2 h-2 bg-orange-500 rounded-full shrink-0 animate-pulse" />
-      <span className="text-orange-300 text-xs font-medium whitespace-nowrap">Ny melding</span>
+      <span className="w-2 h-2 bg-white rounded-full shrink-0" />
+      <span className="text-white text-xs font-semibold whitespace-nowrap">Ny melding</span>
     </Link>
   )
 }
