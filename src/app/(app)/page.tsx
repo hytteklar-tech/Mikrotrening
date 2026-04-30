@@ -46,11 +46,12 @@ export default async function DashboardPage() {
   return (
     <div className="p-4 space-y-6">
       <div className="pt-4">
-        <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
+          <FeedbackBanner userId={user.id} />
+        </div>
         <DailyMessage />
       </div>
-
-      <FeedbackBanner userId={user.id} />
 
       <Suspense fallback={<div className="h-10 bg-gray-800/50 rounded-2xl animate-pulse" />}>
         <GroupBannerLoader
