@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 type Reply = { id: string; message: string; created_at: string }
 type FeedbackItem = {
@@ -23,11 +22,8 @@ export default function MeldingerClient({
   const [text, setText] = useState('')
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
-  const router = useRouter()
-
   useEffect(() => {
-    // Merk som lest og oppdater server components (fjerner banneret på hjem)
-    fetch('/api/feedback/read', { method: 'POST' }).then(() => router.refresh())
+    fetch('/api/feedback/read', { method: 'POST' })
   }, [])
 
   useEffect(() => {

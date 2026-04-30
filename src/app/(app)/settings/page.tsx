@@ -28,7 +28,7 @@ export default async function SettingsPage() {
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
 <SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
-      <FeedbackSection userId={user.id} />
+      <FeedbackSection />
       {isAdmin && (
         <a
           href="/admin"

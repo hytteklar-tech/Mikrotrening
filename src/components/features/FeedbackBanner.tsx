@@ -1,19 +1,18 @@
-import { createClient } from '@/lib/supabase/server'
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-export default async function FeedbackBanner({ userId }: { userId: string }) {
-  const supabase = await createClient()
+export default function FeedbackBanner() {
+  const [hasUnread, setHasUnread] = useState(false)
 
-  // Finn uleste svar: feedback der brukeren har svar, men is_read = false
-  const { data } = await supabase
-    .from('feedback')
-    .select('id, feedback_replies(id)')
-    .eq('user_id', userId)
-    .eq('is_read', false)
+  useEffect(() => {
+    fetch('/api/feedback/unread')
+      .then(r => r.json())
+      .then(d => setHasUnread(d.hasUnread))
+  }, [])
 
-  const hasUnreadReply = data?.some(f => (f.feedback_replies as any[]).length > 0)
-
-  if (!hasUnreadReply) return null
+  if (!hasUnread) return null
 
   return (
     <Link

@@ -50,7 +50,7 @@ export default async function DashboardPage() {
       <div className="pt-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
-          <FeedbackBanner userId={user.id} />
+          <FeedbackBanner />
         </div>
         <DailyMessage />
       </div>
