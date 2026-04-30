@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import FeedbackSection from './FeedbackSection'
 
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
@@ -280,12 +281,20 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
         <span>🧠</span> Hvorfor mikrotrening?
       </a>
 
+      <FeedbackSection userId={userId} />
+
       <button
         onClick={signOut}
         className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-xl py-3 text-sm transition"
       >
         Logg ut
       </button>
+
+      <div className="flex gap-2 text-xs text-gray-500 justify-center">
+        <a href="/personvern" className="hover:text-gray-300 transition underline">Personvern</a>
+        <span>·</span>
+        <a href="/vilkaar" className="hover:text-gray-300 transition underline">Vilkår</a>
+      </div>
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
         <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Farlig sone</p>
