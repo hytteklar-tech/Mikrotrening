@@ -12,6 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   return (
     <div className="min-h-dvh bg-gray-950 text-white">
       <header className="bg-gray-900 border-b border-gray-800 px-4 pt-[env(safe-area-inset-top,16px)] pb-3 flex items-center gap-4">
+        <a href="/" className="text-gray-400 hover:text-white text-sm mr-2">← Appen</a>
         <span className="font-bold text-orange-500">Admin</span>
         <nav className="flex gap-4 text-sm">
           <a href="/admin/feedback" className="text-gray-300 hover:text-white">Tilbakemeldinger</a>
