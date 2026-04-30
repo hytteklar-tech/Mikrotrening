@@ -7,7 +7,7 @@ export default function FeedbackSection() {
   const [hasUnread, setHasUnread] = useState(false)
 
   function check() {
-    fetch('/api/feedback/unread')
+    fetch('/api/feedback/unread', { cache: 'no-store' })
       .then(r => r.json())
       .then(d => setHasUnread(d.hasUnread))
   }

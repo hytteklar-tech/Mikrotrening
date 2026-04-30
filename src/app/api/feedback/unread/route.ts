@@ -15,5 +15,7 @@ export async function GET() {
     .eq('is_read', false)
 
   const hasUnread = data?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
-  return NextResponse.json({ hasUnread })
+  return NextResponse.json({ hasUnread }, {
+    headers: { 'Cache-Control': 'no-store' }
+  })
 }
