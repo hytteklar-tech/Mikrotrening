@@ -51,8 +51,8 @@ export async function POST(req: NextRequest) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
 
-  // Merk som lest
-  await db.from('feedback').update({ is_read: true }).eq('id', feedbackId)
+  // Merk som ulest for bruker (de har ikke sett svaret ennå)
+  await db.from('feedback').update({ is_read: false }).eq('id', feedbackId)
 
   // Hent brukerens push-info for å sende varsel
   const { data: fb } = await db
