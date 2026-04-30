@@ -12,7 +12,6 @@ export async function POST() {
     .from('feedback')
     .update({ is_read: true })
     .eq('user_id', user.id)
-    .eq('is_read', false)
 
   return NextResponse.json({ ok: true })
 }
