@@ -3,23 +3,13 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 
-export default function FeedbackSection() {
-  const [hasUnread, setHasUnread] = useState(false)
-
-  function check() {
-    fetch('/api/feedback/unread', { cache: 'no-store' })
-      .then(r => r.json())
-      .then(d => setHasUnread(d.hasUnread))
-  }
+export default function FeedbackSection({ initialHasUnread }: { initialHasUnread: boolean }) {
+  const [hasUnread, setHasUnread] = useState(initialHasUnread)
 
   useEffect(() => {
-    check()
-    window.addEventListener('feedback-read', () => setHasUnread(false))
-    document.addEventListener('visibilitychange', check)
-    return () => {
-      window.removeEventListener('feedback-read', () => setHasUnread(false))
-      document.removeEventListener('visibilitychange', check)
-    }
+    const hide = () => setHasUnread(false)
+    window.addEventListener('feedback-read', hide)
+    return () => window.removeEventListener('feedback-read', hide)
   }, [])
 
   return (

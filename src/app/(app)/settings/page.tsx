@@ -9,11 +9,20 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('users')
-    .select('display_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription')
-    .eq('id', user.id)
-    .single()
+  const [{ data: profile }, { data: unreadFeedback }] = await Promise.all([
+    supabase
+      .from('users')
+      .select('display_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('feedback')
+      .select('id, feedback_replies(id)')
+      .eq('user_id', user.id)
+      .eq('is_read', false),
+  ])
+
+  const hasUnread = unreadFeedback?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
 
   const headersList = await headers()
   const ua = headersList.get('user-agent') ?? ''
@@ -28,7 +37,7 @@ export default async function SettingsPage() {
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
 <SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
-      <FeedbackSection />
+      <FeedbackSection initialHasUnread={hasUnread} />
       {isAdmin && (
         <a
           href="/admin"

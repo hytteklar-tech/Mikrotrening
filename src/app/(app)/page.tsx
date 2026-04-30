@@ -16,7 +16,7 @@ export default async function DashboardPage() {
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
-  const [{ data: profile }, { data: logs }, { data: packages }] = await Promise.all([
+  const [{ data: profile }, { data: logs }, { data: packages }, { data: unreadFeedback }] = await Promise.all([
     supabase
       .from('users')
       .select('display_name, notifications_enabled, primary_group_id')
@@ -33,7 +33,14 @@ export default async function DashboardPage() {
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('feedback')
+      .select('id, feedback_replies(id)')
+      .eq('user_id', user.id)
+      .eq('is_read', false),
   ])
+
+  const hasUnread = unreadFeedback?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
 
   if (!profile?.display_name) redirect('/onboarding')
 
@@ -50,7 +57,7 @@ export default async function DashboardPage() {
       <div className="pt-4">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Hei, {profile.display_name} 👋</h1>
-          <FeedbackBanner />
+          <FeedbackBanner initialHasUnread={hasUnread} />
         </div>
         <DailyMessage />
       </div>
