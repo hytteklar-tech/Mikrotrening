@@ -6,10 +6,16 @@ import Link from 'next/link'
 export default function FeedbackBanner() {
   const [hasUnread, setHasUnread] = useState(false)
 
-  useEffect(() => {
+  function check() {
     fetch('/api/feedback/unread')
       .then(r => r.json())
       .then(d => setHasUnread(d.hasUnread))
+  }
+
+  useEffect(() => {
+    check()
+    document.addEventListener('visibilitychange', check)
+    return () => document.removeEventListener('visibilitychange', check)
   }, [])
 
   if (!hasUnread) return null
