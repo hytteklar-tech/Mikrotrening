@@ -23,7 +23,9 @@ export default function MeldingerClient({
   const [sending, setSending] = useState(false)
   const bottomRef = useRef<HTMLDivElement>(null)
   useEffect(() => {
-    fetch('/api/feedback/read', { method: 'POST' })
+    fetch('/api/feedback/read', { method: 'POST' }).then(() => {
+      window.dispatchEvent(new Event('feedback-read'))
+    })
   }, [])
 
   useEffect(() => {

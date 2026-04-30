@@ -14,8 +14,12 @@ export default function FeedbackBanner() {
 
   useEffect(() => {
     check()
+    window.addEventListener('feedback-read', () => setHasUnread(false))
     document.addEventListener('visibilitychange', check)
-    return () => document.removeEventListener('visibilitychange', check)
+    return () => {
+      window.removeEventListener('feedback-read', () => setHasUnread(false))
+      document.removeEventListener('visibilitychange', check)
+    }
   }, [])
 
   if (!hasUnread) return null
