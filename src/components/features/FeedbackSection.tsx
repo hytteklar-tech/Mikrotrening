@@ -74,7 +74,7 @@ export default function FeedbackSection({ userId }: { userId: string }) {
         </button>
       </div>
 
-      {sent && <p className="text-xs text-green-400">Sendt! Du horer fra meg snart.</p>}
+      {sent && <p className="text-xs text-green-400">Sendt! Du hører fra meg snart.</p>}
 
       {items.length > 0 && (
         <div className="space-y-3 pt-1">
