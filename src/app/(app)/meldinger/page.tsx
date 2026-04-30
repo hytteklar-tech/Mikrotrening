@@ -7,13 +7,6 @@ export default async function MeldingerPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Merk som lest når brukeren åpner siden
-  await supabase
-    .from('feedback')
-    .update({ is_read: true })
-    .eq('user_id', user.id)
-    .eq('is_read', false)
-
   const { data } = await supabase
     .from('feedback')
     .select('id, message, created_at, feedback_replies (id, message, created_at)')

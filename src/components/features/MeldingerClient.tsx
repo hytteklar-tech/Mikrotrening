@@ -24,6 +24,11 @@ export default function MeldingerClient({
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
+    // Merk som lest når siden åpnes (client-side, fungerer i PWA)
+    fetch('/api/feedback/read', { method: 'POST' })
+  }, [])
+
+  useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [items])
 
@@ -58,7 +63,7 @@ export default function MeldingerClient({
   return (
     <div className="flex flex-col h-full">
       <div className="p-4 border-b border-gray-800 flex items-center gap-3">
-        <Link href="/settings" className="text-gray-400 hover:text-white text-sm">←</Link>
+        <Link href="/settings" className="text-white font-bold text-lg leading-none">←</Link>
         <h1 className="font-semibold text-white">Meldinger</h1>
       </div>
 
