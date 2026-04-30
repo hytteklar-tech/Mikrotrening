@@ -40,7 +40,11 @@ export default function FeedbackSection({ userId }: { userId: string }) {
     const msg = text.trim()
     if (!msg) return
     setSending(true)
-    await supabase.from('feedback').insert({ user_id: userId, message: msg })
+    await fetch('/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: msg }),
+    })
     setText('')
     setSending(false)
     setSent(true)
