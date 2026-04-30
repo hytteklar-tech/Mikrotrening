@@ -25,6 +25,13 @@ export default function FeedbackSection({ userId }: { userId: string }) {
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
     setItems(data ?? [])
+
+    // Merk alle som lest når brukeren ser seksjonen
+    await supabase
+      .from('feedback')
+      .update({ is_read: true })
+      .eq('user_id', userId)
+      .eq('is_read', false)
   }
 
   useEffect(() => { load() }, [])
