@@ -1,11 +1,9 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import SettingsClient from '@/components/features/SettingsClient'
 
 export default async function SettingsPage() {
-  noStore()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -21,12 +19,22 @@ export default async function SettingsPage() {
   const isIos = /iPhone|iPad|iPod/.test(ua)
   const needsActivation = isIos ? !profile?.push_subscription : !profile?.onesignal_id
 
+  const isAdmin = user.email === process.env.ADMIN_EMAIL
+
   return (
     <div className="p-4 space-y-4">
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
 <SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
+      {isAdmin && (
+        <a
+          href="/admin"
+          className="block text-center text-xs text-gray-600 py-2"
+        >
+          Admin
+        </a>
+      )}
     </div>
   )
 }
