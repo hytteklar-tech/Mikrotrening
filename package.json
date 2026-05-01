@@ -13,6 +13,7 @@
     "@supabase/supabase-js": "^2.101.1",
     "canvas-confetti": "^1.9.4",
     "next": "16.2.2",
+    "posthog-js": "^1.372.5",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "web-push": "^3.6.7"
