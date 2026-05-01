@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import confetti from 'canvas-confetti'
+import posthog from 'posthog-js'
 import CalendarView from './CalendarView'
 import type { DayLog } from './DashboardClient'
 
@@ -169,10 +170,24 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       })
   }, [activePackage?.id])
 
+  function calcStreakAfterLog(logsIncludingToday: DayLog[], today: string): number {
+    const uniqueDates = [...new Set(logsIncludingToday.map(l => l.date))]
+    const sorted = uniqueDates.sort().reverse()
+    let streak = 0
+    let d = new Date(today + 'T12:00:00')
+    while (true) {
+      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+      if (sorted.includes(ds)) { streak++; d.setDate(d.getDate() - 1) }
+      else break
+    }
+    return streak
+  }
+
   function startTimer() {
     startTimeRef.current = Date.now()
     setTimerSeconds(0)
     setTimerRunning(true)
+    posthog.capture('okt_startet', { pakke_navn: activePackage?.name })
   }
 
   function stopTimer() {
@@ -218,7 +233,16 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       console.error('[TrainTodayButton] Insert error:', error)
       onLogChange(dayLogs)
     } else if (data) {
-      onLogChange([...dayLogs, { ...optimisticLog, id: data.id as string }])
+      const newLogs = [...dayLogs, { ...optimisticLog, id: data.id as string }]
+      onLogChange(newLogs)
+
+      posthog.capture('okt_fullfort', {
+        pakke_navn: activePackage?.name,
+        varighet_sekunder: duration ?? null,
+        dag_i_streak: calcStreakAfterLog(newLogs, selectedDate),
+        tidspunkt: new Date().toTimeString().slice(0, 5),
+      })
+
       const colors = ['#e85c00', '#f97316', '#ffffff', '#fbbf24', '#facc15']
       confetti({ particleCount: 40, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors })
       confetti({ particleCount: 40, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors })

@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter, useSearchParams } from 'next/navigation'
+import posthog from 'posthog-js'
 
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
@@ -25,6 +26,10 @@ function OnboardingForm() {
   const searchParams = useSearchParams()
   const inviteCode = searchParams.get('invite')
   const supabase = createClient()
+
+  useEffect(() => {
+    posthog.capture('onboarding_startet')
+  }, [])
 
   useEffect(() => {
     // Allerede installert som PWA
@@ -100,9 +105,11 @@ function OnboardingForm() {
   async function handleNotifications(want: boolean) {
     setLoading(true)
     if (!want) {
+      posthog.capture('onboarding_push_avvist')
       await saveAndGoToInstall(false)
       return
     }
+    posthog.capture('onboarding_push_akseptert')
     let granted = false
     try {
       await Promise.race([
@@ -315,7 +322,7 @@ function OnboardingForm() {
               </div>
             )}
             <button
-              onClick={() => { router.push('/'); router.refresh() }}
+              onClick={() => { posthog.capture('onboarding_fullfort'); router.push('/'); router.refresh() }}
               className="w-full bg-orange-500 hover:bg-orange-600 text-white font-bold rounded-xl py-4 text-lg transition"
             >
               Start din første mikroøkt nå →

@@ -3,6 +3,8 @@ import { redirect } from 'next/navigation'
 import BottomNav from '@/components/ui/BottomNav'
 import Logo from '@/components/ui/Logo'
 import OneSignalProvider from '@/components/ui/OneSignalProvider'
+import PostHogIdentify from '@/components/providers/PostHogIdentify'
+import PostHogAppOpened from '@/components/providers/PostHogAppOpened'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
@@ -22,6 +24,8 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
       <BottomNav />
       <OneSignalProvider />
+      <PostHogIdentify userId={user.id} email={user.email} />
+      <PostHogAppOpened />
     </div>
   )
 }
