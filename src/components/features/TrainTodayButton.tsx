@@ -157,7 +157,9 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
 
   const filteredPackages = activeCat === null
     ? packages
-    : packages.filter(p => (p.category_ids ?? []).includes(activeCat))
+    : activeCat === '__none__'
+      ? packages.filter(p => (p.category_ids ?? []).length === 0)
+      : packages.filter(p => (p.category_ids ?? []).includes(activeCat))
 
   const activePackage = selectedPackage && filteredPackages.find(p => p.id === selectedPackage.id)
     ? selectedPackage
@@ -348,6 +350,12 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
               className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === c.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
             >{c.name}</button>
           ))}
+          {packages.some(p => (p.category_ids ?? []).length === 0) && (
+            <button
+              onClick={() => setActiveCat(activeCat === '__none__' ? null : '__none__')}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === '__none__' ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+            >Uten kategori</button>
+          )}
         </div>
       )}
 
