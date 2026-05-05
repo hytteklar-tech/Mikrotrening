@@ -76,13 +76,15 @@ function TimerRing({ seconds, average }: { seconds: number; average: number | nu
   )
 }
 
-type Package = { id: string; name: string }
+type Package = { id: string; name: string; category_ids: string[] }
+type Category = { id: string; name: string }
 
 type Props = {
   dayLogs: DayLog[]
   onLogChange: (logs: DayLog[]) => void
   dayCounts: Record<string, number>
   packages: Package[]
+  categories: Category[]
   userId: string
 }
 
@@ -90,7 +92,7 @@ function toLocalDateStr(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, packages, userId }: Props) {
+export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, packages, categories, userId }: Props) {
   const today = toLocalDateStr(new Date())
   const [selectedDate, setSelectedDate] = useState(today)
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(packages[0] ?? null)
@@ -102,6 +104,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [repsByDate, setRepsByDate] = useState<Record<string, number>>({})
   const [packageExercises, setPackageExercises] = useState<{ name: string; reps: number }[]>([])
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null)
+  const [activeCat, setActiveCat] = useState<string | null>(null)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const supabase = createClient()
@@ -152,9 +155,13 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
     return () => { if (intervalRef.current) clearInterval(intervalRef.current) }
   }, [timerRunning])
 
-  const activePackage = selectedPackage && packages.find(p => p.id === selectedPackage.id)
+  const filteredPackages = activeCat === null
+    ? packages
+    : packages.filter(p => (p.category_ids ?? []).includes(activeCat))
+
+  const activePackage = selectedPackage && filteredPackages.find(p => p.id === selectedPackage.id)
     ? selectedPackage
-    : packages[0] ?? null
+    : filteredPackages[0] ?? null
 
   useEffect(() => {
     if (!activePackage) return
@@ -210,8 +217,8 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const isFuture = selectedDate > today
 
   const logsForDay = dayLogs.filter(l => l.date === selectedDate)
-  const availablePackages = packages
-  const canAdd = !isFuture && packages.length > 0
+  const availablePackages = filteredPackages
+  const canAdd = !isFuture && filteredPackages.length > 0
 
   const labelDate = isToday
     ? 'I dag'
@@ -328,6 +335,22 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
         firstLogDate={dayLogs.length > 0 ? [...dayLogs].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined}
       />
 
+      {categories.length > 0 && (
+        <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
+          <button
+            onClick={() => setActiveCat(null)}
+            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === null ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+          >Alle</button>
+          {categories.map(c => (
+            <button
+              key={c.id}
+              onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
+              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === c.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
+            >{c.name}</button>
+          ))}
+        </div>
+      )}
+
       <p className="text-center text-sm text-gray-300 capitalize">{labelDate}</p>
 
       {packages.length === 0 ? (
@@ -335,6 +358,13 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
           <p className="text-gray-300 text-sm">Du har ingen treningspakker ennå.</p>
           <a href="/workouts" className="text-orange-500 font-semibold text-sm mt-1 block">
             Opprett din første pakke →
+          </a>
+        </div>
+      ) : activeCat !== null && filteredPackages.length === 0 ? (
+        <div className="bg-gray-800 rounded-2xl p-4 text-center">
+          <p className="text-gray-400 text-sm">Ingen pakker i denne kategorien</p>
+          <a href="/workouts" className="text-orange-500 font-semibold text-sm mt-1 block">
+            Gå til pakker og kategoriser →
           </a>
         </div>
       ) : (

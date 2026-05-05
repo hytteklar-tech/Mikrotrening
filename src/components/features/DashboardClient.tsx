@@ -30,13 +30,15 @@ const ONELINERS = [
   'Du trenger ikke en time. Du trenger tredve sekunder. Reis deg opp. Gjør det nå.',
 ]
 
-type Package = { id: string; name: string }
+type Package = { id: string; name: string; category_ids: string[] }
+type Category = { id: string; name: string }
 
 export type DayLog = { id: string; date: string; packageId: string; packageName: string; durationSeconds?: number | null }
 
 type Props = {
   initialDayLogs: DayLog[]
   packages: Package[]
+  categories: Category[]
   userId: string
   notificationsEnabled: boolean
 }
@@ -63,7 +65,7 @@ function calcStreak(uniqueDates: string[]): number {
   return streak
 }
 
-export default function DashboardClient({ initialDayLogs, packages, userId, notificationsEnabled }: Props) {
+export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const router = useRouter()
@@ -243,6 +245,7 @@ export default function DashboardClient({ initialDayLogs, packages, userId, noti
         onLogChange={setDayLogs}
         dayCounts={dayCounts}
         packages={packages}
+        categories={categories}
         userId={userId}
       />
       </div>

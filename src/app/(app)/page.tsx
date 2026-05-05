@@ -16,7 +16,7 @@ export default async function DashboardPage() {
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
-  const [{ data: profile }, { data: logs }, { data: packages }, { data: unreadFeedback }] = await Promise.all([
+  const [{ data: profile }, { data: logs }, { data: rawPackages }, { data: categories }, { data: unreadFeedback }] = await Promise.all([
     supabase
       .from('users')
       .select('display_name, notifications_enabled, primary_group_id')
@@ -29,16 +29,27 @@ export default async function DashboardPage() {
       .order('logged_date', { ascending: false }),
     supabase
       .from('workout_packages')
-      .select('id, name')
+      .select('id, name, workout_package_categories(category_id)')
       .eq('user_id', user.id)
       .eq('is_active', true)
       .order('created_at', { ascending: false }),
+    supabase
+      .from('package_categories')
+      .select('id, name')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: true }),
     supabase
       .from('feedback')
       .select('id, feedback_replies(id)')
       .eq('user_id', user.id)
       .eq('is_read', false),
   ])
+
+  const packages = (rawPackages ?? []).map(p => ({
+    id: p.id,
+    name: p.name,
+    category_ids: ((p.workout_package_categories ?? []) as { category_id: string }[]).map(x => x.category_id),
+  }))
 
   const hasUnread = unreadFeedback?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
 
@@ -72,7 +83,8 @@ export default async function DashboardPage() {
 
       <DashboardClient
         initialDayLogs={initialDayLogs}
-        packages={packages ?? []}
+        packages={packages}
+        categories={categories ?? []}
         userId={user.id}
         notificationsEnabled={profile.notifications_enabled ?? true}
       />
