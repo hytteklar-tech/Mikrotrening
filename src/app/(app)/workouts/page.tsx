@@ -1,46 +1,39 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import WorkoutList from '@/components/features/WorkoutList'
+import EgenpakkeClient from '@/components/features/EgenpakkeClient'
+import { exercises as exerciseLibrary } from '@/data/exercises'
 
-export default async function WorkoutsPage() {
+export default async function WorkoutsPage({ searchParams }: { searchParams: Promise<{ ids?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: packages }, { data: durationLogs }] = await Promise.all([
-    supabase
-      .from('workout_packages')
-      .select('id, name, is_active, exercises(id, name, reps, order)')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('daily_logs')
-      .select('package_id, duration_seconds')
-      .eq('user_id', user.id),
-  ])
+  const { ids } = await searchParams
+  const preselected = ids
+    ? ids.split(',').map(id => exerciseLibrary.find(e => e.id === id)).filter(Boolean).map(e => ({
+        name: e!.name, value: String(e!.suggestedValue), unit: e!.unit,
+      }))
+    : []
 
-  // Beregn snitt-tid og antall uten tid per pakke
-  const durationStats: Record<string, { avgSeconds: number; timedCount: number; untimedCount: number }> = {}
-  for (const row of durationLogs ?? []) {
-    const pid = row.package_id as string
-    if (!durationStats[pid]) durationStats[pid] = { avgSeconds: 0, timedCount: 0, untimedCount: 0 }
-    if (row.duration_seconds != null) {
-      durationStats[pid].timedCount++
-      durationStats[pid].avgSeconds += row.duration_seconds as number
-    } else {
-      durationStats[pid].untimedCount++
-    }
-  }
-  for (const s of Object.values(durationStats)) {
-    if (s.timedCount > 0) s.avgSeconds = Math.round(s.avgSeconds / s.timedCount)
-  }
+  const { data: rawPackages, error } = await supabase
+    .from('workout_packages')
+    .select('id, name, is_active, workout_package_categories(category_id), exercises(id, name, reps, unit, order)')
+    .eq('user_id', user.id)
+    .order('created_at', { ascending: false })
+
+  if (error) console.error('workouts query error:', error)
+
+  const packages = (rawPackages ?? []).map(p => ({
+    ...p,
+    category_ids: ((p.workout_package_categories ?? []) as { category_id: string }[]).map(x => x.category_id),
+  }))
 
   return (
     <div className="p-4 space-y-4">
-      <div className="pt-4 flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Treningspakker</h1>
+      <div className="pt-4">
+        <h1 className="text-2xl font-bold">Egenpakker</h1>
       </div>
-      <WorkoutList packages={packages ?? []} userId={user.id} durationStats={durationStats} />
+      <EgenpakkeClient packages={packages} userId={user.id} preselected={preselected} />
     </div>
   )
 }

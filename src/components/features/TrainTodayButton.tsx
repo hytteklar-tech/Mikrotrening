@@ -126,7 +126,19 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   // useState(today) uses the server's date during SSR and stays stuck after hydration.
   useEffect(() => {
     const clientToday = toLocalDateStr(new Date())
-    setSelectedDate(prev => prev === clientToday ? prev : clientToday)
+    setSelectedDate(prev => prev < clientToday ? clientToday : prev)
+  }, [])
+
+  // Reset to today when app comes back to foreground (PWA/tab switch across midnight)
+  useEffect(() => {
+    function handleVisibility() {
+      if (document.visibilityState === 'visible') {
+        const clientToday = toLocalDateStr(new Date())
+        setSelectedDate(prev => prev < clientToday ? clientToday : prev)
+      }
+    }
+    document.addEventListener('visibilitychange', handleVisibility)
+    return () => document.removeEventListener('visibilitychange', handleVisibility)
   }, [])
 
   useEffect(() => {

@@ -1,23 +1,32 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
-export default function GroupManager({ groups, membersWithStatus, userId, primaryGroupId: initialPrimaryGroupId }: {
+export default function GroupManager({ groups, membersWithStatus, userId, primaryGroupId: initialPrimaryGroupId, initialCode }: {
   groups: any[]
   membersWithStatus: any[]
   userId: string
   primaryGroupId: string | null
+  initialCode?: string
 }) {
-  const [joinCode, setJoinCode] = useState('')
+  const [joinCode, setJoinCode] = useState(initialCode?.toUpperCase() ?? '')
   const [newGroupName, setNewGroupName] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [primaryGroupId, setPrimaryGroupId] = useState(initialPrimaryGroupId)
   const [copiedGroupId, setCopiedGroupId] = useState<string | null>(null)
+  const [appLinkCopied, setAppLinkCopied] = useState(false)
+  const joinSectionRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    if (initialCode && joinSectionRef.current) {
+      joinSectionRef.current.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+  }, [initialCode])
 
   async function deleteGroup(groupId: string) {
     setLoading(true)
@@ -48,6 +57,18 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
       navigator.clipboard.writeText(text)
       setCopiedGroupId(group.id)
       setTimeout(() => setCopiedGroupId(null), 2000)
+    }
+  }
+
+  async function shareApp() {
+    const url = 'https://app.mikrotrening.no'
+    const text = 'Prøv Mikrotrening — 30 sekunder om dagen er nok til å bygge en treningsvane 💪'
+    if (navigator.share) {
+      navigator.share({ title: 'Mikrotrening', text, url })
+    } else {
+      await navigator.clipboard.writeText(`${text}\n${url}`)
+      setAppLinkCopied(true)
+      setTimeout(() => setAppLinkCopied(false), 2000)
     }
   }
 
@@ -142,12 +163,26 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
                   )
                 }
               </div>
-              <button
-                onClick={() => shareGroup(group)}
-                className="text-sm bg-gray-700 text-orange-400 px-4 py-2 rounded-xl font-semibold transition"
-              >
-                {copiedGroupId === group.id ? 'Kopiert! ✓' : 'Del invite 📲'}
-              </button>
+            </div>
+            <div className="flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2">
+              <div>
+                <p className="text-xs text-gray-400 mb-0.5">Invitasjonskode</p>
+                <span className="text-lg font-mono font-bold tracking-widest text-white">{group.invite_code}</span>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => { navigator.clipboard.writeText(group.invite_code); setCopiedGroupId(group.id); setTimeout(() => setCopiedGroupId(null), 2000) }}
+                  className="text-sm bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded-lg font-medium transition"
+                >
+                  {copiedGroupId === group.id ? '✓ Kopiert' : 'Kopier'}
+                </button>
+                <button
+                  onClick={() => shareGroup(group)}
+                  className="text-sm bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 px-3 py-1.5 rounded-lg font-medium transition"
+                >
+                  Del 📲
+                </button>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -198,7 +233,18 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
         <span className="text-xl">🏆</span>
       </a>
 
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
+      <button
+        onClick={shareApp}
+        className="w-full flex items-center justify-between bg-gray-800 rounded-2xl p-4 hover:bg-gray-700 transition"
+      >
+        <div className="text-left">
+          <p className="text-sm font-semibold text-white">Inviter en venn til appen</p>
+          <p className="text-xs text-gray-300">{appLinkCopied ? 'Kopiert! ✓' : 'Del Mikrotrening med noen du kjenner'}</p>
+        </div>
+        <span className="text-xl">🤝</span>
+      </button>
+
+      <div ref={joinSectionRef} className={`bg-gray-800 rounded-2xl p-4 space-y-3 transition-all ${initialCode ? 'ring-2 ring-orange-500' : ''}`}>
         <p className="text-sm font-semibold text-white">Bli med i gruppe</p>
         <div className="flex gap-2">
           <input

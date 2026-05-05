@@ -1,13 +1,12 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import GroupManager from '@/components/features/GroupManager'
 
-export default async function GroupPage() {
-  noStore()
+export default async function GroupPage({ searchParams }: { searchParams: Promise<{ code?: string }> }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
+  const { code: initialCode } = await searchParams
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
@@ -63,6 +62,7 @@ export default async function GroupPage() {
         membersWithStatus={membersWithStatus}
         userId={user.id}
         primaryGroupId={primaryGroupId}
+        initialCode={initialCode}
       />
     </div>
   )

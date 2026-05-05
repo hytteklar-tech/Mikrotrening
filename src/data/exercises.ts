@@ -7,6 +7,8 @@ export type Exercise = {
   level: string
   primaryMuscles: string[]
   description?: string[]
+  unit: 'reps' | 'sek'
+  suggestedValue: number
 }
 
 export const exercises: Exercise[] = [
@@ -18,6 +20,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "intermediate",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 8,
     description: [
       "Start i vanlig push-up posisjon med hendene litt bredere enn skulderbredde.",
       "Senk deg ned mot én hånd mens den andre armen strekkes rett ut til siden.",
@@ -33,6 +37,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "intermediate",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 10,
     description: [
       "Start i push-up posisjon med rett kropp fra hode til hæl.",
       "Gjør én push-up ned og opp.",
@@ -48,6 +54,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 12,
     description: [
       "Start på knærne i push-up posisjon med hendene skulderbredde fra hverandre.",
       "Plasser ett kne ute til siden for balanse.",
@@ -63,6 +71,8 @@ export const exercises: Exercise[] = [
     equipment: "barbell",
     level: "intermediate",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 10,
     description: [
       "Ligg flat på benken med føttene i gulvet og ryggen mot benken.",
       "Grip stangen litt bredere enn skulderbredde med overgrep.",
@@ -79,6 +89,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "intermediate",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 8,
     description: [
       "Start i vanlig push-up posisjon.",
       "Gjør en push-up, og flytt deretter én hånd ett skritt i klokkebevegelse.",
@@ -94,6 +106,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 10,
     description: [
       "Start liggende på magen med hendene ved siden av brystet.",
       "Press deg opp og strekk armene, løft hoften og skyv bakover som en kobra.",
@@ -109,6 +123,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 8,
     description: [
       "Start øverst i push-up posisjon med strake armer.",
       "Senk deg svært sakte ned mot gulvet — bruk 3–5 sekunder.",
@@ -124,6 +140,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 12,
     description: [
       "Start i push-up posisjon på knærne med rett rygg.",
       "Gjør en push-up ned og opp.",
@@ -139,6 +157,8 @@ export const exercises: Exercise[] = [
     equipment: "dumbbell",
     level: "intermediate",
     primaryMuscles: ["chest"],
+    unit: "reps",
+    suggestedValue: 12,
     description: [
       "Ligg på ryggen på gulvet med en manuell i hver hånd.",
       "Start med armene strakt opp over brystet, lett bøy i albuene.",
@@ -154,6 +174,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "intermediate",
     primaryMuscles: ["abs"],
+    unit: "reps",
+    suggestedValue: 15,
     description: [
       "Sitt på gulvet, lene deg let bakover med føttene løftet fra gulvet.",
       "Strekk armene og bena ut i en V-form.",
@@ -169,6 +191,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "intermediate",
     primaryMuscles: ["abs"],
+    unit: "sek",
+    suggestedValue: 30,
     description: [
       "Start i frontplank på underarmene med rett kropp.",
       "Roter til sideplank — støtt på én underarm, kroppen sidelengs.",
@@ -184,6 +208,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["lower back"],
+    unit: "reps",
+    suggestedValue: 15,
     description: [
       "Ligg på magen med armene langs siden eller under haken.",
       "Løft overkroppen og ev. bena forsiktig opp fra gulvet.",
@@ -199,6 +225,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["upper back"],
+    unit: "reps",
+    suggestedValue: 12,
     description: [
       "Ligg på magen med armene bøyd i 90 grader (W-form).",
       "Løft armene fra gulvet og press skulderbladene sammen.",
@@ -214,6 +242,8 @@ export const exercises: Exercise[] = [
     equipment: "body only",
     level: "beginner",
     primaryMuscles: ["calves"],
+    unit: "reps",
+    suggestedValue: 20,
     description: [
       "Stå på kanten av et trinn med hælen hengende fritt.",
       "Senk hælen under trinnkanten for å strekke leggene.",

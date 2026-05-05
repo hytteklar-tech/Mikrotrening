@@ -1,11 +1,9 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { Suspense } from 'react'
 import StatistikkClient from '@/components/features/StatistikkClient'
 
 export default async function StatistikkPage() {
-  noStore()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')

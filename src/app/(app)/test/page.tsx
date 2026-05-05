@@ -1,10 +1,8 @@
-import { unstable_noStore as noStore } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import TestClient from '@/components/features/TestClient'
 
 export default async function TestPage() {
-  noStore()
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
