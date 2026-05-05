@@ -337,28 +337,6 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
         firstLogDate={dayLogs.length > 0 ? [...dayLogs].sort((a, b) => a.date.localeCompare(b.date))[0].date : undefined}
       />
 
-      {categories.length > 0 && (
-        <div className="flex gap-2 overflow-x-auto scrollbar-none pb-1">
-          <button
-            onClick={() => setActiveCat(null)}
-            className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === null ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
-          >Alle</button>
-          {categories.map(c => (
-            <button
-              key={c.id}
-              onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === c.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
-            >{c.name}</button>
-          ))}
-          {packages.some(p => (p.category_ids ?? []).length === 0) && (
-            <button
-              onClick={() => setActiveCat(activeCat === '__none__' ? null : '__none__')}
-              className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === '__none__' ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400 hover:text-white'}`}
-            >Uten kategori</button>
-          )}
-        </div>
-      )}
-
       <p className="text-center text-sm text-gray-300 capitalize">{labelDate}</p>
 
       {packages.length === 0 ? (
@@ -399,6 +377,29 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   </button>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Kategori-filter */}
+          {categories.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto scrollbar-none">
+              <button
+                onClick={() => setActiveCat(null)}
+                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === null ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+              >Alle</button>
+              {categories.map(c => (
+                <button
+                  key={c.id}
+                  onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === c.id ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                >{c.name}</button>
+              ))}
+              {packages.some(p => (p.category_ids ?? []).length === 0) && (
+                <button
+                  onClick={() => setActiveCat(activeCat === '__none__' ? null : '__none__')}
+                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === '__none__' ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
+                >Uten kategori</button>
+              )}
             </div>
           )}
 
