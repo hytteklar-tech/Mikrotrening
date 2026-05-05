@@ -346,13 +346,6 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
             Opprett din første pakke →
           </a>
         </div>
-      ) : activeCat !== null && filteredPackages.length === 0 ? (
-        <div className="bg-gray-800 rounded-2xl p-4 text-center">
-          <p className="text-gray-400 text-sm">Ingen pakker i denne kategorien</p>
-          <a href="/workouts" className="text-orange-500 font-semibold text-sm mt-1 block">
-            Gå til pakker og kategoriser →
-          </a>
-        </div>
       ) : (
         <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
 
@@ -400,6 +393,16 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === '__none__' ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
                 >Uten kategori</button>
               )}
+            </div>
+          )}
+
+          {/* Ingen pakker i valgt kategori */}
+          {activeCat !== null && filteredPackages.length === 0 && (
+            <div className="text-center py-2">
+              <p className="text-gray-400 text-sm">Ingen pakker i denne kategorien</p>
+              <a href="/workouts" className="text-orange-500 font-semibold text-xs mt-1 block">
+                Gå til pakker og kategoriser →
+              </a>
             </div>
           )}
 
