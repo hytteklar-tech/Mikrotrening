@@ -105,6 +105,8 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [packageExercises, setPackageExercises] = useState<{ name: string; reps: number }[]>([])
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null)
   const [activeCat, setActiveCat] = useState<string | null>(null)
+  const [repsByPackageId, setRepsByPackageId] = useState<Record<string, number>>({})
+  const [logsExpanded, setLogsExpanded] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const supabase = createClient()
@@ -112,16 +114,19 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   useEffect(() => {
     supabase
       .from('daily_logs')
-      .select('logged_date, workout_packages(exercises(reps))')
+      .select('logged_date, package_id, workout_packages(exercises(reps))')
       .eq('user_id', userId)
       .then(({ data }) => {
-        const map: Record<string, number> = {}
+        const dateMap: Record<string, number> = {}
+        const pkgMap: Record<string, number> = {}
         for (const row of data ?? []) {
           const reps = ((row.workout_packages as any)?.exercises ?? [])
             .reduce((s: number, e: { reps: number }) => s + (e.reps ?? 0), 0)
-          map[row.logged_date] = (map[row.logged_date] ?? 0) + reps
+          dateMap[row.logged_date] = (dateMap[row.logged_date] ?? 0) + reps
+          pkgMap[row.package_id as string] = reps
         }
-        setRepsByDate(map)
+        setRepsByDate(dateMap)
+        setRepsByPackageId(pkgMap)
       })
   }, [userId])
 
@@ -295,6 +300,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   function handleDateChange(date: string) {
     if (timerRunning) stopTimer()
     setTimerSeconds(0)
+    setLogsExpanded(false)
     setSelectedDate(date)
   }
 
@@ -373,28 +379,73 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
           )}
 
           {/* Registered workouts for selected day */}
-          {logsForDay.length > 0 && (
-            <div className="space-y-2">
-              {logsForDay.map(log => (
-                <div key={log.id} className="flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-green-400">✓</span>
-                    <span className="text-sm text-white font-medium">{log.packageName}</span>
-                    {log.durationSeconds != null && (
-                      <span className="text-xs text-orange-400">⏱ {formatDuration(log.durationSeconds)}</span>
-                    )}
-                  </div>
-                  <button
-                    onClick={() => deleteLog(log)}
-                    disabled={deletingId === log.id}
-                    className="text-gray-500 text-xs hover:text-red-400 transition disabled:opacity-40"
-                  >
-                    {deletingId === log.id ? '...' : 'Angre'}
-                  </button>
-                </div>
-              ))}
+          {logsForDay.length === 1 && (
+            <div className="flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2">
+              <div className="flex items-center gap-2 min-w-0">
+                <span className="text-green-400">✓</span>
+                <span className="text-sm text-white font-medium truncate">{logsForDay[0].packageName}</span>
+                {(repsByPackageId[logsForDay[0].packageId] ?? 0) > 0 && (
+                  <span className="text-xs text-orange-400">{repsByPackageId[logsForDay[0].packageId]} reps</span>
+                )}
+                {logsForDay[0].durationSeconds != null && (
+                  <span className="text-xs text-orange-400">⏱ {formatDuration(logsForDay[0].durationSeconds)}</span>
+                )}
+              </div>
+              <button
+                onClick={() => deleteLog(logsForDay[0])}
+                disabled={deletingId === logsForDay[0].id}
+                className="text-gray-500 text-xs hover:text-red-400 transition disabled:opacity-40 shrink-0"
+              >
+                {deletingId === logsForDay[0].id ? '...' : 'Angre'}
+              </button>
             </div>
           )}
+          {logsForDay.length > 1 && (() => {
+            const totalReps = logsForDay.reduce((s, l) => s + (repsByPackageId[l.packageId] ?? 0), 0)
+            const totalSek = logsForDay.reduce((s, l) => s + (l.durationSeconds ?? 0), 0)
+            const hasDuration = logsForDay.some(l => l.durationSeconds != null)
+            return (
+              <div className="space-y-1">
+                <button
+                  onClick={() => setLogsExpanded(e => !e)}
+                  className="w-full flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2 text-left"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="text-green-400">✓</span>
+                    <span className="text-sm text-white font-medium">{logsForDay.length} økter</span>
+                    {totalReps > 0 && <span className="text-xs text-orange-400">{totalReps} reps</span>}
+                    {hasDuration && totalSek > 0 && <span className="text-xs text-orange-400">⏱ {formatDuration(totalSek)}</span>}
+                  </div>
+                  <span className="text-gray-400 text-xs">{logsExpanded ? '▲' : '▼'}</span>
+                </button>
+                {logsExpanded && (
+                  <div className="space-y-1 pl-2">
+                    {logsForDay.map(log => (
+                      <div key={log.id} className="flex items-center justify-between bg-gray-700/30 rounded-xl px-3 py-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-green-400 text-xs">✓</span>
+                          <span className="text-sm text-white font-medium truncate">{log.packageName}</span>
+                          {(repsByPackageId[log.packageId] ?? 0) > 0 && (
+                            <span className="text-xs text-orange-400">{repsByPackageId[log.packageId]} reps</span>
+                          )}
+                          {log.durationSeconds != null && (
+                            <span className="text-xs text-orange-400">⏱ {formatDuration(log.durationSeconds)}</span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => deleteLog(log)}
+                          disabled={deletingId === log.id}
+                          className="text-gray-500 text-xs hover:text-red-400 transition disabled:opacity-40 shrink-0 ml-2"
+                        >
+                          {deletingId === log.id ? '...' : 'Angre'}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )
+          })()}
 
           {/* Ingen pakker i valgt kategori */}
           {activeCat !== null && filteredPackages.length === 0 && (
