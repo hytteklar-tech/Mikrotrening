@@ -31,7 +31,7 @@ export default async function WorkoutsPage({ searchParams }: { searchParams: Pro
   return (
     <div className="p-4 space-y-4">
       <div className="pt-4">
-        <h1 className="text-2xl font-bold">Egenpakker</h1>
+        <h1 className="text-2xl font-bold">Mine pakker</h1>
       </div>
       <EgenpakkeClient packages={packages} userId={user.id} preselected={preselected} />
     </div>

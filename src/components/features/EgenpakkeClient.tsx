@@ -169,7 +169,7 @@ export default function EgenpakkeClient({
 
   function goToLibrary(name: string, exercises: ExerciseRow[], categoryIds?: string[]) {
     sessionStorage.setItem('wip_package', JSON.stringify({ name, exercises, categoryIds: categoryIds ?? newCategoryIds }))
-    router.push('/test-exercises?addto=1')
+    router.push('/test-exercises?tab=pakker&addto=1')
   }
 
   async function saveCategoryLinks(pkgId: string, catIds: string[]) {
@@ -404,11 +404,16 @@ export default function EgenpakkeClient({
         </div>
       )}
 
-      {/* Øvelsesbibliotek-lenke + Arkiv */}
+      {/* Bibliotek-lenker + Arkiv */}
       <div className="space-y-3">
-        <button onClick={() => router.push('/test-exercises')} className="flex items-center gap-1.5 text-orange-400 text-sm font-semibold hover:text-orange-300 transition">
-          Øvelsesbibliotek →
-        </button>
+        <div className="flex gap-4">
+          <button onClick={() => router.push('/test-exercises?tab=bibliotek')} className="flex items-center gap-1.5 text-orange-400 text-sm font-semibold hover:text-orange-300 transition">
+            Bibliotek →
+          </button>
+          <button onClick={() => router.push('/test-exercises?tab=maler')} className="flex items-center gap-1.5 text-gray-400 text-sm font-semibold hover:text-gray-200 transition">
+            Maler →
+          </button>
+        </div>
         {archived.length > 0 && (
           <div>
             <button onClick={() => setShowArchive(v => !v)} className="flex items-center gap-2 text-white text-sm hover:text-gray-300 transition">
