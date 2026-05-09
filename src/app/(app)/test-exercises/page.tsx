@@ -462,8 +462,8 @@ export default function TestExercisesPage() {
         </div>
       )}
 
-      {/* Valg-bar (kun i bibliotek-fanen) */}
-      {tab === 'bibliotek' && picked.size > 0 && (
+      {/* Valg-bar */}
+      {picked.size > 0 && (
         <div className="fixed bottom-20 left-0 right-0 px-4 z-40 flex justify-center">
           <button
             onClick={() => {
