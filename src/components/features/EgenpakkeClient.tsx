@@ -410,7 +410,7 @@ export default function EgenpakkeClient({
           <button onClick={() => router.push('/test-exercises?tab=bibliotek')} className="flex items-center gap-1.5 text-orange-400 text-sm font-semibold hover:text-orange-300 transition">
             Bibliotek →
           </button>
-          <button onClick={() => router.push('/test-exercises?tab=maler')} className="flex items-center gap-1.5 text-gray-400 text-sm font-semibold hover:text-gray-200 transition">
+          <button onClick={() => router.push('/test-exercises?tab=maler')} className="flex items-center gap-1.5 text-orange-400 text-sm font-semibold hover:text-orange-300 transition">
             Maler →
           </button>
         </div>
