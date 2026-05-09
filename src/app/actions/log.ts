@@ -36,10 +36,13 @@ function calculateStreak(dates: string[], today: string): number {
   return streak
 }
 
-export async function logWorkout(userId: string, packageId: string, date: string) {
+export async function logWorkout(packageId: string, date: string) {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
   await supabase.from('daily_logs').insert({
-    user_id: userId,
+    user_id: user.id,
     package_id: packageId,
     logged_date: date,
   })
@@ -47,7 +50,7 @@ export async function logWorkout(userId: string, packageId: string, date: string
   revalidatePath('/statistikk')
 
   // Kjør varslinger i bakgrunnen (ikke blokker bruker)
-  notifyAfterLog(userId, date).catch(() => {})
+  notifyAfterLog(user.id, date).catch(() => {})
 }
 
 const DAILY_PUSH_LIMIT = 5
@@ -156,11 +159,14 @@ async function notifyAfterLog(userId: string, today: string) {
   })
 }
 
-export async function removeLog(userId: string, date: string) {
+export async function removeLog(date: string) {
   const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return
+
   await supabase.from('daily_logs')
     .delete()
-    .eq('user_id', userId)
+    .eq('user_id', user.id)
     .eq('logged_date', date)
   revalidatePath('/')
   revalidatePath('/statistikk')
