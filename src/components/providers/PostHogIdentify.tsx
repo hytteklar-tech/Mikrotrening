@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useLayoutEffect } from 'react'
 import posthog from 'posthog-js'
 
 type Props = {
@@ -9,7 +9,9 @@ type Props = {
 }
 
 export default function PostHogIdentify({ userId, email }: Props) {
-  useEffect(() => {
+  // useLayoutEffect kjører før useEffect — sikrer at identify skjer
+  // før $pageview og app_apnet-hendelser sendes til PostHog
+  useLayoutEffect(() => {
     posthog.identify(userId, {
       email,
     })
