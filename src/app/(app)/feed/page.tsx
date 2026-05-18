@@ -30,19 +30,28 @@ export default async function FeedPage() {
     return [{ id: single.id, name: single.name }]
   })
 
-  // Hent gruppe-klipp
+  // Hent gruppe-klipp: finn clip_ids via clip_groups først
   const groupIds = groups.map(g => g.id)
   let groupClipsRaw: typeof globalRaw = []
   if (groupIds.length > 0) {
-    const { data } = await supabase
-      .from('clips')
-      .select('id, video_url, thumbnail_url, scope, created_at, expires_at, user_id, users(display_name), music_tracks(id, title, artist, url, duration_seconds), exercises(id, name), clip_reactions(emoji, user_id), clip_groups(group_id)')
-      .eq('scope', 'group')
-      .gt('expires_at', new Date().toISOString())
-      .in('clip_groups.group_id', groupIds)
-      .order('created_at', { ascending: false })
-      .limit(50)
-    groupClipsRaw = data ?? []
+    const { data: clipGroupRows } = await supabase
+      .from('clip_groups')
+      .select('clip_id')
+      .in('group_id', groupIds)
+
+    const clipIds = (clipGroupRows ?? []).map(r => r.clip_id)
+
+    if (clipIds.length > 0) {
+      const { data } = await supabase
+        .from('clips')
+        .select('id, video_url, thumbnail_url, scope, created_at, expires_at, user_id, users(display_name), music_tracks(id, title, artist, url, duration_seconds), exercises(id, name), clip_reactions(emoji, user_id)')
+        .eq('scope', 'group')
+        .gt('expires_at', new Date().toISOString())
+        .in('id', clipIds)
+        .order('created_at', { ascending: false })
+        .limit(50)
+      groupClipsRaw = data ?? []
+    }
   }
 
   // Generer signed URLs for videoer
