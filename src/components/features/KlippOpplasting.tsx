@@ -36,8 +36,8 @@ export default function KlippOpplasting({
   const [step, setStep] = useState<'video' | 'detaljer'>('video')
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [previewAudio, setPreviewAudio] = useState<HTMLAudioElement | null>(null)
   const [playingMusicId, setPlayingMusicId] = useState<string | null>(null)
+  const audioRef = useRef<HTMLAudioElement>(null)
 
   function handleVideoValgt(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
@@ -58,19 +58,17 @@ export default function KlippOpplasting({
     )
   }
 
-  function velgOgSpillMusick(track: MusicTrack) {
+  function velgOgSpillMusikk(track: MusicTrack) {
+    const audio = audioRef.current
+    if (!audio) return
     if (playingMusicId === track.id) {
-      // Trykker på samme spor — stopp
-      previewAudio?.pause()
+      audio.pause()
       setPlayingMusicId(null)
-      setPreviewAudio(null)
       setSelectedMusic(null)
     } else {
-      // Nytt spor — stopp forrige, start nytt
-      previewAudio?.pause()
-      const audio = new Audio(track.url)
+      audio.src = track.url
+      audio.load()
       audio.play().catch(() => {})
-      setPreviewAudio(audio)
       setPlayingMusicId(track.id)
       setSelectedMusic(track)
     }
@@ -84,7 +82,7 @@ export default function KlippOpplasting({
     }
     setUploading(true)
     setError(null)
-    previewAudio?.pause()
+    audioRef.current?.pause()
 
     try {
       const clipId = crypto.randomUUID()
@@ -182,6 +180,9 @@ export default function KlippOpplasting({
       </div>
 
       <div className="flex-1 overflow-y-auto p-4 space-y-5 pb-8">
+        {/* Skjult audio-element for musikk-forhåndsvisning */}
+        <audio ref={audioRef} />
+
         {/* Forhåndsvisning */}
         {videoPreview && (
           <div className="relative rounded-2xl overflow-hidden bg-black mx-auto" style={{ maxWidth: 200, aspectRatio: '9/16' }}>
@@ -203,7 +204,7 @@ export default function KlippOpplasting({
             {musicTracks.map(track => (
               <button
                 key={track.id}
-                onClick={() => velgOgSpillMusick(track)}
+                onClick={() => velgOgSpillMusikk(track)}
                 className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${selectedMusic?.id === track.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
               >
                 <span className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center shrink-0 text-base">
