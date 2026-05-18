@@ -46,6 +46,7 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
   const [showReport, setShowReport] = useState(false)
   const [reported, setReported] = useState(false)
   const [playing, setPlaying] = useState(false)
+  const [muted, setMuted] = useState(true)
 
   // IntersectionObserver — spill av kun når synlig
   useEffect(() => {
@@ -123,7 +124,7 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
         src={clip.signedVideoUrl}
         className="w-full h-full object-cover"
         loop
-        muted
+        muted={muted}
         playsInline
         poster={clip.thumbnail_url ?? undefined}
       />
@@ -148,6 +149,28 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
         )}
         <p className="text-gray-400 text-xs mt-1">{timeAgo(clip.created_at)}</p>
       </div>
+
+      {/* Lyd-knapp øverst til høyre */}
+      <button
+        onClick={() => {
+          const newMuted = !muted
+          setMuted(newMuted)
+          if (audioRef.current) audioRef.current.muted = newMuted
+        }}
+        className="absolute top-3 right-3 w-9 h-9 bg-black/50 rounded-full flex items-center justify-center"
+      >
+        {muted ? (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <line x1="23" y1="9" x2="17" y2="15" /><line x1="17" y1="9" x2="23" y2="15" />
+          </svg>
+        ) : (
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+            <path d="M19.07 4.93a10 10 0 010 14.14M15.54 8.46a5 5 0 010 7.07" />
+          </svg>
+        )}
+      </button>
 
       {/* Høyre-side: reaksjoner + rapport */}
       <div className="absolute right-3 bottom-20 flex flex-col items-center gap-4">
