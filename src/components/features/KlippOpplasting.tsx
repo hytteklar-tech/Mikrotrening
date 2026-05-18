@@ -58,17 +58,21 @@ export default function KlippOpplasting({
     )
   }
 
-  function togglePreviewMusic(track: MusicTrack) {
+  function velgOgSpillMusick(track: MusicTrack) {
     if (playingMusicId === track.id) {
+      // Trykker på samme spor — stopp
       previewAudio?.pause()
       setPlayingMusicId(null)
       setPreviewAudio(null)
+      setSelectedMusic(null)
     } else {
+      // Nytt spor — stopp forrige, start nytt
       previewAudio?.pause()
       const audio = new Audio(track.url)
       audio.play().catch(() => {})
       setPreviewAudio(audio)
       setPlayingMusicId(track.id)
+      setSelectedMusic(track)
     }
   }
 
@@ -197,23 +201,20 @@ export default function KlippOpplasting({
               <span>Ingen musikk</span>
             </button>
             {musicTracks.map(track => (
-              <div
+              <button
                 key={track.id}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition cursor-pointer ${selectedMusic?.id === track.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
-                onClick={() => setSelectedMusic(track)}
+                onClick={() => velgOgSpillMusick(track)}
+                className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${selectedMusic?.id === track.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-300'}`}
               >
-                <button
-                  onClick={e => { e.stopPropagation(); togglePreviewMusic(track) }}
-                  className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center shrink-0"
-                >
+                <span className="w-8 h-8 bg-black/20 rounded-full flex items-center justify-center shrink-0 text-base">
                   {playingMusicId === track.id ? '⏸' : '▶️'}
-                </button>
+                </span>
                 <div className="flex-1 min-w-0">
                   <p className="font-medium truncate">{track.title}</p>
                   <p className="text-xs opacity-75">{track.artist} · {formatDuration(track.duration_seconds)}</p>
                 </div>
-                {selectedMusic?.id === track.id && <span>✓</span>}
-              </div>
+                {selectedMusic?.id === track.id && <span className="text-base">✓</span>}
+              </button>
             ))}
           </div>
         </div>
