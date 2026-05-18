@@ -7,16 +7,18 @@ export default async function FeedPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  // Hent globale klipp (top 10 etter opprettelsesdato, sortering etter reaksjoner skjer client-side)
-  const { data: globalRaw } = await supabase
+  // Hent alle klipp brukeren har tilgang til — RLS håndterer filtering
+  const { data: alleKlipp } = await supabase
     .from('clips')
     .select('id, video_url, thumbnail_url, scope, created_at, expires_at, user_id, users(display_name), music_tracks(id, title, artist, url, duration_seconds), exercises(id, name), clip_reactions(emoji, user_id)')
-    .eq('scope', 'global')
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
-    .limit(30)
+    .limit(100)
 
-  // Hent brukerens grupper
+  const globalRaw = (alleKlipp ?? []).filter(c => c.scope === 'global')
+  const groupClipsRaw = (alleKlipp ?? []).filter(c => c.scope === 'group')
+
+  // Hent brukerens grupper (for visning i faner)
   const { data: memberships } = await supabase
     .from('group_members')
     .select('group_id, groups(id, name)')
@@ -30,30 +32,6 @@ export default async function FeedPage() {
     return [{ id: single.id, name: single.name }]
   })
 
-  // Hent gruppe-klipp: finn clip_ids via clip_groups først
-  const groupIds = groups.map(g => g.id)
-  let groupClipsRaw: typeof globalRaw = []
-  if (groupIds.length > 0) {
-    const { data: clipGroupRows } = await supabase
-      .from('clip_groups')
-      .select('clip_id')
-      .in('group_id', groupIds)
-
-    const clipIds = (clipGroupRows ?? []).map(r => r.clip_id)
-
-    if (clipIds.length > 0) {
-      const { data } = await supabase
-        .from('clips')
-        .select('id, video_url, thumbnail_url, scope, created_at, expires_at, user_id, users(display_name), music_tracks(id, title, artist, url, duration_seconds), exercises(id, name), clip_reactions(emoji, user_id)')
-        .eq('scope', 'group')
-        .gt('expires_at', new Date().toISOString())
-        .in('id', clipIds)
-        .order('created_at', { ascending: false })
-        .limit(50)
-      groupClipsRaw = data ?? []
-    }
-  }
-
   // Generer signed URLs for videoer
   async function withSignedUrl(clips: typeof globalRaw) {
     if (!clips) return []
@@ -65,9 +43,9 @@ export default async function FeedPage() {
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const globalClips = (await withSignedUrl(globalRaw ?? [])) as any[]
+  const globalClips = (await withSignedUrl(globalRaw)) as any[]
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const groupClips = (await withSignedUrl(groupClipsRaw ?? [])) as any[]
+  const groupClips = (await withSignedUrl(groupClipsRaw)) as any[]
 
   return (
     <KlippFeed
