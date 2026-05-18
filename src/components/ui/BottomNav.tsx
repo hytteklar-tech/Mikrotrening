@@ -1,7 +1,9 @@
 'use client'
 
+import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import { useEffect, useState } from 'react'
 
 const ACTIVE = '#e85c00'
 const INACTIVE = '#aaa'
@@ -27,22 +29,11 @@ function IconTrening() {
   )
 }
 
-function IconTester() {
+function IconFeed() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M17 3a2.83 2.83 0 014 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
-      <line x1="14" y1="6" x2="18" y2="10" />
-    </svg>
-  )
-}
-
-function IconStats() {
-  return (
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="6" y1="20" x2="6" y2="14" />
-      <line x1="12" y1="20" x2="12" y2="6" />
-      <line x1="18" y1="20" x2="18" y2="10" />
-      <line x1="2" y1="20" x2="22" y2="20" />
+      <rect x="2" y="4" width="20" height="14" rx="2" />
+      <polygon points="10 8.5 16 11 10 13.5" fill="currentColor" stroke="none" />
     </svg>
   )
 }
@@ -67,21 +58,61 @@ function IconMeg() {
   )
 }
 
-const links = [
+const leftLinks = [
   { href: '/', label: 'Hjem', Icon: IconHjem },
   { href: '/workouts', label: 'Trening', Icon: IconTrening },
-  { href: '/test', label: 'Tester', Icon: IconTester },
-  { href: '/statistikk', label: 'Stats', Icon: IconStats },
+]
+
+const rightLinks = [
+  { href: '/feed', label: 'Feed', Icon: IconFeed },
   { href: '/group', label: 'Gruppe', Icon: IconGruppe },
   { href: '/settings', label: 'Meg', Icon: IconMeg },
 ]
 
 export default function BottomNav() {
   const pathname = usePathname()
+  const router = useRouter()
+  const [hasNewClips, setHasNewClips] = useState(false)
+
+  useEffect(() => {
+    async function checkNewClips() {
+      try {
+        const res = await fetch('/api/feed/latest')
+        const { latestAt } = await res.json()
+        if (!latestAt) return
+        const lastVisit = localStorage.getItem('lastFeedVisit')
+        if (!lastVisit || new Date(latestAt) > new Date(lastVisit)) {
+          setHasNewClips(true)
+        }
+      } catch {}
+    }
+    checkNewClips()
+  }, [pathname])
 
   function isActive(href: string) {
     if (href === '/') return pathname === '/'
     return pathname === href || pathname.startsWith(href + '/')
+  }
+
+  function renderLink({ href, label, Icon }: { href: string; label: string; Icon: () => React.ReactElement }) {
+    const active = isActive(href)
+    const isFeed = href === '/feed'
+    return (
+      <Link
+        key={href}
+        href={href}
+        className="flex-1 flex flex-col items-center py-3 gap-1 touch-manipulation transition-colors relative"
+        style={{ color: active ? ACTIVE : INACTIVE }}
+      >
+        <span className="relative">
+          <Icon />
+          {isFeed && hasNewClips && !active && (
+            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+          )}
+        </span>
+        <span style={{ fontSize: '11px', lineHeight: 1 }}>{label}</span>
+      </Link>
+    )
   }
 
   return (
@@ -89,21 +120,29 @@ export default function BottomNav() {
       className="shrink-0 border-t border-gray-800 pb-[env(safe-area-inset-bottom)]"
       style={{ backgroundColor: '#111' }}
     >
-      <div className="max-w-lg mx-auto flex">
-        {links.map(({ href, label, Icon }) => {
-          const active = isActive(href)
-          return (
-            <Link
-              key={href}
-              href={href}
-              className="flex-1 flex flex-col items-center py-3 gap-1 touch-manipulation transition-colors"
-              style={{ color: active ? ACTIVE : INACTIVE }}
-            >
-              <Icon />
-              <span style={{ fontSize: '11px', lineHeight: 1 }}>{label}</span>
-            </Link>
-          )
-        })}
+      <div className="max-w-lg mx-auto flex items-end">
+        {leftLinks.map(link => renderLink(link))}
+
+        {/* TikTok-stil kamera-knapp */}
+        <div className="flex-1 flex flex-col items-center py-2">
+          <button
+            onClick={() => router.push('/klipp/ny')}
+            className="flex items-center justify-center rounded-xl touch-manipulation"
+            style={{
+              background: 'linear-gradient(135deg, #e85c00, #ff8c00)',
+              width: 48,
+              height: 34,
+            }}
+            aria-label="Legg ut klipp"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 7l-7 5 7 5V7z" />
+              <rect x="1" y="5" width="15" height="14" rx="2" />
+            </svg>
+          </button>
+        </div>
+
+        {rightLinks.map(link => renderLink(link))}
       </div>
     </nav>
   )

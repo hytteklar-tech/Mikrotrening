@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import EgenpakkeClient from '@/components/features/EgenpakkeClient'
 import { exercises as exerciseLibrary } from '@/data/exercises'
+import Link from 'next/link'
 
 export default async function WorkoutsPage({ searchParams }: { searchParams: Promise<{ ids?: string }> }) {
   const supabase = await createClient()
@@ -34,6 +35,18 @@ export default async function WorkoutsPage({ searchParams }: { searchParams: Pro
         <h1 className="text-2xl font-bold">Mine pakker</h1>
       </div>
       <EgenpakkeClient packages={packages} userId={user.id} preselected={preselected} />
+      <div className="pt-4 border-t border-gray-800">
+        <Link
+          href="/test"
+          className="flex items-center justify-between bg-gray-800 rounded-2xl p-4 hover:bg-gray-750 transition"
+        >
+          <div>
+            <p className="font-semibold text-white">Tester 📏</p>
+            <p className="text-sm text-gray-400">Mål fremgangen din</p>
+          </div>
+          <span className="text-gray-500 text-lg">›</span>
+        </Link>
+      </div>
     </div>
   )
 }
