@@ -111,9 +111,10 @@ export default function KlippOpplasting({
       if (insertError || !clip) throw new Error(insertError?.message ?? 'Feil ved lagring')
 
       if (scope === 'group' && selectedGroups.length > 0) {
-        await supabase.from('clip_groups').insert(
+        const { error: groupError } = await supabase.from('clip_groups').insert(
           selectedGroups.map(gid => ({ clip_id: clipId, group_id: gid }))
         )
+        if (groupError) throw new Error('Gruppe-feil: ' + groupError.message)
       }
 
       router.push('/feed')
