@@ -2,7 +2,7 @@
 
 import React from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 
 const ACTIVE = '#e85c00'
@@ -38,6 +38,15 @@ function IconFeed() {
   )
 }
 
+function IconKamera() {
+  return (
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M23 7l-7 5 7 5V7z" />
+      <rect x="1" y="5" width="15" height="14" rx="2" />
+    </svg>
+  )
+}
+
 function IconGruppe() {
   return (
     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
@@ -58,12 +67,9 @@ function IconMeg() {
   )
 }
 
-const leftLinks = [
+const navLinks = [
   { href: '/', label: 'Hjem', Icon: IconHjem },
   { href: '/workouts', label: 'Trening', Icon: IconTrening },
-]
-
-const rightLinks = [
   { href: '/feed', label: 'Feed', Icon: IconFeed },
   { href: '/group', label: 'Gruppe', Icon: IconGruppe },
   { href: '/settings', label: 'Meg', Icon: IconMeg },
@@ -71,7 +77,6 @@ const rightLinks = [
 
 export default function BottomNav() {
   const pathname = usePathname()
-  const router = useRouter()
   const [hasNewClips, setHasNewClips] = useState(false)
 
   useEffect(() => {
@@ -120,29 +125,8 @@ export default function BottomNav() {
       className="shrink-0 border-t border-gray-800 pb-[env(safe-area-inset-bottom)]"
       style={{ backgroundColor: '#111' }}
     >
-      <div className="max-w-lg mx-auto flex items-end">
-        {leftLinks.map(link => renderLink(link))}
-
-        {/* TikTok-stil kamera-knapp */}
-        <div className="flex-1 flex flex-col items-center py-2">
-          <button
-            onClick={() => router.push('/klipp/ny')}
-            className="flex items-center justify-center rounded-xl touch-manipulation"
-            style={{
-              background: 'linear-gradient(135deg, #e85c00, #ff8c00)',
-              width: 48,
-              height: 34,
-            }}
-            aria-label="Legg ut klipp"
-          >
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 7l-7 5 7 5V7z" />
-              <rect x="1" y="5" width="15" height="14" rx="2" />
-            </svg>
-          </button>
-        </div>
-
-        {rightLinks.map(link => renderLink(link))}
+      <div className="max-w-lg mx-auto flex">
+        {navLinks.map(link => renderLink(link))}
       </div>
     </nav>
   )

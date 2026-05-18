@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
 type Reaction = { emoji: string; user_id: string }
@@ -257,19 +258,30 @@ export default function KlippFeed({
   return (
     <div className="flex flex-col h-full">
       {/* Fane-header */}
-      <div className="flex border-b border-gray-800 px-4 pt-4 pb-0 gap-4 shrink-0">
-        <button
-          onClick={() => setTab('global')}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${tab === 'global' ? 'border-orange-500 text-white' : 'border-transparent text-gray-500'}`}
+      <div className="flex items-center border-b border-gray-800 px-4 pt-4 pb-0 shrink-0">
+        <div className="flex gap-4 flex-1">
+          <button
+            onClick={() => setTab('global')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${tab === 'global' ? 'border-orange-500 text-white' : 'border-transparent text-gray-500'}`}
+          >
+            Global
+          </button>
+          <button
+            onClick={() => setTab('gruppe')}
+            className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${tab === 'gruppe' ? 'border-orange-500 text-white' : 'border-transparent text-gray-500'}`}
+          >
+            Mine grupper
+          </button>
+        </div>
+        <Link
+          href="/klipp/ny"
+          className="mb-2 flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-3 py-1.5 rounded-xl transition"
         >
-          Global
-        </button>
-        <button
-          onClick={() => setTab('gruppe')}
-          className={`pb-3 text-sm font-semibold border-b-2 transition-colors ${tab === 'gruppe' ? 'border-orange-500 text-white' : 'border-transparent text-gray-500'}`}
-        >
-          Mine grupper
-        </button>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
+          </svg>
+          Del klipp
+        </Link>
       </div>
 
       {/* Feed */}
