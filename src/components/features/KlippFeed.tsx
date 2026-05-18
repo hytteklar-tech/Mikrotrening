@@ -256,7 +256,7 @@ export default function KlippFeed({
   }, [])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
       {/* Fane-header */}
       <div className="flex items-center border-b border-gray-800 px-4 pt-4 pb-0 shrink-0">
         <div className="flex gap-4 flex-1">
@@ -285,12 +285,21 @@ export default function KlippFeed({
       </div>
 
       {/* Feed */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-6">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
         {clips.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <p className="text-4xl mb-3">🎬</p>
-            <p className="text-white font-semibold">Ingen klipp ennå</p>
-            <p className="text-gray-400 text-sm mt-1">Vær den første til å dele!</p>
+            <p className="text-5xl mb-4">🎬</p>
+            <p className="text-white font-bold text-lg">Ingen klipp ennå</p>
+            <p className="text-gray-400 text-sm mt-1 mb-6">Vær den første til å dele!</p>
+            <Link
+              href="/klipp/ny"
+              className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl text-base transition"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
+              </svg>
+              Ta opp video
+            </Link>
           </div>
         ) : (
           clips.map(clip => (
@@ -298,6 +307,18 @@ export default function KlippFeed({
           ))
         )}
       </div>
+
+      {/* Flytende kamera-knapp */}
+      <Link
+        href="/klipp/ny"
+        className="absolute bottom-6 right-4 flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-3 rounded-2xl shadow-lg transition"
+        style={{ zIndex: 20 }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
+        </svg>
+        Ta opp video
+      </Link>
     </div>
   )
 }
