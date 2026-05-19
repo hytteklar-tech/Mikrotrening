@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
 type UserExercise = { id: string; name: string }
@@ -13,6 +14,7 @@ type Props = {
 
 export default function OvelsesDemoModal({ clip, onClose, onSaved }: Props) {
   const supabase = createClient()
+  const router = useRouter()
   const [exercises, setExercises] = useState<UserExercise[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [nyNavn, setNyNavn] = useState('')
@@ -63,7 +65,6 @@ export default function OvelsesDemoModal({ clip, onClose, onSaved }: Props) {
 
     setSaving(false)
     setDone(true)
-    setTimeout(onSaved, 1000)
   }
 
   const kanLagre = visNy ? nyNavn.trim().length > 0 : selectedId !== null
@@ -77,9 +78,21 @@ export default function OvelsesDemoModal({ clip, onClose, onSaved }: Props) {
         </div>
 
         {done ? (
-          <div className="p-8 text-center">
-            <p className="text-2xl mb-2">✅</p>
-            <p className="text-white font-semibold">Lagret!</p>
+          <div className="p-6 space-y-3 pb-8 text-center">
+            <p className="text-3xl mb-1">✅</p>
+            <p className="text-white font-bold">Lagret som øvelsesdemo!</p>
+            <button
+              onClick={() => router.push('/test-exercises?tab=pakker')}
+              className="w-full bg-orange-500 text-white rounded-xl py-3 text-sm font-semibold"
+            >
+              Gå til Mine øvelser →
+            </button>
+            <button
+              onClick={onSaved}
+              className="w-full bg-gray-800 text-gray-300 rounded-xl py-3 text-sm"
+            >
+              Tilbake til feed
+            </button>
           </div>
         ) : (
           <div className="p-4 space-y-3 pb-8">
