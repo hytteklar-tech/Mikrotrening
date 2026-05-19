@@ -123,18 +123,20 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
 
   return (
     <div ref={cardRef} className="relative bg-black rounded-2xl overflow-hidden" style={{ aspectRatio: '9/16', maxHeight: '70vh' }}>
+      {/* Har musikk: video alltid muted — lyd-knapp styrer musikken */}
+      {/* Ingen musikk: lyd-knapp styrer video-lyden */}
       <video
         ref={videoRef}
         src={clip.signedVideoUrl}
         className="w-full h-full object-cover"
         loop
-        muted={muted}
+        muted={clip.music_tracks ? true : muted}
         playsInline
         poster={clip.thumbnail_url ?? undefined}
       />
 
       {clip.music_tracks && (
-        <audio ref={audioRef} src={clip.music_tracks.url} loop />
+        <audio ref={audioRef} src={clip.music_tracks.url} loop preload="none" />
       )}
 
       {/* Bruker + info */}
@@ -159,12 +161,19 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
         onClick={() => {
           const newMuted = !muted
           setMuted(newMuted)
-          if (audioRef.current) {
-            if (newMuted) {
-              audioRef.current.pause()
-            } else {
-              audioRef.current.play().catch(() => {})
+          if (clip.music_tracks) {
+            // Klipp med musikk: styr musikk-element
+            if (audioRef.current) {
+              if (newMuted) {
+                audioRef.current.pause()
+              } else {
+                audioRef.current.loop = true
+                audioRef.current.play().catch(() => {})
+              }
             }
+          } else {
+            // Klipp uten musikk: styr video-lyden
+            if (videoRef.current) videoRef.current.muted = newMuted
           }
         }}
         className="absolute top-3 right-3 w-9 h-9 bg-black/50 rounded-full flex items-center justify-center"
