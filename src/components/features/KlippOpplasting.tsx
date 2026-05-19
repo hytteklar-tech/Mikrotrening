@@ -102,7 +102,6 @@ export default function KlippOpplasting({
           user_id: userId,
           video_url: path,
           music_id: selectedMusic?.id ?? null,
-          exercise_id: selectedExercise?.id ?? null,
           scope,
         })
         .select()
