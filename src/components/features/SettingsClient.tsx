@@ -287,7 +287,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
             <p className="text-xs text-gray-400 mt-0.5">Bruker snittet ditt til å estimere tid på treninger uten tidtaker</p>
           </div>
           <button
-            onClick={() => setAutoFillDuration(v => !v)}
+            onClick={() => setAutoFillDuration((v: boolean) => !v)}
             className={`w-12 h-6 rounded-full transition-colors shrink-0 ml-3 ${autoFillDuration ? 'bg-orange-500' : 'bg-gray-600'}`}
           >
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${autoFillDuration ? 'translate-x-6' : 'translate-x-0'}`} />
