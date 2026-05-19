@@ -8,12 +8,14 @@ export default async function FeedPage() {
   if (!user) redirect('/login')
 
   // Hent alle klipp brukeren har tilgang til — RLS håndterer filtering
-  const { data: alleKlipp } = await supabase
+  const { data: alleKlipp, error: klippFeil } = await supabase
     .from('clips')
     .select('id, video_url, thumbnail_url, scope, created_at, expires_at, user_id, users(display_name), music_tracks(id, title, artist, url, duration_seconds), exercises(id, name), clip_reactions(emoji, user_id)')
     .gt('expires_at', new Date().toISOString())
     .order('created_at', { ascending: false })
     .limit(100)
+
+  if (klippFeil) console.error('[feed] klipp-feil:', klippFeil)
 
   const globalRaw = (alleKlipp ?? []).filter(c => c.scope === 'global')
   const groupClipsRaw = (alleKlipp ?? []).filter(c => c.scope === 'group')
