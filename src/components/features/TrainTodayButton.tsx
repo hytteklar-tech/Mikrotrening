@@ -109,6 +109,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [logsExpanded, setLogsExpanded] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
+  const musicAudioRef = useRef<HTMLAudioElement | null>(null)
   const supabase = createClient()
 
   useEffect(() => {
@@ -209,15 +210,36 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
     return streak
   }
 
-  function startTimer() {
+  async function startTimer() {
     startTimeRef.current = Date.now()
     setTimerSeconds(0)
     setTimerRunning(true)
     posthog.capture('okt_startet', { pakke_navn: activePackage?.name })
+
+    // Hent og spill foretrukket musikk
+    const { data: profile } = await supabase
+      .from('users')
+      .select('preferred_music_id')
+      .eq('id', userId)
+      .single()
+    if (profile?.preferred_music_id) {
+      const { data: track } = await supabase
+        .from('music_tracks')
+        .select('url')
+        .eq('id', profile.preferred_music_id)
+        .single()
+      if (track?.url) {
+        if (!musicAudioRef.current) musicAudioRef.current = new Audio()
+        musicAudioRef.current.src = track.url
+        musicAudioRef.current.loop = true
+        musicAudioRef.current.play().catch(() => {})
+      }
+    }
   }
 
   function stopTimer() {
     setTimerRunning(false)
+    musicAudioRef.current?.pause()
   }
 
   const isToday = selectedDate === today
@@ -237,7 +259,10 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
     if (!activePackage || isFuture) return
     setLoading(true)
     const duration = withTimer && timerSeconds > 0 ? timerSeconds : null
-    if (withTimer) stopTimer()
+    if (withTimer) {
+      setTimerRunning(false)
+      musicAudioRef.current?.pause()
+    }
 
     const optimisticLog: DayLog = {
       id: `optimistic-${Date.now()}`,

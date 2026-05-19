@@ -9,10 +9,10 @@ export default async function SettingsPage() {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const [{ data: profile }, { data: unreadFeedback }] = await Promise.all([
+  const [{ data: profile }, { data: unreadFeedback }, { data: musicTracks }] = await Promise.all([
     supabase
       .from('users')
-      .select('display_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription')
+      .select('display_name, company_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription, preferred_music_id')
       .eq('id', user.id)
       .single(),
     supabase
@@ -20,6 +20,10 @@ export default async function SettingsPage() {
       .select('id, feedback_replies(id)')
       .eq('user_id', user.id)
       .eq('is_read', false),
+    supabase
+      .from('music_tracks')
+      .select('id, title, artist, url, duration_seconds')
+      .order('title', { ascending: true }),
   ])
 
   const hasUnread = unreadFeedback?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
@@ -36,7 +40,7 @@ export default async function SettingsPage() {
       <div className="pt-4">
         <h1 className="text-2xl font-bold">Innstillinger</h1>
       </div>
-<SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} />
+<SettingsClient profile={profile} userId={user.id} needsActivation={needsActivation} musicTracks={musicTracks ?? []} />
       <FeedbackSection initialHasUnread={hasUnread} />
       {isAdmin && (
         <a

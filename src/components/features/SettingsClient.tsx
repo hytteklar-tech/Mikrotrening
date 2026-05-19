@@ -5,6 +5,7 @@ import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 
 
+type MusicTrack = { id: string; title: string; artist: string; url: string; duration_seconds: number }
 type TimeOption = 'morning' | 'midday' | 'afternoon' | 'evening'
 
 const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
@@ -14,9 +15,15 @@ const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
   { value: 'evening', label: 'Kveld', hint: 'kl 19' },
 ]
 
-export default function SettingsClient({ profile, userId, needsActivation }: { profile: any; userId: string; needsActivation: boolean }) {
+function formatDuration(sec: number) {
+  return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, '0')}`
+}
+
+export default function SettingsClient({ profile, userId, needsActivation, musicTracks }: { profile: any; userId: string; needsActivation: boolean; musicTracks: MusicTrack[] }) {
   const [name, setName] = useState(profile?.display_name ?? '')
   const [company, setCompany] = useState(profile?.company_name ?? '')
+  const [preferredMusicId, setPreferredMusicId] = useState<string | null>(profile?.preferred_music_id ?? null)
+  const [previewAudio] = useState(() => typeof window !== 'undefined' ? new Audio() : null)
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
@@ -158,9 +165,11 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
 
   async function save() {
     setSaving(true)
+    previewAudio?.pause()
     await supabase.from('users').update({
       display_name: name.trim(),
       company_name: company.trim() || null,
+      preferred_music_id: preferredMusicId,
       notifications_enabled: notifications,
       push_enabled: pushEnabled,
       preferred_times: preferredTimes,
@@ -206,6 +215,53 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
           />
         </div>
       </div>
+
+      {musicTracks.length > 0 && (
+        <div className="bg-gray-800 rounded-2xl p-4 space-y-2">
+          <p className="text-sm font-semibold text-white">🎵 Treningsmusikk</p>
+          <p className="text-xs text-gray-400 mb-1">Spilles automatisk når du trener med tid</p>
+          <div className="space-y-1.5">
+            <button
+              onClick={() => {
+                previewAudio?.pause()
+                setPreferredMusicId(null)
+              }}
+              className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${!preferredMusicId ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+            >
+              <span>🔇</span>
+              <span>Ingen musikk</span>
+            </button>
+            {musicTracks.map(track => (
+              <button
+                key={track.id}
+                onClick={() => {
+                  if (preferredMusicId === track.id) {
+                    previewAudio?.pause()
+                    setPreferredMusicId(null)
+                  } else {
+                    setPreferredMusicId(track.id)
+                    if (previewAudio) {
+                      previewAudio.src = track.url
+                      previewAudio.loop = false
+                      previewAudio.play().catch(() => {})
+                      setTimeout(() => previewAudio.pause(), 8000)
+                    }
+                  }
+                }}
+                className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${preferredMusicId === track.id ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+              >
+                <span className="w-7 h-7 bg-black/20 rounded-full flex items-center justify-center shrink-0">
+                  {preferredMusicId === track.id ? '✓' : '▶'}
+                </span>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium truncate">{track.title}</p>
+                  <p className="text-xs opacity-75">{track.artist} · {formatDuration(track.duration_seconds)}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
         <div className="flex items-center justify-between">
