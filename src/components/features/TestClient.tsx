@@ -509,23 +509,29 @@ export default function TestClient({ initialTestTypes, initialTestResults, userI
               <label className="text-xs text-gray-300 mb-1 block">Enhet</label>
               <select
                 value={customUnit}
-                onChange={e => setCustomUnit(e.target.value)}
+                onChange={e => {
+                  const unit = e.target.value
+                  setCustomUnit(unit)
+                  if (unit === 'kg' || unit === 'cm') setCustomHigher(false)
+                  else setCustomHigher(true)
+                }}
                 className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 outline-none focus:ring-2 focus:ring-orange-500 text-sm"
               >
                 <option value="reps">reps</option>
                 <option value="sekunder">sekunder</option>
                 <option value="kg">kg</option>
+                <option value="cm">cm</option>
               </select>
             </div>
             <div className="flex-1">
-              <label className="text-xs text-gray-300 mb-1 block">Høyere = bedre?</label>
+              <label className="text-xs text-gray-300 mb-1 block">Mål</label>
               <button
                 onClick={() => setCustomHigher(h => !h)}
                 className={`w-full rounded-xl px-3 py-2 text-sm font-medium transition ${
                   customHigher ? 'bg-green-700/50 text-green-300' : 'bg-red-900/40 text-red-300'
                 }`}
               >
-                {customHigher ? 'Ja' : 'Nei'}
+                {customHigher ? '↑ Høyere' : '↓ Lavere'}
               </button>
             </div>
           </div>
