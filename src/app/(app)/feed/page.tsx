@@ -15,7 +15,7 @@ export default async function FeedPage() {
     .order('created_at', { ascending: false })
     .limit(100)
 
-  if (klippFeil) console.error('[feed] klipp-feil:', klippFeil)
+  if (klippFeil) console.error('[feed] klipp-feil kode=' + klippFeil.code + ' msg=' + klippFeil.message + ' hint=' + klippFeil.hint)
 
   const globalRaw = (alleKlipp ?? []).filter(c => c.scope === 'global')
   const groupClipsRaw = (alleKlipp ?? []).filter(c => c.scope === 'group')
