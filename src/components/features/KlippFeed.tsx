@@ -32,11 +32,12 @@ function timeAgo(dateStr: string) {
   return `${d}d siden`
 }
 
-function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string }) {
+function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId: string; onSeen: (id: string) => void }) {
   const videoRef = useRef<HTMLVideoElement>(null)
   const audioRef = useRef<HTMLAudioElement>(null)
   const cardRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
+  const hasBeenVisible = useRef(false)
 
   const [reactions, setReactions] = useState<Reaction[]>(clip.clip_reactions)
   const [myEmoji, setMyEmoji] = useState<string | null>(
@@ -48,7 +49,7 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(true)
 
-  // IntersectionObserver — spill av kun når synlig
+  // IntersectionObserver — spill av kun når synlig, merk som sett når scrollet forbi
   useEffect(() => {
     const el = cardRef.current
     if (!el) return
@@ -57,17 +58,21 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
         if (entry.isIntersecting) {
           videoRef.current?.play().catch(() => {})
           setPlaying(true)
+          hasBeenVisible.current = true
         } else {
           videoRef.current?.pause()
           audioRef.current?.pause()
           setPlaying(false)
+          if (hasBeenVisible.current) {
+            onSeen(clip.id)
+          }
         }
       },
       { threshold: 0.7 }
     )
     obs.observe(el)
     return () => obs.disconnect()
-  }, [])
+  }, [clip.id, onSeen])
 
   async function react(emoji: string) {
     const removing = myEmoji === emoji
@@ -258,6 +263,23 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
   )
 }
 
+const SEEN_KEY = 'seenClips'
+
+function loadSeenIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(SEEN_KEY)
+    return raw ? new Set(JSON.parse(raw)) : new Set()
+  } catch { return new Set() }
+}
+
+function saveSeenId(id: string) {
+  try {
+    const ids = loadSeenIds()
+    ids.add(id)
+    localStorage.setItem(SEEN_KEY, JSON.stringify([...ids]))
+  } catch { /* ignore */ }
+}
+
 export default function KlippFeed({
   globalClips,
   groupClips,
@@ -270,13 +292,25 @@ export default function KlippFeed({
   currentUserId: string
 }) {
   const [tab, setTab] = useState<'global' | 'gruppe'>('global')
+  const [seenIds, setSeenIds] = useState<Set<string>>(new Set())
 
-  // Sorter global etter antall reaksjoner, ta top 10
+  useEffect(() => {
+    setSeenIds(loadSeenIds())
+  }, [])
+
+  function handleSeen(id: string) {
+    saveSeenId(id)
+    setSeenIds(prev => new Set([...prev, id]))
+  }
+
+  // Sorter global etter antall reaksjoner, ta top 10 — filtrer sette
   const sortedGlobal = [...globalClips]
+    .filter(c => !seenIds.has(c.id))
     .sort((a, b) => b.clip_reactions.length - a.clip_reactions.length)
     .slice(0, 10)
 
-  const clips = tab === 'global' ? sortedGlobal : groupClips
+  const usettGruppe = groupClips.filter(c => !seenIds.has(c.id))
+  const clips = tab === 'global' ? sortedGlobal : usettGruppe
 
   // Marker feed som besøkt
   useEffect(() => {
@@ -331,7 +365,7 @@ export default function KlippFeed({
           </div>
         ) : (
           clips.map(clip => (
-            <KlippKort key={clip.id} clip={clip} currentUserId={currentUserId} />
+            <KlippKort key={clip.id} clip={clip} currentUserId={currentUserId} onSeen={handleSeen} />
           ))
         )}
       </div>
