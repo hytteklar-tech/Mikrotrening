@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   const [{ data: profile }, { data: unreadFeedback }, { data: musicTracks }] = await Promise.all([
     supabase
       .from('users')
-      .select('display_name, company_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription, preferred_music_id')
+      .select('display_name, company_name, notifications_enabled, push_enabled, preferred_times, onesignal_id, push_subscription, preferred_music_id, auto_fill_duration')
       .eq('id', user.id)
       .single(),
     supabase

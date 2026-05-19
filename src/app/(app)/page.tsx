@@ -19,7 +19,7 @@ export default async function DashboardPage() {
   const [{ data: profile }, { data: logs }, { data: rawPackages }, { data: categories }, { data: unreadFeedback }] = await Promise.all([
     supabase
       .from('users')
-      .select('display_name, notifications_enabled, primary_group_id')
+      .select('display_name, notifications_enabled, primary_group_id, auto_fill_duration')
       .eq('id', user.id)
       .single(),
     supabase
@@ -54,6 +54,43 @@ export default async function DashboardPage() {
   const hasUnread = unreadFeedback?.some(f => (f.feedback_replies as any[]).length > 0) ?? false
 
   if (!profile?.display_name) redirect('/onboarding')
+
+  // Auto-fyll manglende tid med pakke-snitt
+  if (profile.auto_fill_duration) {
+    const { data: alleLogs } = await supabase
+      .from('daily_logs')
+      .select('id, package_id, duration_seconds')
+      .eq('user_id', user.id)
+
+    if (alleLogs && alleLogs.length > 0) {
+      // Beregn snitt per pakke fra logger med tid
+      const snittPerPakke: Record<string, number> = {}
+      const gruppert: Record<string, number[]> = {}
+      for (const log of alleLogs) {
+        if (log.duration_seconds != null && log.duration_seconds > 0) {
+          const pid = log.package_id as string
+          if (!gruppert[pid]) gruppert[pid] = []
+          gruppert[pid].push(log.duration_seconds as number)
+        }
+      }
+      for (const [pid, tider] of Object.entries(gruppert)) {
+        snittPerPakke[pid] = Math.round(tider.reduce((a, b) => a + b, 0) / tider.length)
+      }
+
+      // Oppdater logger uten tid der pakken har et snitt
+      for (const log of alleLogs) {
+        if (log.duration_seconds == null) {
+          const snitt = snittPerPakke[log.package_id as string]
+          if (snitt) {
+            await supabase
+              .from('daily_logs')
+              .update({ duration_seconds: snitt })
+              .eq('id', log.id as string)
+          }
+        }
+      }
+    }
+  }
 
   const initialDayLogs: DayLog[] = (logs ?? []).map(row => ({
     id: row.id as string,

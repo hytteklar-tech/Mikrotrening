@@ -23,6 +23,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
   const [name, setName] = useState(profile?.display_name ?? '')
   const [company, setCompany] = useState(profile?.company_name ?? '')
   const [preferredMusicId, setPreferredMusicId] = useState<string | null>(profile?.preferred_music_id ?? null)
+  const [autoFillDuration, setAutoFillDuration] = useState(profile?.auto_fill_duration ?? false)
   const [musikkliste, setMusikkliste] = useState(false)
   const [previewAudio] = useState(() => typeof window !== 'undefined' ? new Audio() : null)
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
@@ -171,6 +172,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
       display_name: name.trim(),
       company_name: company.trim() || null,
       preferred_music_id: preferredMusicId,
+      auto_fill_duration: autoFillDuration,
       notifications_enabled: notifications,
       push_enabled: pushEnabled,
       preferred_times: preferredTimes,
@@ -277,6 +279,21 @@ export default function SettingsClient({ profile, userId, needsActivation, music
           )}
         </div>
       )}
+
+      <div className="bg-gray-800 rounded-2xl p-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-sm font-semibold text-white">⏱ Fyll inn manglende tid</p>
+            <p className="text-xs text-gray-400 mt-0.5">Bruker snittet ditt til å estimere tid på treninger uten tidtaker</p>
+          </div>
+          <button
+            onClick={() => setAutoFillDuration(v => !v)}
+            className={`w-12 h-6 rounded-full transition-colors shrink-0 ml-3 ${autoFillDuration ? 'bg-orange-500' : 'bg-gray-600'}`}
+          >
+            <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${autoFillDuration ? 'translate-x-6' : 'translate-x-0'}`} />
+          </button>
+        </div>
+      </div>
 
       <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
         <div className="flex items-center justify-between">
