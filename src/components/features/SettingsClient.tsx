@@ -168,7 +168,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
   async function save() {
     setSaving(true)
     previewAudio?.pause()
-    await supabase.from('users').update({
+    const { error } = await supabase.from('users').update({
       display_name: name.trim(),
       company_name: company.trim() || null,
       preferred_music_id: preferredMusicId,
@@ -178,6 +178,10 @@ export default function SettingsClient({ profile, userId, needsActivation, music
       preferred_times: preferredTimes,
     }).eq('id', userId)
     setSaving(false)
+    if (error) {
+      alert('Feil ved lagring: ' + error.message)
+      return
+    }
     router.push('/')
   }
 
