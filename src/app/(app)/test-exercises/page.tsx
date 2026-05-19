@@ -6,7 +6,7 @@ import { exercises, MUSCLE_GROUP_LABELS } from '@/data/exercises'
 import type { Exercise } from '@/data/exercises'
 import { createClient } from '@/lib/supabase/client'
 
-type UserExercise = { id: string; name: string; unit: 'reps' | 'sek'; suggested_value: number; muscle_group: string | null; description: string | null }
+type UserExercise = { id: string; name: string; unit: 'reps' | 'sek'; suggested_value: number; muscle_group: string | null; description: string | null; demoSignedUrl?: string }
 
 type TabId = 'pakker' | 'bibliotek' | 'maler'
 
@@ -115,14 +115,38 @@ export default function TestExercisesPage() {
   const addto = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('addto')
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) return
-      supabase
+
+      const { data: exData } = await supabase
         .from('user_exercises')
         .select('id, name, unit, suggested_value, muscle_group, description')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .then(({ data }) => setUserExercises((data ?? []) as UserExercise[]))
+
+      const exercises = (exData ?? []) as UserExercise[]
+
+      // Hent siste demo-video per øvelse
+      const { data: videoData } = await supabase
+        .from('exercise_videos')
+        .select('user_exercise_id, video_url')
+        .eq('user_id', user.id)
+        .not('video_url', 'is', null)
+        .order('created_at', { ascending: false })
+
+      // Lag signed URLs for demo-videoer
+      const videoMap: Record<string, string> = {}
+      for (const v of (videoData ?? [])) {
+        if (v.user_exercise_id && !videoMap[v.user_exercise_id] && v.video_url) {
+          const { data } = await supabase.storage.from('clips').createSignedUrl(v.video_url, 3600)
+          if (data?.signedUrl) videoMap[v.user_exercise_id] = data.signedUrl
+        }
+      }
+
+      setUserExercises(exercises.map(ex => ({
+        ...ex,
+        demoSignedUrl: videoMap[ex.id] ?? undefined,
+      })))
     })
   }, [])
 
@@ -275,13 +299,20 @@ export default function TestExercisesPage() {
                   {isPicked && <span className="text-white text-xs leading-none font-bold">✓</span>}
                 </button>
                 <button onClick={() => togglePick(ex.id)} className="w-full text-left">
-                  <div className="w-full aspect-square bg-gray-700 flex flex-col items-center justify-center px-3 gap-1.5">
-                    <p className="text-white text-sm font-semibold text-center leading-snug">{ex.name}</p>
-                    {ex.description && (
-                      <p className="text-gray-400 text-xs text-center leading-snug line-clamp-3">{ex.description}</p>
+                  <div className="w-full aspect-square bg-gray-700 flex flex-col items-center justify-center px-3 gap-1.5 overflow-hidden">
+                    {ex.demoSignedUrl ? (
+                      <video src={ex.demoSignedUrl} autoPlay loop muted playsInline className="w-full h-full object-cover" />
+                    ) : (
+                      <>
+                        <p className="text-white text-sm font-semibold text-center leading-snug">{ex.name}</p>
+                        {ex.description && (
+                          <p className="text-gray-400 text-xs text-center leading-snug line-clamp-3">{ex.description}</p>
+                        )}
+                      </>
                     )}
                   </div>
                   <div className="p-2">
+                    <p className="text-white text-xs font-semibold truncate">{ex.name}</p>
                     <p className="text-orange-400 text-xs font-medium">{ex.suggested_value} {ex.unit}</p>
                   </div>
                 </button>

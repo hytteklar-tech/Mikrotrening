@@ -3,10 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
+import OvelsesDemoModal from '@/components/features/OvelsesDemoModal'
 
 type Reaction = { emoji: string; user_id: string }
 type Clip = {
   id: string
+  video_url: string
   signedVideoUrl: string
   thumbnail_url: string | null
   scope: string
@@ -46,6 +48,7 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
   const [showEmojis, setShowEmojis] = useState(false)
   const [showReport, setShowReport] = useState(false)
   const [reported, setReported] = useState(false)
+  const [showDemoModal, setShowDemoModal] = useState(false)
   const [playing, setPlaying] = useState(false)
   const [muted, setMuted] = useState(true)
 
@@ -204,6 +207,17 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
           <span className="text-white text-xs font-medium">{reactions.length}</span>
         </div>
 
+        {/* Lagre som øvelsesdemo */}
+        <button
+          onClick={() => setShowDemoModal(true)}
+          className="w-10 h-10 bg-black/50 rounded-full flex items-center justify-center"
+          aria-label="Lagre som øvelsesdemo"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+          </svg>
+        </button>
+
         {/* Rapport */}
         {clip.user_id !== currentUserId && (
           <button
@@ -267,6 +281,14 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
         <div className="absolute inset-0 flex items-center justify-center bg-black/60 z-10">
           <p className="text-white font-semibold bg-gray-900 px-4 py-2 rounded-xl">Takk — vi ser på det 👍</p>
         </div>
+      )}
+
+      {showDemoModal && (
+        <OvelsesDemoModal
+          clip={{ video_url: clip.video_url }}
+          onClose={() => setShowDemoModal(false)}
+          onSaved={() => setShowDemoModal(false)}
+        />
       )}
     </div>
   )
