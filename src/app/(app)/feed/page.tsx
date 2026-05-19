@@ -26,7 +26,7 @@ export default async function FeedPage() {
 
   const [usersRes, musicRes, exercisesRes, reactionsRes] = await Promise.all([
     userIds.length > 0
-      ? supabase.from('users').select('id, display_name').in('id', userIds)
+      ? supabase.from('users').select('id, display_name, company_name').in('id', userIds)
       : Promise.resolve({ data: [] }),
     musicIds.length > 0
       ? supabase.from('music_tracks').select('id, title, artist, url, duration_seconds').in('id', musicIds)

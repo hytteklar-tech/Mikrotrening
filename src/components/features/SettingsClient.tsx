@@ -16,6 +16,7 @@ const TIME_OPTIONS: { value: TimeOption; label: string; hint: string }[] = [
 
 export default function SettingsClient({ profile, userId, needsActivation }: { profile: any; userId: string; needsActivation: boolean }) {
   const [name, setName] = useState(profile?.display_name ?? '')
+  const [company, setCompany] = useState(profile?.company_name ?? '')
   const [notifications, setNotifications] = useState(profile?.notifications_enabled ?? true)
   const [pushEnabled, setPushEnabled] = useState(profile?.push_enabled ?? true)
   const [preferredTimes, setPreferredTimes] = useState<TimeOption[]>(profile?.preferred_times ?? [])
@@ -159,14 +160,13 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
     setSaving(true)
     await supabase.from('users').update({
       display_name: name.trim(),
+      company_name: company.trim() || null,
       notifications_enabled: notifications,
       push_enabled: pushEnabled,
       preferred_times: preferredTimes,
     }).eq('id', userId)
     setSaving(false)
-    setSaved(true)
-    setTimeout(() => setSaved(false), 2000)
-    router.refresh()
+    router.push('/')
   }
 
   async function signOut() {
@@ -193,6 +193,16 @@ export default function SettingsClient({ profile, userId, needsActivation }: { p
             value={name}
             onChange={e => setName(e.target.value)}
             className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+          />
+        </div>
+        <div>
+          <label className="text-xs text-gray-400">Firma</label>
+          <input
+            type="text"
+            value={company}
+            onChange={e => setCompany(e.target.value)}
+            placeholder="Valgfritt"
+            className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm placeholder-gray-500"
           />
         </div>
       </div>

@@ -15,7 +15,7 @@ type Clip = {
   created_at: string
   expires_at: string
   user_id: string
-  users: { display_name: string | null } | null
+  users: { display_name: string | null; company_name: string | null } | null
   music_tracks: { id: string; title: string; artist: string; url: string; duration_seconds: number } | null
   exercises: { id: string; name: string } | null
   clip_reactions: Reaction[]
@@ -145,6 +145,9 @@ function KlippKort({ clip, currentUserId, onSeen }: { clip: Clip; currentUserId:
       {/* Bruker + info */}
       <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-black/80 to-transparent">
         <p className="text-white font-semibold text-sm">{clip.users?.display_name ?? 'Bruker'}</p>
+        {clip.users?.company_name && (
+          <p className="text-gray-400 text-xs">{clip.users.company_name}</p>
+        )}
         {clip.music_tracks && (
           <p className="text-gray-300 text-xs mt-0.5">🎵 {clip.music_tracks.title} — {clip.music_tracks.artist}</p>
         )}
