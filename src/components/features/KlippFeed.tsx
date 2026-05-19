@@ -373,12 +373,12 @@ export default function KlippFeed({
         </div>
         <Link
           href="/klipp/ny"
-          className="mb-2 flex items-center gap-1.5 bg-orange-500 hover:bg-orange-600 text-white text-sm font-semibold px-3 py-1.5 rounded-xl transition"
+          className="mb-2 w-9 h-9 flex items-center justify-center rounded-full text-gray-400 hover:text-white transition"
+          aria-label="Ta opp klipp"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
           </svg>
-          Del klipp
         </Link>
       </div>
 
@@ -405,10 +405,7 @@ export default function KlippFeed({
               href="/klipp/ny"
               className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl text-base transition"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
-              </svg>
-              Ta opp video
+              Ta opp klipp
             </Link>
           </div>
         ) : (
@@ -436,17 +433,6 @@ export default function KlippFeed({
         )}
       </div>
 
-      {/* Flytende kamera-knapp */}
-      <Link
-        href="/klipp/ny"
-        className="absolute bottom-6 right-4 flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-4 py-3 rounded-2xl shadow-lg transition"
-        style={{ zIndex: 20 }}
-      >
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M23 7l-7 5 7 5V7z" /><rect x="1" y="5" width="15" height="14" rx="2" />
-        </svg>
-        Ta opp video
-      </Link>
     </div>
   )
 }
