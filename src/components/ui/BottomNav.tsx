@@ -124,7 +124,7 @@ export default function BottomNav() {
         <span className="relative">
           <Icon />
           {isFeed && hasNewClips && !active && (
-            <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-red-500 rounded-full" />
+            <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full" />
           )}
         </span>
         <span style={{ fontSize: '11px', lineHeight: 1 }}>{label}</span>
