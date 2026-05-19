@@ -25,14 +25,14 @@ export default async function NyttKlippPage() {
     return [{ id: single.id, name: single.name }]
   })
 
-  const { data: userExercises } = await supabase
-    .from('exercises')
-    .select('id, name, workout_packages!inner(user_id)')
-    .eq('workout_packages.user_id', user.id)
+  const { data: mineOvelser } = await supabase
+    .from('user_exercises')
+    .select('id, name')
+    .eq('user_id', user.id)
     .order('name', { ascending: true })
     .limit(50)
 
-  const exercises = (userExercises ?? []).map(e => ({ id: e.id, name: e.name }))
+  const exercises = (mineOvelser ?? []).map(e => ({ id: e.id, name: e.name }))
 
   return (
     <KlippOpplasting

@@ -117,6 +117,16 @@ export default function KlippOpplasting({
         if (groupError) throw new Error('Gruppe-feil: ' + groupError.message)
       }
 
+      // Lagre som øvelsesdemo hvis øvelse er valgt
+      if (selectedExercise) {
+        await supabase.from('exercise_videos').insert({
+          user_id: userId,
+          user_exercise_id: selectedExercise.id,
+          exercise_name: selectedExercise.name,
+          video_url: path,
+        })
+      }
+
       router.push('/feed')
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Noe gikk galt')
@@ -191,6 +201,33 @@ export default function KlippOpplasting({
           </div>
         )}
 
+        {/* Knytt til Mine øvelser */}
+        <div>
+          <p className="text-white font-semibold mb-1">💪 Knytt til en av Mine øvelser</p>
+          <p className="text-gray-500 text-xs mb-2">Videoen lagres som demo på øvelsen</p>
+          {exercises.length === 0 ? (
+            <p className="text-gray-600 text-sm">Du har ingen egne øvelser ennå — lag en i <span className="text-orange-400">Øvelser → Mine øvelser</span></p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={() => setSelectedExercise(null)}
+                className={`px-3 py-1.5 rounded-full text-sm transition ${!selectedExercise ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}
+              >
+                Ingen
+              </button>
+              {exercises.map(ex => (
+                <button
+                  key={ex.id}
+                  onClick={() => setSelectedExercise(ex)}
+                  className={`px-3 py-1.5 rounded-full text-sm transition ${selectedExercise?.id === ex.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}
+                >
+                  {ex.name}
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Musikk */}
         <div>
           <p className="text-white font-semibold mb-2">🎵 Musikk</p>
@@ -224,30 +261,6 @@ export default function KlippOpplasting({
             ))}
           </div>
         </div>
-
-        {/* Øvelse */}
-        {exercises.length > 0 && (
-          <div>
-            <p className="text-white font-semibold mb-2">💪 Tagg en øvelse (valgfritt)</p>
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => setSelectedExercise(null)}
-                className={`px-3 py-1.5 rounded-full text-sm transition ${!selectedExercise ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}
-              >
-                Ingen
-              </button>
-              {exercises.map(ex => (
-                <button
-                  key={ex.id}
-                  onClick={() => setSelectedExercise(ex)}
-                  className={`px-3 py-1.5 rounded-full text-sm transition ${selectedExercise?.id === ex.id ? 'bg-orange-500 text-white' : 'bg-gray-800 text-gray-400'}`}
-                >
-                  {ex.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
         {/* Hvem ser dette? */}
         <div>
