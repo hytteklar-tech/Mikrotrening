@@ -293,6 +293,7 @@ export default function KlippFeed({
 }) {
   const [tab, setTab] = useState<'global' | 'gruppe'>('global')
   const [seenIds, setSeenIds] = useState<Set<string>>(new Set())
+  const [visSette, setVisSette] = useState(false)
 
   useEffect(() => {
     setSeenIds(loadSeenIds())
@@ -305,12 +306,16 @@ export default function KlippFeed({
 
   // Sorter global etter antall reaksjoner, ta top 10 — filtrer sette
   const sortedGlobal = [...globalClips]
-    .filter(c => !seenIds.has(c.id))
+    .filter(c => visSette || !seenIds.has(c.id))
     .sort((a, b) => b.clip_reactions.length - a.clip_reactions.length)
     .slice(0, 10)
 
-  const usettGruppe = groupClips.filter(c => !seenIds.has(c.id))
-  const clips = tab === 'global' ? sortedGlobal : usettGruppe
+  const filtrertGruppe = groupClips.filter(c => visSette || !seenIds.has(c.id))
+  const clips = tab === 'global' ? sortedGlobal : filtrertGruppe
+
+  const antallSetteGlobal = globalClips.filter(c => seenIds.has(c.id)).length
+  const antallSetteGruppe = groupClips.filter(c => seenIds.has(c.id)).length
+  const antallSette = tab === 'global' ? antallSetteGlobal : antallSetteGruppe
 
   // Marker feed som besøkt
   useEffect(() => {
@@ -348,11 +353,23 @@ export default function KlippFeed({
 
       {/* Feed */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 pb-24">
-        {clips.length === 0 ? (
+        {clips.length === 0 && !visSette ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
             <p className="text-5xl mb-4">🎬</p>
-            <p className="text-white font-bold text-lg">Ingen klipp ennå</p>
-            <p className="text-gray-400 text-sm mt-1 mb-6">Vær den første til å dele!</p>
+            <p className="text-white font-bold text-lg">
+              {antallSette > 0 ? 'Du har sett alle klipp' : 'Ingen klipp ennå'}
+            </p>
+            <p className="text-gray-400 text-sm mt-1 mb-6">
+              {antallSette > 0 ? 'Kom tilbake senere for nye klipp' : 'Vær den første til å dele!'}
+            </p>
+            {antallSette > 0 && (
+              <button
+                onClick={() => setVisSette(true)}
+                className="mb-4 text-orange-400 text-sm font-medium underline underline-offset-2"
+              >
+                Se {antallSette} sette klipp igjen
+              </button>
+            )}
             <Link
               href="/klipp/ny"
               className="flex items-center gap-2 bg-orange-500 hover:bg-orange-600 text-white font-bold px-6 py-3 rounded-2xl text-base transition"
@@ -364,9 +381,27 @@ export default function KlippFeed({
             </Link>
           </div>
         ) : (
-          clips.map(clip => (
-            <KlippKort key={clip.id} clip={clip} currentUserId={currentUserId} onSeen={handleSeen} />
-          ))
+          <>
+            {clips.map(clip => (
+              <KlippKort key={clip.id} clip={clip} currentUserId={currentUserId} onSeen={handleSeen} />
+            ))}
+            {!visSette && antallSette > 0 && (
+              <button
+                onClick={() => setVisSette(true)}
+                className="w-full py-3 text-gray-500 text-sm font-medium"
+              >
+                Se {antallSette} sette klipp igjen
+              </button>
+            )}
+            {visSette && (
+              <button
+                onClick={() => setVisSette(false)}
+                className="w-full py-3 text-gray-500 text-sm font-medium"
+              >
+                Skjul sette klipp
+              </button>
+            )}
+          </>
         )}
       </div>
 
