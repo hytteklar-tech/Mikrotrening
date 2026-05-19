@@ -56,7 +56,6 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
       ([entry]) => {
         if (entry.isIntersecting) {
           videoRef.current?.play().catch(() => {})
-          audioRef.current?.play().catch(() => {})
           setPlaying(true)
         } else {
           videoRef.current?.pause()
@@ -155,7 +154,13 @@ function KlippKort({ clip, currentUserId }: { clip: Clip; currentUserId: string 
         onClick={() => {
           const newMuted = !muted
           setMuted(newMuted)
-          if (audioRef.current) audioRef.current.muted = newMuted
+          if (audioRef.current) {
+            if (newMuted) {
+              audioRef.current.pause()
+            } else {
+              audioRef.current.play().catch(() => {})
+            }
+          }
         }}
         className="absolute top-3 right-3 w-9 h-9 bg-black/50 rounded-full flex items-center justify-center"
       >
