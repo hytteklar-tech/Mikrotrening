@@ -52,7 +52,7 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     const url = `${window.location.origin}/join/${group.invite_code}`
     const text = `Bli med i gruppen «${group.name}» på Mikrotrening:\n${url}`
     if (navigator.share) {
-      navigator.share({ title: 'Mikrotrening', text })
+      try { await navigator.share({ title: 'Mikrotrening', text }) } catch {}
     } else {
       navigator.clipboard.writeText(text)
       setCopiedGroupId(group.id)
@@ -64,7 +64,7 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     const url = 'https://app.mikrotrening.no'
     const text = 'Prøv Mikrotrening — 30 sekunder om dagen er nok til å bygge en treningsvane 💪'
     if (navigator.share) {
-      navigator.share({ title: 'Mikrotrening', text, url })
+      try { await navigator.share({ title: 'Mikrotrening', text, url }) } catch {}
     } else {
       await navigator.clipboard.writeText(`${text}\n${url}`)
       setAppLinkCopied(true)
