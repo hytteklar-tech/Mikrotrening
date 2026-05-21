@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import BottomNav from '@/components/ui/BottomNav'
 import Logo from '@/components/ui/Logo'
 import OneSignalProvider from '@/components/ui/OneSignalProvider'
-import PostHogIdentify from '@/components/providers/PostHogIdentify'
+import PostHogBootstrap from '@/components/providers/PostHogBootstrap'
 import PostHogAppOpened from '@/components/providers/PostHogAppOpened'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -24,7 +24,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
       <BottomNav />
       <OneSignalProvider />
-      <PostHogIdentify userId={user.id} email={user.email} />
+      <PostHogBootstrap userId={user.id} email={user.email} />
       <PostHogAppOpened />
     </div>
   )
