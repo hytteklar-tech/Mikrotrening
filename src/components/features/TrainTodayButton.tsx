@@ -6,6 +6,8 @@ import confetti from 'canvas-confetti'
 import posthog from 'posthog-js'
 import CalendarView from './CalendarView'
 import type { DayLog } from './DashboardClient'
+import { Button } from '@/components/ui/button'
+import { cn } from '@/lib/utils'
 
 function formatDuration(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -340,7 +342,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
             <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide mb-0.5">Milepæl nådd!</p>
             <p className="text-white text-sm font-medium">{milestoneToast}</p>
           </div>
-          <button onClick={() => setMilestoneToast(null)} className="text-gray-500 hover:text-gray-300 text-lg leading-none ml-2">×</button>
+          <Button variant="ghost" size="icon-sm" onClick={() => setMilestoneToast(null)} className="text-gray-500 hover:text-gray-300 ml-2 shrink-0">×</Button>
         </div>
       )}
       <CalendarView
@@ -366,22 +368,28 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
           {/* Kategori-filter */}
           {categories.length > 0 && (
             <div className="flex gap-2 overflow-x-auto scrollbar-none">
-              <button
+              <Button
+                size="sm"
                 onClick={() => setActiveCat(null)}
-                className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === null ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
-              >Alle</button>
+                className={cn('shrink-0 rounded-full', activeCat === null ? '' : 'bg-secondary text-muted-foreground hover:text-foreground')}
+                variant={activeCat === null ? 'default' : 'ghost'}
+              >Alle</Button>
               {categories.map(c => (
-                <button
+                <Button
                   key={c.id}
+                  size="sm"
                   onClick={() => setActiveCat(activeCat === c.id ? null : c.id)}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === c.id ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
-                >{c.name}</button>
+                  className="shrink-0 rounded-full"
+                  variant={activeCat === c.id ? 'default' : 'ghost'}
+                >{c.name}</Button>
               ))}
               {packages.some(p => (p.category_ids ?? []).length === 0) && (
-                <button
+                <Button
+                  size="sm"
                   onClick={() => setActiveCat(activeCat === '__none__' ? null : '__none__')}
-                  className={`shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold transition ${activeCat === '__none__' ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-400 hover:text-white'}`}
-                >Uten kategori</button>
+                  className="shrink-0 rounded-full"
+                  variant={activeCat === '__none__' ? 'default' : 'ghost'}
+                >Uten kategori</Button>
               )}
             </div>
           )}
@@ -399,13 +407,15 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   <span className="text-xs text-orange-400">⏱ {formatDuration(logsForDay[0].durationSeconds)}</span>
                 )}
               </div>
-              <button
+              <Button
+                variant="ghost"
+                size="sm"
                 onClick={() => deleteLog(logsForDay[0])}
                 disabled={deletingId === logsForDay[0].id}
-                className="text-gray-500 text-xs hover:text-red-400 transition disabled:opacity-40 shrink-0"
+                className="text-muted-foreground hover:text-destructive shrink-0"
               >
                 {deletingId === logsForDay[0].id ? '...' : 'Angre'}
-              </button>
+              </Button>
             </div>
           )}
           {logsForDay.length > 1 && (() => {
@@ -440,13 +450,15 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                             <span className="text-xs text-orange-400">⏱ {formatDuration(log.durationSeconds)}</span>
                           )}
                         </div>
-                        <button
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           onClick={() => deleteLog(log)}
                           disabled={deletingId === log.id}
-                          className="text-gray-500 text-xs hover:text-red-400 transition disabled:opacity-40 shrink-0 ml-2"
+                          className="text-muted-foreground hover:text-destructive shrink-0 ml-2"
                         >
                           {deletingId === log.id ? '...' : 'Angre'}
-                        </button>
+                        </Button>
                       </div>
                     ))}
                   </div>
@@ -471,17 +483,14 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
               {availablePackages.length > 1 && (
                 <div className="flex gap-2 flex-wrap">
                   {availablePackages.map(pkg => (
-                    <button
+                    <Button
                       key={pkg.id}
                       onClick={() => setSelectedPackage(pkg)}
-                      className={`flex-1 min-w-0 px-3 py-2 rounded-xl text-sm font-medium transition truncate ${
-                        activePackage?.id === pkg.id
-                          ? 'bg-orange-500 text-white'
-                          : 'bg-gray-700 text-gray-300 hover:text-white'
-                      }`}
+                      variant={activePackage?.id === pkg.id ? 'default' : 'secondary'}
+                      className="flex-1 min-w-0 truncate"
                     >
                       {pkg.name}
-                    </button>
+                    </Button>
                   ))}
                 </div>
               )}
@@ -505,39 +514,44 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
                   <div className="flex justify-center py-2">
                     <TimerRing seconds={timerSeconds} average={averageSeconds} />
                   </div>
-                  <button
+                  <Button
+                    size="xl"
                     onClick={() => addLog(true)}
                     disabled={loading || !activePackage}
-                    className="w-full bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-lg rounded-xl py-4 transition"
+                    className="w-full"
                   >
                     {loading ? 'Registrerer...' : `■ Ferdig og registrer — ${activePackage?.name}`}
-                  </button>
-                  <button
+                  </Button>
+                  <Button
+                    variant="ghost"
                     onClick={stopTimer}
-                    className="w-full text-white text-base py-1 hover:text-gray-300 transition"
+                    className="w-full"
                   >
                     Avbryt tidtaker
-                  </button>
+                  </Button>
                 </div>
               ) : (
                 <div className="flex gap-2">
-                  <button
+                  <Button
+                    size="xl"
                     onClick={() => addLog(false)}
                     disabled={loading || !activePackage}
-                    className="flex-1 bg-orange-500 hover:bg-orange-600 active:scale-95 disabled:opacity-50 text-white font-bold text-base rounded-xl py-4 transition"
+                    className="flex-1"
                   >
                     {loading ? 'Registrerer...' : logsForDay.length > 0
-  ? <><span className="text-xl font-black leading-none">+</span> Uten tid</>
-  : <><span className="text-xl font-black leading-none">+</span> Tren uten tid</>
-}
-                  </button>
-                  <button
+                      ? <><span className="text-xl font-black leading-none">+</span> Uten tid</>
+                      : <><span className="text-xl font-black leading-none">+</span> Tren uten tid</>
+                    }
+                  </Button>
+                  <Button
+                    size="xl"
+                    variant="outline"
                     onClick={startTimer}
                     disabled={loading}
-                    className="flex-1 border border-gray-600 bg-gray-700 hover:bg-gray-600 text-white font-bold text-base rounded-xl py-4 transition"
+                    className="flex-1"
                   >
                     ⏱ Tren med tid
-                  </button>
+                  </Button>
                 </div>
               )}
             </>
