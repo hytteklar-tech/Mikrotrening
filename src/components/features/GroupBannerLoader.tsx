@@ -24,17 +24,16 @@ export default async function GroupBannerLoader({ userId, primaryGroupId, today 
 
   if (!firstGroup) return null
 
-  const [{ data: allMembers }, { data: todayLogs }] = await Promise.all([
-    supabase
-      .from('group_members')
-      .select('user_id, users(display_name)')
-      .eq('group_id', firstGroup.id),
-    supabase
-      .from('daily_logs')
-      .select('user_id, group_members!inner(group_id)')
-      .eq('logged_date', today)
-      .eq('group_members.group_id', firstGroup.id),
-  ])
+  const { data: allMembers } = await supabase
+    .from('group_members')
+    .select('user_id, users(display_name)')
+    .eq('group_id', firstGroup.id)
+
+  const { data: todayLogs } = await supabase
+    .from('daily_logs')
+    .select('user_id')
+    .eq('logged_date', today)
+    .in('user_id', (allMembers ?? []).map((m: any) => m.user_id))
 
   const activeTodayIds = new Set((todayLogs ?? []).map((l: any) => l.user_id))
 

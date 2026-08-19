@@ -14,21 +14,21 @@ async function getLeaderboard(userId: string, supabase: Awaited<ReturnType<typeo
 
   const groupIds = memberships.map(m => m.group_id)
 
-  const [{ data: members }, { data: logs }] = await Promise.all([
-    supabase
-      .from('group_members')
-      .select('user_id, users(display_name)')
-      .in('group_id', groupIds),
-    supabase
-      .from('daily_logs')
-      .select('user_id, logged_date, group_members!inner(group_id)')
-      .in('group_members.group_id', groupIds)
-      .order('logged_date', { ascending: false }),
-  ])
+  const { data: members } = await supabase
+    .from('group_members')
+    .select('user_id, users(display_name)')
+    .in('group_id', groupIds)
 
   if (!members?.length) return []
 
   const uniqueUsers = Array.from(new Map(members.map(m => [m.user_id, m])).values())
+  const memberIds = uniqueUsers.map(m => m.user_id)
+
+  const { data: logs } = await supabase
+    .from('daily_logs')
+    .select('user_id, logged_date')
+    .in('user_id', memberIds)
+    .order('logged_date', { ascending: false })
 
   const today = new Date()
   today.setHours(12, 0, 0, 0)

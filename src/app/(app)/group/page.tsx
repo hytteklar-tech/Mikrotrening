@@ -32,17 +32,16 @@ export default async function GroupPage({ searchParams }: { searchParams: Promis
   let membersWithStatus: any[] = []
 
   if (groupIds.length > 0) {
-    const [{ data: allMembers }, { data: todayLogs }] = await Promise.all([
-      supabase
-        .from('group_members')
-        .select('group_id, user_id, users(display_name)')
-        .in('group_id', groupIds),
-      supabase
-        .from('daily_logs')
-        .select('user_id, group_members!inner(group_id)')
-        .eq('logged_date', today)
-        .in('group_members.group_id', groupIds),
-    ])
+    const { data: allMembers } = await supabase
+      .from('group_members')
+      .select('group_id, user_id, users(display_name)')
+      .in('group_id', groupIds)
+
+    const { data: todayLogs } = await supabase
+      .from('daily_logs')
+      .select('user_id')
+      .eq('logged_date', today)
+      .in('user_id', (allMembers ?? []).map((m: any) => m.user_id))
 
     const activeTodayIds = new Set((todayLogs ?? []).map((l: any) => l.user_id))
 
