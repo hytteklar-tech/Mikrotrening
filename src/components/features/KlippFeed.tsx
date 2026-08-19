@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import OvelsesDemoModal from '@/components/features/OvelsesDemoModal'
@@ -333,10 +333,10 @@ export default function KlippFeed({
     setSeenIds(loadSeenIds())
   }, [])
 
-  function handleSeen(id: string) {
+  const handleSeen = useCallback((id: string) => {
     saveSeenId(id)
     setSeenIds(prev => new Set([...prev, id]))
-  }
+  }, [])
 
   // Sorter global etter antall reaksjoner, ta top 10 — filtrer sette
   const sortedGlobal = [...globalClips]
