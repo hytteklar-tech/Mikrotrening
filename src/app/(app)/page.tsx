@@ -55,43 +55,6 @@ export default async function DashboardPage() {
 
   if (!profile?.display_name) redirect('/onboarding')
 
-  // Auto-fyll manglende tid med pakke-snitt
-  if (profile.auto_fill_duration) {
-    const { data: alleLogs } = await supabase
-      .from('daily_logs')
-      .select('id, package_id, duration_seconds')
-      .eq('user_id', user.id)
-
-    if (alleLogs && alleLogs.length > 0) {
-      // Beregn snitt per pakke fra logger med tid
-      const snittPerPakke: Record<string, number> = {}
-      const gruppert: Record<string, number[]> = {}
-      for (const log of alleLogs) {
-        if (log.duration_seconds != null && log.duration_seconds > 0) {
-          const pid = log.package_id as string
-          if (!gruppert[pid]) gruppert[pid] = []
-          gruppert[pid].push(log.duration_seconds as number)
-        }
-      }
-      for (const [pid, tider] of Object.entries(gruppert)) {
-        snittPerPakke[pid] = Math.round(tider.reduce((a, b) => a + b, 0) / tider.length)
-      }
-
-      // Oppdater logger uten tid der pakken har et snitt
-      for (const log of alleLogs) {
-        if (log.duration_seconds == null) {
-          const snitt = snittPerPakke[log.package_id as string]
-          if (snitt) {
-            await supabase
-              .from('daily_logs')
-              .update({ duration_seconds: snitt })
-              .eq('id', log.id as string)
-          }
-        }
-      }
-    }
-  }
-
   const initialDayLogs: DayLog[] = (logs ?? []).map(row => ({
     id: row.id as string,
     date: row.logged_date as string,
@@ -124,6 +87,7 @@ export default async function DashboardPage() {
         categories={categories ?? []}
         userId={user.id}
         notificationsEnabled={profile.notifications_enabled ?? true}
+        autoFillDuration={profile.auto_fill_duration ?? false}
       />
     </div>
   )

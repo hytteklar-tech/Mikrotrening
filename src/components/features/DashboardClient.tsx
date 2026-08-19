@@ -1,8 +1,8 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { autoFillDurations, setPwaFlag } from '@/app/(app)/actions'
 import Link from 'next/link'
 import StreakCard from './StreakCard'
 import TrainTodayButton from './TrainTodayButton'
@@ -41,6 +41,7 @@ type Props = {
   categories: Category[]
   userId: string
   notificationsEnabled: boolean
+  autoFillDuration: boolean
 }
 
 function toLocalDateStr(date: Date) {
@@ -65,7 +66,7 @@ function calcStreak(uniqueDates: string[]): number {
   return streak
 }
 
-export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled }: Props) {
+export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled, autoFillDuration }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const router = useRouter()
@@ -78,44 +79,21 @@ export default function DashboardClient({ initialDayLogs, packages, categories, 
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
 
   useEffect(() => {
+    if (autoFillDuration) {
+      autoFillDurations(userId)
+    }
+  }, [userId, autoFillDuration])
+
+  useEffect(() => {
     const isPwa = window.matchMedia('(display-mode: standalone)').matches
     if (isPwa) {
-      // Logg at brukeren kjører som PWA
-      createClient().from('users').update({ is_pwa: true }).eq('id', userId).then(() => {})
+      setPwaFlag(userId)
       return
     }
     const handler = (e: Event) => { e.preventDefault(); setDeferredPrompt(e) }
     window.addEventListener('beforeinstallprompt', handler)
     return () => window.removeEventListener('beforeinstallprompt', handler)
   }, [])
-
-  useEffect(() => {
-    const supabase = createClient()
-
-    async function fetchLogs() {
-      const { data: { session } } = await supabase.auth.getSession()
-      if (!session) return
-
-      const { data, error } = await supabase
-        .from('daily_logs')
-        .select('id, logged_date, package_id, duration_seconds, workout_packages(name)')
-        .eq('user_id', session.user.id)
-        .order('logged_date', { ascending: false })
-
-      if (error) { console.error('[Dashboard] Fetch error:', error.message); return }
-
-      const mapped: DayLog[] = (data ?? []).map(row => ({
-        id: row.id as string,
-        date: row.logged_date as string,
-        packageId: row.package_id as string,
-        packageName: ((row.workout_packages as any)?.name ?? 'Ukjent') as string,
-        durationSeconds: row.duration_seconds as number | null,
-      }))
-      setDayLogs(mapped)
-    }
-
-    fetchLogs()
-  }, [userId])
 
   const today = toLocalDateStr(new Date())
   const thisYear = new Date().getFullYear()
