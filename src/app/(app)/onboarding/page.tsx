@@ -110,7 +110,6 @@ function OnboardingForm() {
       return
     }
     posthog.capture('onboarding_push_akseptert')
-    let granted = false
     try {
       await Promise.race([
         new Promise<void>(resolve => {
@@ -132,10 +131,7 @@ function OnboardingForm() {
         }),
         new Promise<void>(resolve => setTimeout(resolve, 5000)),
       ])
-      granted = Notification.permission === 'granted'
-    } catch {
-      granted = false
-    }
+    } catch {}
     await saveAndGoToInstall(true)
   }
 

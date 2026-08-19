@@ -19,8 +19,17 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
   const [copiedGroupId, setCopiedGroupId] = useState<string | null>(null)
   const [appLinkCopied, setAppLinkCopied] = useState(false)
   const joinSectionRef = useRef<HTMLDivElement>(null)
+  const copiedTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const appLinkTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const router = useRouter()
   const supabase = createClient()
+
+  useEffect(() => {
+    return () => {
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
+      if (appLinkTimerRef.current) clearTimeout(appLinkTimerRef.current)
+    }
+  }, [])
 
   useEffect(() => {
     if (initialCode && joinSectionRef.current) {
@@ -56,7 +65,8 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     } else {
       navigator.clipboard.writeText(text)
       setCopiedGroupId(group.id)
-      setTimeout(() => setCopiedGroupId(null), 2000)
+      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
+      copiedTimerRef.current = setTimeout(() => setCopiedGroupId(null), 2000)
     }
   }
 
@@ -68,7 +78,8 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
     } else {
       await navigator.clipboard.writeText(`${text}\n${url}`)
       setAppLinkCopied(true)
-      setTimeout(() => setAppLinkCopied(false), 2000)
+      if (appLinkTimerRef.current) clearTimeout(appLinkTimerRef.current)
+      appLinkTimerRef.current = setTimeout(() => setAppLinkCopied(false), 2000)
     }
   }
 
@@ -171,7 +182,7 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
               </div>
               <div className="flex gap-2">
                 <button
-                  onClick={() => { navigator.clipboard.writeText(group.invite_code); setCopiedGroupId(group.id); setTimeout(() => setCopiedGroupId(null), 2000) }}
+                  onClick={() => { navigator.clipboard.writeText(group.invite_code); setCopiedGroupId(group.id); if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current); copiedTimerRef.current = setTimeout(() => setCopiedGroupId(null), 2000) }}
                   className="text-sm bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded-lg font-medium transition"
                 >
                   {copiedGroupId === group.id ? '✓ Kopiert' : 'Kopier'}

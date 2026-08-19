@@ -81,21 +81,15 @@ export async function GET(request: Request) {
     return NextResponse.json({ sent: 0 })
   }
 
-  const CRON_BATCH_LIMIT = 100
-  if (users.length > CRON_BATCH_LIMIT) {
-    console.error(`ADVARSEL: cron forsøkte å sende til ${users.length} brukere — begrenset til ${CRON_BATCH_LIMIT}. Mulig bug.`)
+  const BATCH_SIZE = 100
+  let sent = 0
+  for (let i = 0; i < users.length; i += BATCH_SIZE) {
+    const batch = users.slice(i, i + BATCH_SIZE)
+    const playerIds = batch.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
+    const nativeSubscriptions = batch.filter(u => u.push_subscription).map(u => u.push_subscription)
+    await sendPushNotification({ playerIds, nativeSubscriptions, title: 'Mikrotrening', body: message })
+    sent += batch.length
   }
-  const batch = users.slice(0, CRON_BATCH_LIMIT)
 
-  const playerIds = batch.filter(u => u.onesignal_id).map(u => u.onesignal_id as string)
-  const nativeSubscriptions = batch.filter(u => u.push_subscription).map(u => u.push_subscription)
-
-  await sendPushNotification({
-    playerIds,
-    nativeSubscriptions,
-    title: 'Mikrotrening',
-    body: message,
-  })
-
-  return NextResponse.json({ sent: batch.length, total_matched: users.length })
+  return NextResponse.json({ sent, total_matched: users.length })
 }
