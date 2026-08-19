@@ -86,13 +86,15 @@ type Props = {
   packages: Package[]
   categories: Category[]
   userId: string
+  initialRepsByDate: Record<string, number>
+  initialRepsByPackageId: Record<string, number>
 }
 
 function toLocalDateStr(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, packages, categories, userId }: Props) {
+export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, packages, categories, userId, initialRepsByDate, initialRepsByPackageId }: Props) {
   const today = toLocalDateStr(new Date())
   const [selectedDate, setSelectedDate] = useState(today)
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(packages[0] ?? null)
@@ -101,35 +103,16 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [timerRunning, setTimerRunning] = useState(false)
   const [timerSeconds, setTimerSeconds] = useState(0)
   const [averageSeconds, setAverageSeconds] = useState<number | null>(null)
-  const [repsByDate, setRepsByDate] = useState<Record<string, number>>({})
+  const [repsByDate] = useState<Record<string, number>>(initialRepsByDate)
   const [packageExercises, setPackageExercises] = useState<{ name: string; reps: number }[]>([])
   const [milestoneToast, setMilestoneToast] = useState<string | null>(null)
   const [activeCat, setActiveCat] = useState<string | null>(null)
-  const [repsByPackageId, setRepsByPackageId] = useState<Record<string, number>>({})
+  const [repsByPackageId] = useState<Record<string, number>>(initialRepsByPackageId)
   const [logsExpanded, setLogsExpanded] = useState(false)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const startTimeRef = useRef<number>(0)
   const musicAudioRef = useRef<HTMLAudioElement | null>(null)
   const supabase = createClient()
-
-  useEffect(() => {
-    supabase
-      .from('daily_logs')
-      .select('logged_date, package_id, workout_packages(exercises(reps))')
-      .eq('user_id', userId)
-      .then(({ data }) => {
-        const dateMap: Record<string, number> = {}
-        const pkgMap: Record<string, number> = {}
-        for (const row of data ?? []) {
-          const reps = ((row.workout_packages as any)?.exercises ?? [])
-            .reduce((s: number, e: { reps: number }) => s + (e.reps ?? 0), 0)
-          dateMap[row.logged_date] = (dateMap[row.logged_date] ?? 0) + reps
-          pkgMap[row.package_id as string] = reps
-        }
-        setRepsByDate(dateMap)
-        setRepsByPackageId(pkgMap)
-      })
-  }, [userId])
 
   // Correct for SSR/hydration timezone mismatch: server runs UTC, user is in local time.
   // useState(today) uses the server's date during SSR and stays stuck after hydration.

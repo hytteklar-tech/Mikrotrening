@@ -42,6 +42,8 @@ type Props = {
   userId: string
   notificationsEnabled: boolean
   autoFillDuration: boolean
+  repsByDate: Record<string, number>
+  repsByPackageId: Record<string, number>
 }
 
 function toLocalDateStr(date: Date) {
@@ -66,7 +68,7 @@ function calcStreak(uniqueDates: string[]): number {
   return streak
 }
 
-export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled, autoFillDuration }: Props) {
+export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled, autoFillDuration, repsByDate, repsByPackageId }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
   const [showInstallBanner, setShowInstallBanner] = useState(false)
   const router = useRouter()
@@ -225,6 +227,8 @@ export default function DashboardClient({ initialDayLogs, packages, categories, 
         packages={packages}
         categories={categories}
         userId={userId}
+        initialRepsByDate={repsByDate}
+        initialRepsByPackageId={repsByPackageId}
       />
       </div>
     </>

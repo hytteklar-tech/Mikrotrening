@@ -24,7 +24,7 @@ export default async function DashboardPage() {
       .single(),
     supabase
       .from('daily_logs')
-      .select('id, logged_date, package_id, duration_seconds, workout_packages(name)')
+      .select('id, logged_date, package_id, duration_seconds, workout_packages(name, exercises(reps))')
       .eq('user_id', user.id)
       .order('logged_date', { ascending: false }),
     supabase
@@ -63,6 +63,15 @@ export default async function DashboardPage() {
     durationSeconds: row.duration_seconds as number | null,
   }))
 
+  const repsByDate: Record<string, number> = {}
+  const repsByPackageId: Record<string, number> = {}
+  for (const row of logs ?? []) {
+    const reps = ((row.workout_packages as any)?.exercises ?? [])
+      .reduce((s: number, e: { reps: number }) => s + (e.reps ?? 0), 0)
+    repsByDate[row.logged_date as string] = (repsByDate[row.logged_date as string] ?? 0) + reps
+    repsByPackageId[row.package_id as string] = reps
+  }
+
   return (
     <div className="p-4 space-y-6">
       <div className="pt-4">
@@ -88,6 +97,8 @@ export default async function DashboardPage() {
         userId={user.id}
         notificationsEnabled={profile.notifications_enabled ?? true}
         autoFillDuration={profile.auto_fill_duration ?? false}
+        repsByDate={repsByDate}
+        repsByPackageId={repsByPackageId}
       />
     </div>
   )
