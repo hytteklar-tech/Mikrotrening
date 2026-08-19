@@ -86,7 +86,7 @@ export default function KlippOpplasting({
 
     try {
       const clipId = crypto.randomUUID()
-      const ext = videoFile.name.split('.').pop() ?? 'mp4'
+      const ext = videoFile.type === 'video/webm' ? 'webm' : videoFile.type === 'video/quicktime' ? 'mov' : 'mp4'
       const path = `${userId}/${clipId}.${ext}`
 
       const { error: uploadError } = await supabase.storage

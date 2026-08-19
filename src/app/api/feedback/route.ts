@@ -23,11 +23,16 @@ export async function POST(req: NextRequest) {
     .from('feedback')
     .insert({ user_id: user.id, message: message.trim() })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'En feil oppstod' }, { status: 500 })
 
   // Hent Arilds push-info via e-post → auth → users
-  const { data: { users: authUsers } } = await db.auth.admin.listUsers()
-  const adminAuthId = authUsers.find(u => u.email === process.env.ADMIN_EMAIL)?.id
+  const { data: adminAuthData } = await db
+    .schema('auth')
+    .from('users')
+    .select('id')
+    .eq('email', process.env.ADMIN_EMAIL!)
+    .single()
+  const adminAuthId = adminAuthData?.id
 
   const { data: adminUser } = adminAuthId ? await db
     .from('users')

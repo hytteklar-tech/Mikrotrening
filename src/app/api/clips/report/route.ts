@@ -23,12 +23,17 @@ export async function POST(req: NextRequest) {
     .insert({ clip_id: clipId, user_id: user.id, reason: reason ?? null })
 
   if (error && error.code !== '23505') {
-    return NextResponse.json({ error: error.message }, { status: 500 })
+    return NextResponse.json({ error: 'En feil oppstod' }, { status: 500 })
   }
 
   // Varsle admin
-  const { data: { users: authUsers } } = await db.auth.admin.listUsers()
-  const adminAuthId = authUsers.find(u => u.email === process.env.ADMIN_EMAIL)?.id
+  const { data: adminAuthData } = await db
+    .schema('auth')
+    .from('users')
+    .select('id')
+    .eq('email', process.env.ADMIN_EMAIL!)
+    .single()
+  const adminAuthId = adminAuthData?.id
 
   const { data: adminUser } = adminAuthId ? await db
     .from('users')

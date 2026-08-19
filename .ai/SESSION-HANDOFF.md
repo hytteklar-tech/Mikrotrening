@@ -1,29 +1,32 @@
 # SESSION-HANDOFF — Mikrotrening
-**Lagret:** 2026-04-27
+**Lagret:** 2026-08-19
 **Fase:** 7 — Live / Post-launch
-**URL:** https://www.mikrotrening.no
+**URL:** https://app.mikrotrening.no
 
-## Hva ble gjort denne økten (sess-030)
+## Hva ble gjort denne sesjonen
 
-- **Android PWA-ikon** — manifest.json byttet fra statiske PNG-er til dynamisk `/icon`-rute. Georgia-font og scaleX-transform fjernet (ikke støttet i Satori). icon.tsx oppgradert til 512px.
-- **Kalender 2-ukers visning** — Feil dag-kolonner rettet. Ny funksjon `getLastTwoCalendarWeeks()` viser faktiske man-søn kalenderuker.
-- **OTP 6 sifre** — Supabase satt til 6 i Dashboard. login/page.tsx oppdatert tilsvarende.
-- **Onboarding installguide** — 3-stegs guide for Android og iOS vises etter notifikasjonssteg. Hoppes over om allerede installert.
-- **Invitasjonslenke** — join/[code]/page.tsx viser koden tydelig med forklaring "Åpne appen og skriv inn koden under Gruppe".
-- **push_enabled-logikk** — `saveAndGoToInstall(granted)` → `saveAndGoToInstall(true)` når bruker sier JA. Notification.permission-sjekken ga false på iOS/trege enheter.
+### Ytelsesfikser — hjemskjerm
+- Auto-fill N+1 loop fjernet fra render-path → `src/app/(app)/actions.ts` (Server Action med batch-update per pakke)
+- Overflødig `fetchLogs` useEffect fjernet fra DashboardClient
+- GroupBannerLoader: 3 sekvensielle → 2 parallelle queries med `group_members!inner`-join
 
-## Neste steg
+### Ytelsesfikser — andre sider
+- `klipp/ny/page.tsx`: 3 sekvensielle queries → `Promise.all`
+- `leaderboard/page.tsx`: members + logs hentes parallelt etter groupIds
+- `group/page.tsx`: `todayLogs` bruker join mot group_id, parallelt med allMembers
+- `TrainTodayButton`: reps-beregning flyttet til server (`page.tsx`), fjerner mount-fetch på klienten. Props `repsByDate` og `repsByPackageId` sendes ned via DashboardClient.
 
-1. **Sett opp 3 gjenstående cron-jobber på cron-job.org**:
-   - `0 6 * * *` → morning (08:00 Oslo)
-   - `0 9 * * *` → midday (11:00 Oslo)
-   - `0 13 * * *` → afternoon (15:00 Oslo)
-   - `0 17 * * *` → evening (19:00 Oslo)
-2. **Event-drevet push** — iOS-brukere uten onesignal_id får ikke milepæl-push
+### KlippFeed
+- `handleSeen` pakket i `useCallback` — forhindrer IntersectionObserver disconnect/reconnect for alle klipp ved hvert scroll-event
 
-## Miljø
-- Vercel-prosjekt: **mikrotrening**
-- URL: www.mikrotrening.no
-- Supabase: lnnejzxebvbtygcrknkh
-- OneSignal App ID: 5940cc3a-ce56-4cce-a252-6c3f3e39a612
-- CRON_SECRET: finnes i .env lokalt og i Vercel
+### Kodegjennomgang
+- Slettet `WorkoutList.tsx` (ubrukt fil, 389 linjer)
+- Fjernet ubrukt `granted`-variabel i `onboarding/page.tsx`
+- `GroupManager`: setTimeout-refs med cleanup ved unmount
+- Cron `daily-reminder`: hard cutoff på 100 brukere erstattet med løkke-batching
+
+## Utestående (uendret fra før)
+- Cron-jobber på cron-job.org (08/11/15/19 Oslo) — kun én satt
+- Event-drevet push for iOS-brukere uten `onesignal_id`
+- Markedsside på mikrotrening.no (nytt repo)
+- Gruppe-klipp: ingen bug i koden. Utløpt testdata (7-dagers expiry) var årsaken. Verifisert 2026-08-19.

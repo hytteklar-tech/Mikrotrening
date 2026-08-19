@@ -42,6 +42,10 @@
     {
       "id": "event-driven-push",
       "title": "Bygg event-drevet push i log.ts: etter trening og ved milepæl (milestone-confetti fungerer, men push-varslet mangler for iOS-brukere uten onesignal_id)"
+    },
+    {
+      "id": "markedsside",
+      "title": "Bygg markedsside på mikrotrening.no (nytt repo). App ligger nå på app.mikrotrening.no."
     }
   ],
   "completedTasks": [
@@ -93,10 +97,11 @@
   ],
 
   "session": {
-    "status": "active",
-    "startedAt": "2026-04-29T08:00:00Z",
-    "sessionId": "sess-sommerkropp-033",
-    "lastSignificantAction": "Sentry satt opp (javascript-nextjs prosjekt). Login: 60s cooldown på resend. Sentry DSN oppdatert og deployet."
+    "status": "completed",
+    "startedAt": "2026-08-19T00:00:00Z",
+    "completedAt": "2026-08-19T00:00:00Z",
+    "sessionId": "sess-sommerkropp-051",
+    "lastSignificantAction": "Ytelsesøkt: N+1 fiks, parallelle DB-kall, kodegjennomgang, KlippFeed useCallback. Alt deployet."
   },
 
   "dataTypes": {

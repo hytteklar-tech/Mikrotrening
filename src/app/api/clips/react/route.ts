@@ -11,11 +11,14 @@ export async function POST(req: NextRequest) {
   const { clipId, emoji } = await req.json()
   if (!clipId || !emoji) return NextResponse.json({ error: 'Mangler data' }, { status: 400 })
 
+  const ALLOWED_EMOJIS = ['❤️', '🔥', '💪', '😂', '👏']
+  if (!ALLOWED_EMOJIS.includes(emoji)) return NextResponse.json({ error: 'Ugyldig emoji' }, { status: 400 })
+
   const { error } = await supabase
     .from('clip_reactions')
     .upsert({ clip_id: clipId, user_id: user.id, emoji }, { onConflict: 'clip_id,user_id' })
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  if (error) return NextResponse.json({ error: 'En feil oppstod' }, { status: 500 })
 
   return NextResponse.json({ ok: true })
 }
