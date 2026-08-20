@@ -3,6 +3,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 
 export default function GroupManager({ groups, membersWithStatus, userId, primaryGroupId: initialPrimaryGroupId, initialCode }: {
   groups: any[]
@@ -158,144 +162,165 @@ export default function GroupManager({ groups, membersWithStatus, userId, primar
         const isAlone = members.length === 1 && members[0]?.user_id === userId
         const canLeave = members.some((m: any) => m.user_id === userId) && !isAlone
         return (
-          <div key={group.id} className="bg-gray-800 rounded-2xl p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <h3 className="font-semibold">{group.name}</h3>
-                {group.id === primaryGroupId
-                  ? <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-0.5 rounded-full">I fokus</span>
-                  : groups.length > 1 && (
-                    <button
-                      onClick={() => setFocusGroup(group.id)}
-                      className="text-xs text-gray-300 hover:text-white transition"
-                    >
-                      Sett som fokus
-                    </button>
-                  )
-                }
-              </div>
-            </div>
-            <div className="flex items-center justify-between bg-gray-700/50 rounded-xl px-3 py-2">
-              <div>
-                <p className="text-xs text-gray-400 mb-0.5">Invitasjonskode</p>
-                <span className="text-lg font-mono font-bold tracking-widest text-white">{group.invite_code}</span>
-              </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => { navigator.clipboard.writeText(group.invite_code); setCopiedGroupId(group.id); if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current); copiedTimerRef.current = setTimeout(() => setCopiedGroupId(null), 2000) }}
-                  className="text-sm bg-gray-600 hover:bg-gray-500 text-white px-3 py-1.5 rounded-lg font-medium transition"
-                >
-                  {copiedGroupId === group.id ? '✓ Kopiert' : 'Kopier'}
-                </button>
-                <button
-                  onClick={() => shareGroup(group)}
-                  className="text-sm bg-orange-500/20 hover:bg-orange-500/30 text-orange-400 px-3 py-1.5 rounded-lg font-medium transition"
-                >
-                  Del 📲
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              {members.map((m: any) => (
-                <div key={m.user_id} className="flex items-center justify-between">
-                  <span className="text-sm">{m.users?.display_name ?? 'Ukjent'}{m.isMe ? ' (meg)' : ''}</span>
-                  <span className={`text-xs px-2 py-0.5 rounded-full ${m.activeToday ? 'bg-green-500/20 text-green-400' : 'bg-gray-700 text-gray-300'}`}>
-                    {m.activeToday ? '✅ Trent i dag' : '💤 Ikke trent i dag'}
-                  </span>
+          <Card key={group.id}>
+            <CardContent className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-semibold">{group.name}</h3>
+                  {group.id === primaryGroupId
+                    ? <Badge variant="outline" className="border-primary/40 text-primary bg-primary/20">I fokus</Badge>
+                    : groups.length > 1 && (
+                      <Button
+                        onClick={() => setFocusGroup(group.id)}
+                        variant="ghost"
+                        size="xs"
+                      >
+                        Sett som fokus
+                      </Button>
+                    )
+                  }
                 </div>
-              ))}
-            </div>
-
-            {(canLeave || isAlone) && (
-              <div className="flex justify-end">
-                {isAlone && (
-                  <button
-                    onClick={() => deleteGroup(group.id)}
-                    disabled={loading}
-                    className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
-                  >
-                    Slett gruppe
-                  </button>
-                )}
-                {canLeave && (
-                  <button
-                    onClick={() => leaveGroup(group.id)}
-                    disabled={loading}
-                    className="text-xs text-red-400 hover:text-red-300 disabled:opacity-50 transition"
-                  >
-                    Meld deg ut
-                  </button>
-                )}
               </div>
-            )}
-          </div>
+
+              <div className="flex items-center justify-between bg-muted rounded-xl px-3 py-2">
+                <div>
+                  <p className="text-xs text-muted-foreground mb-0.5">Invitasjonskode</p>
+                  <span className="text-lg font-mono font-bold tracking-widest">{group.invite_code}</span>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    onClick={() => {
+                      navigator.clipboard.writeText(group.invite_code)
+                      setCopiedGroupId(group.id)
+                      if (copiedTimerRef.current) clearTimeout(copiedTimerRef.current)
+                      copiedTimerRef.current = setTimeout(() => setCopiedGroupId(null), 2000)
+                    }}
+                    variant="secondary"
+                    size="sm"
+                  >
+                    {copiedGroupId === group.id ? '✓ Kopiert' : 'Kopier'}
+                  </Button>
+                  <Button
+                    onClick={() => shareGroup(group)}
+                    variant="outline"
+                    size="sm"
+                    className="border-primary/40 text-primary hover:bg-primary/10"
+                  >
+                    Del 📲
+                  </Button>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                {members.map((m: any) => (
+                  <div key={m.user_id} className="flex items-center justify-between">
+                    <span className="text-sm">{m.users?.display_name ?? 'Ukjent'}{m.isMe ? ' (meg)' : ''}</span>
+                    {m.activeToday
+                      ? <Badge className="bg-green-500/20 text-green-400 border-transparent">✅ Trent i dag</Badge>
+                      : <Badge variant="secondary">💤 Ikke trent i dag</Badge>
+                    }
+                  </div>
+                ))}
+              </div>
+
+              {(canLeave || isAlone) && (
+                <div className="flex justify-end">
+                  {isAlone && (
+                    <Button
+                      onClick={() => deleteGroup(group.id)}
+                      disabled={loading}
+                      variant="ghost"
+                      size="xs"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      Slett gruppe
+                    </Button>
+                  )}
+                  {canLeave && (
+                    <Button
+                      onClick={() => leaveGroup(group.id)}
+                      disabled={loading}
+                      variant="ghost"
+                      size="xs"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                    >
+                      Meld deg ut
+                    </Button>
+                  )}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         )
       })}
 
       <a
         href="/leaderboard"
-        className="flex items-center justify-between bg-gray-800 rounded-2xl p-4 hover:bg-gray-700 transition"
+        className="flex items-center justify-between bg-card rounded-xl ring-1 ring-foreground/10 px-4 py-4 hover:bg-muted/50 transition"
       >
         <div>
-          <p className="text-sm font-semibold text-white">Toppliste</p>
-          <p className="text-xs text-gray-300">Se hvem som trener mest</p>
+          <p className="text-sm font-semibold">Toppliste</p>
+          <p className="text-xs text-muted-foreground">Se hvem som trener mest</p>
         </div>
         <span className="text-xl">🏆</span>
       </a>
 
       <button
         onClick={shareApp}
-        className="w-full flex items-center justify-between bg-gray-800 rounded-2xl p-4 hover:bg-gray-700 transition"
+        className="w-full flex items-center justify-between bg-card rounded-xl ring-1 ring-foreground/10 px-4 py-4 hover:bg-muted/50 transition text-left"
       >
-        <div className="text-left">
-          <p className="text-sm font-semibold text-white">Inviter en venn til appen</p>
-          <p className="text-xs text-gray-300">{appLinkCopied ? 'Kopiert! ✓' : 'Del Mikrotrening med noen du kjenner'}</p>
+        <div>
+          <p className="text-sm font-semibold">Inviter en venn til appen</p>
+          <p className="text-xs text-muted-foreground">{appLinkCopied ? 'Kopiert! ✓' : 'Del Mikrotrening med noen du kjenner'}</p>
         </div>
         <span className="text-xl">🤝</span>
       </button>
 
-      <div ref={joinSectionRef} className={`bg-gray-800 rounded-2xl p-4 space-y-3 transition-all ${initialCode ? 'ring-2 ring-orange-500' : ''}`}>
-        <p className="text-sm font-semibold text-white">Bli med i gruppe</p>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Invitasjonskode"
-            value={joinCode}
-            onChange={e => setJoinCode(e.target.value.toUpperCase())}
-            maxLength={6}
-            className="flex-1 bg-gray-700 text-white rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500 tracking-widest"
-          />
-          <button
-            onClick={joinGroup}
-            disabled={loading || joinCode.length < 6}
-            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl px-4 py-2 text-sm font-semibold"
-          >
-            Bli med
-          </button>
-        </div>
-        {error && <p className="text-red-400 text-xs">{error}</p>}
+      <div ref={joinSectionRef}>
+        <Card className={initialCode ? 'ring-2 ring-primary' : ''}>
+          <CardContent className="space-y-3">
+            <p className="text-sm font-semibold">Bli med i gruppe</p>
+            <div className="flex gap-2">
+              <Input
+                type="text"
+                placeholder="Invitasjonskode"
+                value={joinCode}
+                onChange={e => setJoinCode(e.target.value.toUpperCase())}
+                maxLength={6}
+                className="flex-1 tracking-widest"
+              />
+              <Button
+                onClick={joinGroup}
+                disabled={loading || joinCode.length < 6}
+              >
+                Bli med
+              </Button>
+            </div>
+            {error && <p className="text-destructive text-xs">{error}</p>}
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-sm font-semibold text-white">Opprett ny gruppe</p>
-        <div className="flex gap-2">
-          <input
-            type="text"
-            placeholder="Gruppenavn"
-            value={newGroupName}
-            onChange={e => setNewGroupName(e.target.value)}
-            className="flex-1 bg-gray-700 text-white rounded-xl px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          <button
-            onClick={createGroup}
-            disabled={loading || !newGroupName.trim()}
-            className="bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white rounded-xl px-4 py-2 text-sm font-semibold"
-          >
-            Opprett
-          </button>
-        </div>
-      </div>
+      <Card>
+        <CardContent className="space-y-3">
+          <p className="text-sm font-semibold">Opprett ny gruppe</p>
+          <div className="flex gap-2">
+            <Input
+              type="text"
+              placeholder="Gruppenavn"
+              value={newGroupName}
+              onChange={e => setNewGroupName(e.target.value)}
+              className="flex-1"
+            />
+            <Button
+              onClick={createGroup}
+              disabled={loading || !newGroupName.trim()}
+            >
+              Opprett
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   )
 }
