@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
+import posthog from 'posthog-js'
 
 
 type MusicTrack = { id: string; title: string; artist: string; url: string; duration_seconds: number }
@@ -193,6 +194,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
 
   async function signOut() {
     await supabase.auth.signOut()
+    posthog.reset()
     router.push('/login')
     router.refresh()
   }
@@ -201,6 +203,7 @@ export default function SettingsClient({ profile, userId, needsActivation, music
     setDeleting(true)
     await supabase.from('users').delete().eq('id', userId)
     await supabase.auth.signOut()
+    posthog.reset()
     router.push('/login')
   }
 

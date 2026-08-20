@@ -24,11 +24,10 @@ export default function PostHogBootstrap({ userId, email }: Props) {
     })
   }
 
-  // Fallback: hvis PostHog allerede var lastet (f.eks. bruker bytter konto)
+  // Kall identify ved hver mount — setter email som person-property selv om
+  // bootstrap allerede satte correct distinct_id (bootstrap setter ikke properties).
   useLayoutEffect(() => {
-    if (posthog.get_distinct_id() !== userId) {
-      posthog.identify(userId, { email })
-    }
+    posthog.identify(userId, { email })
   }, [userId])
 
   return null
