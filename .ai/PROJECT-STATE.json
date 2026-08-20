@@ -97,11 +97,11 @@
   ],
 
   "session": {
-    "status": "completed",
-    "startedAt": "2026-08-19T00:00:00Z",
-    "completedAt": "2026-08-19T00:00:00Z",
-    "sessionId": "sess-sommerkropp-051",
-    "lastSignificantAction": "Ytelsesøkt: N+1 fiks, parallelle DB-kall, kodegjennomgang, KlippFeed useCallback. Alt deployet."
+    "status": "active",
+    "startedAt": "2026-08-20T00:00:00Z",
+    "completedAt": "2026-08-19T10:00:00Z",
+    "sessionId": "sess-sommerkropp-055",
+    "lastSignificantAction": "shadcn/ui installert, design system sett opp, TrainTodayButton migrert, deployet til prod."
   },
 
   "dataTypes": {

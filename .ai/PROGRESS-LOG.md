@@ -2,6 +2,26 @@
 
 ---
 
+## 2026-08-19 | P7 | SESSION_END (053)
+Tre leveranser: (1) Fiks gruppe/toppliste: group_members!inner-join på daily_logs fungerte ikke (ingen FK mellom tabellene) — revertert til sekvensiell henting via memberIds i GroupBannerLoader, group/page og leaderboard/page. (2) Avhengighetsoppdatering: Next 16.3.1, React 19.2.8, Supabase 2.112.3/0.12.4, Sentry 10.70.0, PostHog 1.418.3, Tailwind 4.3.3. TypeScript 7 og @types/node 26 utsatt (major-hopp, kun utviklingsverktøy, ikke kritisk). Alt deployet og committet.
+
+---
+
+## 2026-08-19 | P7 | SESSION_START (053)
+Fokus: bug-fiks gruppe/toppliste, avhengighetsoppdatering.
+
+---
+
+## 2026-08-19 | P7 | SESSION_END (052)
+Sikkerhetsøkt: 4 reelle sikkerhetsproblemer identifisert og fikset. (1) auth.admin.listUsers() erstattet med målrettet query mot auth.users i feedback/route.ts og clips/report/route.ts — fjerner eksponering av alle brukere. (2) error.message fra Supabase skjult i alle API-svar — returnerer nå generisk 'En feil oppstod'. (3) Emoji-whitelist lagt til i clips/react/route.ts — validerer mot ['❤️','🔥','💪','😂','👏']. (4) Filendelse i KlippOpplasting utledes fra MIME-type i stedet for klientens filnavn. Alt deployet til prod og committet til main (48fd42f).
+
+---
+
+## 2026-08-19 | P7 | SESSION_START (052)
+Fokus: sikkerhetsfikser etter grundig gjennomgang forrige sesjon.
+
+---
+
 ## 2026-08-19 | P7 | SESSION_END (051)
 Ytelsesøkt: eliminerte flere sekunders lastetid på hjemskjerm og andre sider. (1) N+1 auto-fill loop fjernet fra render-path → Server Action med batch-oppdatering per pakke. (2) Overflødig fetchLogs useEffect i DashboardClient fjernet. (3) GroupBannerLoader: 3 sekvensielle → 2 parallelle queries. (4) Kodegjennomgang: slettet WorkoutList.tsx, fjernet ubrukt granted-variabel i onboarding, setTimeout-refs i GroupManager, cron-batching for > 100 brukere. (5) klipp/ny, leaderboard og group: sekvensielle DB-kall parallellisert. (6) TrainTodayButton: reps-beregning flyttet til server, eliminerer client-side mount-fetch. (7) KlippFeed: useCallback på handleSeen forhindrer IntersectionObserver-rekrering ved scroll. Alt deployet til prod. Commits: 6a88a1e, 56eb8d4, 7ab5d5f, 9551037.
 
@@ -577,3 +597,18 @@ Løsning: SECURITY DEFINER-funksjon get_my_group_clip_ids() — samme mønster s
 Rotårsak: PostgREST embedded join-spørring feilet stille (PGRST FK-problem) — alleKlipp returnerte null, dermed ingen klipp i noen fane.
 Løsning del 1: RLS-fiks med SECURITY DEFINER get_my_group_clip_ids() (migrasjon 021).
 Løsning del 2: Feed-spørring skrevet om — henter relatert data (users, music_tracks, exercises, clip_reactions) separat med in-filter. commits 97cae64, 876dfc7.
+
+---
+
+## 2026-08-19 | P7 | SESSION_START (054)
+Fokus: shadcn/ui installasjon og design system.
+
+---
+
+## 2026-08-19 | P7 | ACTION (054)
+shadcn/ui installert og grunnleggjande design system satt opp. (1) npx shadcn@latest init -d — Base UI valt automatisk, Tailwind v4 oppdaga. (2) globals.css: fiks sirkulær --font-sans-referanse (→ literal Geist), mørkt tema som standard i :root, oransje brand (#e85c00 / oklch(0.646 0.222 41.116)) som --primary. (3) Komponentar installert: button (med custom xl-storleik), card, badge, input, label, separator. (4) TrainTodayButton migrert: alle 8 raw <button> → shadcn Button med variant/size. (5) bg-gray-900 fjerna frå body i layout.tsx. Bygget er grønt. Commit: 5051d2c.
+
+---
+
+## 2026-08-19 | P7 | SESSION_END (054)
+shadcn/ui-økt: (1) Init med Base UI og Tailwind v4 — fiks sirkulær font-referanse, mørkt tema som default i :root, oransje (#e85c00) som --primary. (2) Komponentar installert: button (+ xl-storleik), card, badge, input, label, separator, utils/cn. (3) TrainTodayButton: alle 8 raw <button> migrert til shadcn Button med riktige variant/size. (4) Deploy til prod — READY 41s, commit 5051d2c. Neste: migrer SettingsClient, GroupManager, LeaderboardClient.

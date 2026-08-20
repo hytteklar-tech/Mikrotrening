@@ -3,6 +3,12 @@
 import { useState, useEffect } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
+import { Button, buttonVariants } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Separator } from '@/components/ui/separator'
+import { cn } from '@/lib/utils'
 
 
 type MusicTrack = { id: string; title: string; artist: string; url: string; duration_seconds: number }
@@ -200,231 +206,248 @@ export default function SettingsClient({ profile, userId, needsActivation, music
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-sm font-semibold text-white">Profil</p>
-        <div>
-          <label className="text-xs text-gray-400">Visningsnavn</label>
-          <input
-            type="text"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm"
-          />
-        </div>
-        <div>
-          <label className="text-xs text-gray-400">Firma</label>
-          <input
-            type="text"
-            value={company}
-            onChange={e => setCompany(e.target.value)}
-            placeholder="Valgfritt"
-            className="w-full bg-gray-700 text-white rounded-xl px-3 py-2 mt-1 outline-none focus:ring-2 focus:ring-orange-500 text-sm placeholder-gray-500"
-          />
-        </div>
-      </div>
+      <Card>
+        <CardContent className="space-y-3">
+          <p className="text-sm font-semibold">Profil</p>
+          <div className="space-y-1">
+            <Label htmlFor="display-name" className="text-xs text-muted-foreground font-normal">Visningsnavn</Label>
+            <Input
+              id="display-name"
+              type="text"
+              value={name}
+              onChange={e => setName(e.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
+            <Label htmlFor="company" className="text-xs text-muted-foreground font-normal">Firma</Label>
+            <Input
+              id="company"
+              type="text"
+              value={company}
+              onChange={e => setCompany(e.target.value)}
+              placeholder="Valgfritt"
+            />
+          </div>
+        </CardContent>
+      </Card>
 
       {musicTracks.length > 0 && (
-        <div className="bg-gray-800 rounded-2xl p-4">
-          <button
-            onClick={() => setMusikkliste(v => !v)}
-            className="w-full flex items-center justify-between"
-          >
-            <div>
-              <p className="text-sm font-semibold text-white text-left">🎵 Treningsmusikk</p>
-              <p className="text-xs text-gray-400 mt-0.5 text-left">
-                {preferredMusicId
-                  ? musicTracks.find(t => t.id === preferredMusicId)?.title ?? 'Valgt'
-                  : 'Ingen musikk valgt'}
-              </p>
-            </div>
-            <span className="text-gray-400 text-sm ml-2">{musikkliste ? '▲' : '▼'}</span>
-          </button>
-          {musikkliste && (
-            <div className="space-y-1.5 mt-3">
-              <button
-                onClick={() => {
-                  previewAudio?.pause()
-                  setPreferredMusicId(null)
-                }}
-                className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${!preferredMusicId ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-300'}`}
-              >
-                <span>🔇</span>
-                <span>Ingen musikk</span>
-              </button>
-              {musicTracks.map(track => (
+        <Card>
+          <CardContent>
+            <button
+              onClick={() => setMusikkliste(v => !v)}
+              className="w-full flex items-center justify-between"
+            >
+              <div>
+                <p className="text-sm font-semibold text-left">🎵 Treningsmusikk</p>
+                <p className="text-xs text-muted-foreground mt-0.5 text-left">
+                  {preferredMusicId
+                    ? musicTracks.find(t => t.id === preferredMusicId)?.title ?? 'Valgt'
+                    : 'Ingen musikk valgt'}
+                </p>
+              </div>
+              <span className="text-muted-foreground text-sm ml-2">{musikkliste ? '▲' : '▼'}</span>
+            </button>
+            {musikkliste && (
+              <div className="space-y-1.5 mt-3">
                 <button
-                  key={track.id}
                   onClick={() => {
-                    if (preferredMusicId === track.id) {
-                      previewAudio?.pause()
-                      setPreferredMusicId(null)
-                    } else {
-                      setPreferredMusicId(track.id)
-                      if (previewAudio) {
-                        previewAudio.src = track.url
-                        previewAudio.loop = false
-                        previewAudio.play().catch(() => {})
-                        setTimeout(() => previewAudio.pause(), 8000)
-                      }
-                    }
+                    previewAudio?.pause()
+                    setPreferredMusicId(null)
                   }}
-                  className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${preferredMusicId === track.id ? 'bg-orange-500 text-white' : 'bg-gray-700 text-gray-300'}`}
+                  className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${!preferredMusicId ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
                 >
-                  <span className="w-7 h-7 bg-black/20 rounded-full flex items-center justify-center shrink-0">
-                    {preferredMusicId === track.id ? '✓' : '▶'}
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium truncate">{track.title}</p>
-                    <p className="text-xs opacity-75">{track.artist} · {formatDuration(track.duration_seconds)}</p>
-                  </div>
+                  <span>🔇</span>
+                  <span>Ingen musikk</span>
                 </button>
-              ))}
-            </div>
-          )}
-        </div>
+                {musicTracks.map(track => (
+                  <button
+                    key={track.id}
+                    onClick={() => {
+                      if (preferredMusicId === track.id) {
+                        previewAudio?.pause()
+                        setPreferredMusicId(null)
+                      } else {
+                        setPreferredMusicId(track.id)
+                        if (previewAudio) {
+                          previewAudio.src = track.url
+                          previewAudio.loop = false
+                          previewAudio.play().catch(() => {})
+                          setTimeout(() => previewAudio.pause(), 8000)
+                        }
+                      }
+                    }}
+                    className={`w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm transition text-left ${preferredMusicId === track.id ? 'bg-primary text-primary-foreground' : 'bg-muted text-muted-foreground'}`}
+                  >
+                    <span className="w-7 h-7 bg-black/20 rounded-full flex items-center justify-center shrink-0">
+                      {preferredMusicId === track.id ? '✓' : '▶'}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{track.title}</p>
+                      <p className="text-xs opacity-75">{track.artist} · {formatDuration(track.duration_seconds)}</p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
 
-      <div className="bg-gray-800 rounded-2xl p-4">
-        <div className="flex items-center justify-between">
+      <Card>
+        <CardContent className="flex items-center justify-between">
           <div>
-            <p className="text-sm font-semibold text-white">⏱ Fyll inn manglende tid</p>
-            <p className="text-xs text-gray-400 mt-0.5">Bruker snittet ditt til å estimere tid på treninger uten tidtaker</p>
+            <p className="text-sm font-semibold">⏱ Fyll inn manglende tid</p>
+            <p className="text-xs text-muted-foreground mt-0.5">Bruker snittet ditt til å estimere tid på treninger uten tidtaker</p>
           </div>
           <button
             onClick={() => setAutoFillDuration((v: boolean) => !v)}
-            className={`w-12 h-6 rounded-full transition-colors shrink-0 ml-3 ${autoFillDuration ? 'bg-orange-500' : 'bg-gray-600'}`}
+            className={`w-12 h-6 rounded-full transition-colors shrink-0 ml-3 ${autoFillDuration ? 'bg-primary' : 'bg-muted'}`}
           >
             <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${autoFillDuration ? 'translate-x-6' : 'translate-x-0'}`} />
           </button>
-        </div>
-      </div>
+        </CardContent>
+      </Card>
 
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold">Motivasjonsmeldinger</p>
-            <p className="text-xs text-gray-400 mt-0.5">Vis forskningstips underveis i treningen</p>
-          </div>
-          <button
-            onClick={() => setNotifications(!notifications)}
-            className={`w-12 h-6 rounded-full transition-colors ${notifications ? 'bg-orange-500' : 'bg-gray-600'}`}
-          >
-            <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
-          </button>
-        </div>
-
-        <div className="border-t border-gray-700" />
-
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-semibold">Push-varsler</p>
-            <p className="text-xs text-gray-400 mt-0.5">Daglig påminnelse på valgte tidspunkt</p>
-          </div>
-          <button
-            onClick={() => setPushEnabled(!pushEnabled)}
-            className={`w-12 h-6 rounded-full transition-colors ${pushEnabled ? 'bg-orange-500' : 'bg-gray-600'}`}
-          >
-            <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
-          </button>
-        </div>
-
-        {pushEnabled && showActivateButton && (
-          <div className="space-y-2">
+      <Card>
+        <CardContent className="space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Motivasjonsmeldinger</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Vis forskningstips underveis i treningen</p>
+            </div>
             <button
-              onClick={activatePush}
-              disabled={activating}
-              className="w-full bg-orange-500/20 border border-orange-500/40 text-orange-400 rounded-xl py-2 text-sm font-medium transition hover:bg-orange-500/30 disabled:opacity-50"
+              onClick={() => setNotifications(!notifications)}
+              className={`w-12 h-6 rounded-full transition-colors ${notifications ? 'bg-primary' : 'bg-muted'}`}
             >
-              {activating ? 'Aktiverer...' : '🔔 Trykk her for å aktivere push på denne enheten'}
+              <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${notifications ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>
-            {activateError && <p className="text-xs text-red-400 text-center">{activateError}</p>}
           </div>
-        )}
 
-        {pushEnabled && (
-          <div className="space-y-2">
-            <p className="text-xs text-gray-400">Når vil du ha påminnelse?</p>
-            {TIME_OPTIONS.map(opt => {
-              const selected = preferredTimes.includes(opt.value)
-              return (
-                <button
-                  key={opt.value}
-                  onClick={() => toggleTime(opt.value)}
-                  className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border transition text-left
-                    ${selected
-                      ? 'border-orange-500 bg-orange-500/10 text-white'
-                      : 'border-gray-700 bg-gray-700 text-gray-400'}`}
-                >
-                  <div>
-                    <span className="text-sm font-medium">{opt.label}</span>
-                    <span className="text-xs text-gray-500 ml-2">{opt.hint}</span>
-                  </div>
-                  {selected && <span className="text-orange-400 text-xs">✓</span>}
-                </button>
-              )
-            })}
+          <Separator />
+
+          <div className="flex items-center justify-between">
+            <div>
+              <p className="text-sm font-semibold">Push-varsler</p>
+              <p className="text-xs text-muted-foreground mt-0.5">Daglig påminnelse på valgte tidspunkt</p>
+            </div>
+            <button
+              onClick={() => setPushEnabled(!pushEnabled)}
+              className={`w-12 h-6 rounded-full transition-colors ${pushEnabled ? 'bg-primary' : 'bg-muted'}`}
+            >
+              <div className={`w-5 h-5 bg-white rounded-full mx-0.5 transition-transform ${pushEnabled ? 'translate-x-6' : 'translate-x-0'}`} />
+            </button>
           </div>
-        )}
-      </div>
 
-      <button
+          {pushEnabled && showActivateButton && (
+            <div className="space-y-2">
+              <Button
+                onClick={activatePush}
+                disabled={activating}
+                variant="outline"
+                className="w-full border-primary/40 text-primary hover:bg-primary/10"
+              >
+                {activating ? 'Aktiverer...' : '🔔 Trykk her for å aktivere push på denne enheten'}
+              </Button>
+              {activateError && <p className="text-xs text-destructive text-center">{activateError}</p>}
+            </div>
+          )}
+
+          {pushEnabled && (
+            <div className="space-y-2">
+              <p className="text-xs text-muted-foreground">Når vil du ha påminnelse?</p>
+              {TIME_OPTIONS.map(opt => {
+                const selected = preferredTimes.includes(opt.value)
+                return (
+                  <button
+                    key={opt.value}
+                    onClick={() => toggleTime(opt.value)}
+                    className={`w-full flex items-center justify-between px-3 py-2 rounded-xl border transition text-left
+                      ${selected
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border bg-muted text-muted-foreground'}`}
+                  >
+                    <div>
+                      <span className="text-sm font-medium">{opt.label}</span>
+                      <span className="text-xs text-muted-foreground ml-2">{opt.hint}</span>
+                    </div>
+                    {selected && <span className="text-primary text-xs">✓</span>}
+                  </button>
+                )
+              })}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+
+      <Button
         onClick={save}
         disabled={saving}
-        className="w-full bg-orange-500 hover:bg-orange-600 disabled:opacity-50 text-white font-semibold rounded-xl py-3 transition"
+        size="xl"
+        className="w-full"
       >
         {saving ? 'Lagrer...' : saved ? '✅ Lagret!' : 'Lagre endringer'}
-      </button>
+      </Button>
 
       <a
         href="/mikrotrening"
-        className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-xl py-3 text-sm transition flex items-center justify-center gap-2"
+        className={cn(buttonVariants({ variant: 'secondary', size: 'lg' }), 'w-full gap-2')}
       >
         <span>🧠</span> Hvorfor mikrotrening?
       </a>
 
-      <button
+      <Button
         onClick={signOut}
-        className="w-full bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white rounded-xl py-3 text-sm transition"
+        variant="secondary"
+        size="lg"
+        className="w-full"
       >
         Logg ut
-      </button>
+      </Button>
 
-      <div className="flex gap-2 text-xs text-gray-500 justify-center">
-        <a href="/personvern" className="hover:text-gray-300 transition underline">Personvern</a>
+      <div className="flex gap-2 text-xs text-muted-foreground justify-center">
+        <a href="/personvern" className="hover:text-foreground transition underline">Personvern</a>
         <span>·</span>
-        <a href="/vilkaar" className="hover:text-gray-300 transition underline">Vilkår</a>
+        <a href="/vilkaar" className="hover:text-foreground transition underline">Vilkår</a>
       </div>
 
-      <div className="bg-gray-800 rounded-2xl p-4 space-y-3">
-        <p className="text-xs text-gray-500 font-semibold uppercase tracking-wide">Farlig sone</p>
-        {!confirmDelete ? (
-          <button
-            onClick={() => setConfirmDelete(true)}
-            className="w-full text-red-500 hover:text-red-400 text-sm py-1 transition"
-          >
-            Slett konto og alle data
-          </button>
-        ) : (
-          <div className="space-y-2">
-            <p className="text-sm text-gray-300">Er du sikker? All data slettes permanent.</p>
-            <div className="flex gap-2">
-              <button
-                onClick={() => setConfirmDelete(false)}
-                className="flex-1 bg-gray-700 text-white rounded-xl py-2 text-sm"
-              >
-                Avbryt
-              </button>
-              <button
-                onClick={deleteAccount}
-                disabled={deleting}
-                className="flex-1 bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white rounded-xl py-2 text-sm font-semibold"
-              >
-                {deleting ? 'Sletter...' : 'Ja, slett alt'}
-              </button>
+      <Card>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-wide">Farlig sone</p>
+          {!confirmDelete ? (
+            <Button
+              onClick={() => setConfirmDelete(true)}
+              variant="ghost"
+              className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+            >
+              Slett konto og alle data
+            </Button>
+          ) : (
+            <div className="space-y-2">
+              <p className="text-sm text-muted-foreground">Er du sikker? All data slettes permanent.</p>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setConfirmDelete(false)}
+                  variant="outline"
+                  size="lg"
+                  className="flex-1"
+                >
+                  Avbryt
+                </Button>
+                <Button
+                  onClick={deleteAccount}
+                  disabled={deleting}
+                  variant="destructive"
+                  size="lg"
+                  className="flex-1"
+                >
+                  {deleting ? 'Sletter...' : 'Ja, slett alt'}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   )
 }
