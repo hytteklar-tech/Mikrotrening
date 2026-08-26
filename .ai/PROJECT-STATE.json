@@ -36,6 +36,10 @@
 
   "pendingTasks": [
     {
+      "id": "leaderboardclient-shadcn",
+      "title": "Migrer LeaderboardClient til shadcn/ui (cards/buttons) — siste komponent i design system-runden"
+    },
+    {
       "id": "cron-job-org-4-jobber",
       "title": "Sett opp 4 cron-jobber på cron-job.org: 08/11/15/19 Oslo. Én er satt (18:00 test). Resten settes senere."
     },
@@ -49,6 +53,21 @@
     }
   ],
   "completedTasks": [
+    {
+      "id": "posthog-identify-fix",
+      "title": "PostHog: identify() kalles ubetinget ved mount (email som person-property) + reset() ved signOut/deleteAccount — commit 9f6320c",
+      "completedAt": "2026-08-20"
+    },
+    {
+      "id": "groupmanager-shadcn",
+      "title": "GroupManager migrert til shadcn/ui (Card, Badge, Button, Input, design tokens) — commit a744f34",
+      "completedAt": "2026-08-20"
+    },
+    {
+      "id": "settingsclient-shadcn",
+      "title": "SettingsClient migrert til shadcn/ui (Input/Label, Card, Separator, Button-varianter) — commit 364b9ba",
+      "completedAt": "2026-08-20"
+    },
     {
       "id": "nav-ikoner",
       "title": "Navigasjonsbar: emojier → SVG linjikoner, oransje aktiv (#e85c00), grå inaktiv (#aaa) — DEPLOYET",
@@ -98,10 +117,10 @@
 
   "session": {
     "status": "active",
-    "startedAt": "2026-08-20T00:00:00Z",
-    "completedAt": "2026-08-19T10:00:00Z",
-    "sessionId": "sess-sommerkropp-055",
-    "lastSignificantAction": "shadcn/ui installert, design system sett opp, TrainTodayButton migrert, deployet til prod."
+    "startedAt": "2026-08-26T00:00:00Z",
+    "completedAt": "2026-08-20T15:59:10Z",
+    "sessionId": "sess-sommerkropp-056",
+    "lastSignificantAction": "SettingsClient + GroupManager migrert til shadcn/ui, PostHog-identifisering fikset (email som person-property + reset ved utlogging). LeaderboardClient gjenstår i design system-migreringen."
   },
 
   "dataTypes": {

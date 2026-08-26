@@ -612,3 +612,26 @@ shadcn/ui installert og grunnleggjande design system satt opp. (1) npx shadcn@la
 
 ## 2026-08-19 | P7 | SESSION_END (054)
 shadcn/ui-økt: (1) Init med Base UI og Tailwind v4 — fiks sirkulær font-referanse, mørkt tema som default i :root, oransje (#e85c00) som --primary. (2) Komponentar installert: button (+ xl-storleik), card, badge, input, label, separator, utils/cn. (3) TrainTodayButton: alle 8 raw <button> migrert til shadcn Button med riktige variant/size. (4) Deploy til prod — READY 41s, commit 5051d2c. Neste: migrer SettingsClient, GroupManager, LeaderboardClient.
+
+---
+
+## 2026-08-20 | P7 | SESSION_START (055)
+Fokus: Fortsette design system-migrering.
+
+## 2026-08-20 | P7 | DONE — SettingsClient migrert til shadcn/ui
+Input/Label, Card/CardContent, Separator og Button-varianter erstatter hardkodede Tailwind-klasser og raw <button>-elementer. Hardkodede farger erstattet med design tokens (primary, muted-foreground, destructive). Commit 364b9ba.
+
+## 2026-08-20 | P7 | DONE — GroupManager migrert til shadcn/ui
+Card/CardContent, Badge, Button og Input erstatter hardkodede Tailwind-klasser. Fokus-badge, status-badges og destruktive knapper bruker design tokens (primary, destructive, muted). Commit a744f34.
+
+## 2026-08-20 | P7 | DONE — PostHog: fiks identifisering
+PostHogBootstrap kalte identify() betinget og hoppet over det når distinct_id allerede matchet userId — bootstrap setter ikke properties, så e-post ble aldri satt som person-property (UUID uten navn/e-post i PostHog-UI). Fiks: identify() kalles ubetinget ved mount. SettingsClient: posthog.reset() lagt til på signOut() og deleteAccount() for å unngå at neste bruker på samme enhet arver forrige brukers distinct_id. Commit 9f6320c.
+
+## 2026-08-20 | P7 | RECOVERY
+Fant `session.status="active"` i PROJECT-STATE.json med `startedAt=2026-08-20`, men ingen SESSION_END var logget for sesjon 055 og PROGRESS-LOG/PROJECT-STATE var 2 commits bak git-historikken (GroupManager + PostHog-fiksen manglet). Rekonstruert fra `git log` i sesjon 056 (2026-08-26). Ingen tegn til at arbeid gikk tapt — kun bokføringen som ikke ble oppdatert etter de to siste commitene.
+
+---
+
+## 2026-08-26 | P7 | SESSION_START (056)
+Fokus: fortsette der 055 slapp — LeaderboardClient gjenstår i design system-migreringen. Untracked i arbeidstreet: `musikk/` og `scripts/upload-musikk.mjs` (uklart om dette er pågående arbeid eller kan ignoreres — sjekk med bruker før noe røres).
+shadcn/ui-økt: (1) Init med Base UI og Tailwind v4 — fiks sirkulær font-referanse, mørkt tema som default i :root, oransje (#e85c00) som --primary. (2) Komponentar installert: button (+ xl-storleik), card, badge, input, label, separator, utils/cn. (3) TrainTodayButton: alle 8 raw <button> migrert til shadcn Button med riktige variant/size. (4) Deploy til prod — READY 41s, commit 5051d2c. Neste: migrer SettingsClient, GroupManager, LeaderboardClient.
