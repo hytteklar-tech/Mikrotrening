@@ -118,6 +118,11 @@
       "id": "visste-du-at-lenke",
       "title": "Les mer om mikrotrening-lenke på Visste du at-kortene — DEPLOYET",
       "completedAt": "2026-04-26"
+    },
+    {
+      "id": "auth-getuser-dedup",
+      "title": "Fjernet 2 av 3 redundante getUser()-kall i oppstartskjeden (proxy.ts → layout.tsx/page.tsx via x-user-id/x-user-email-headere) — commit 79d703d, DEPLOYET",
+      "completedAt": "2026-09-14"
     }
   ],
 
@@ -126,7 +131,7 @@
     "startedAt": "2026-09-14T00:00:00Z",
     "completedAt": null,
     "sessionId": "sess-sommerkropp-057",
-    "lastSignificantAction": "Pausemerker-funksjonalitet bygget: ny uendelig milepæl-rekke (7/14/30/50/75/100/125...), stateless pausemerke-algoritme i src/lib/streak.ts, konsoliderer 5 dupliserte streak-beregninger. Committer og deployer nå."
+    "lastSignificantAction": "Auth-ytelsesfiks committet (79d703d), pushet og deployet (dpl_JC25vkRu6aZWSdsvhFmGcuiQk5rx, READY 28s), verifisert live på app.mikrotrening.no."
   },
 
   "dataTypes": {

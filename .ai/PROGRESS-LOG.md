@@ -1,5 +1,8 @@
 # PROGRESS-LOG — Sommerkropp
 
+## 2026-09-14 | P7 | DONE — Bekreftet deploy av auth-ytelsesfiksen
+Committet (79d703d) og pushet — GitHub-integrasjonen deployet automatisk (dpl_JC25vkRu6aZWSdsvhFmGcuiQk5rx, READY 28s), aliaset til app.mikrotrening.no. `tsc --noEmit` grønt før push. Post-deploy: uinnlogget `/` → 307 til `/login` (bekrefter at proxy.ts fjerner x-user-id-headeren og layout.tsx redirecter korrekt når den mangler), `/login` → 200. Ingen feil i build-logg.
+
 ## 2026-09-14 | P7 | SESSION_START (057)
 Fokus: gjenopptar post-launch-arbeid. Kit CC-agentrammeverket er fortsatt ikke installert på riktige stier (bekreftet på nytt: `Kit CC/Agenter/` finnes ikke, kun `Kit CC/4.6 - New project - Kit CC/...`) — jobber som vanlig ingeniørarbeid, ikke via formell agent-sekvens/Monitor.
 
