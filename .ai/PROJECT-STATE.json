@@ -46,6 +46,18 @@
     {
       "id": "markedsside",
       "title": "Bygg markedsside på mikrotrening.no (nytt repo). App ligger nå på app.mikrotrening.no."
+    },
+    {
+      "id": "getuser-dedup-resten",
+      "title": "Utvid header-mønsteret fra auth-ytelsesfiksen (commit 79d703d) til de ~13 andre page.tsx-filene under (app)/ som fortsatt kaller getUser() individuelt (gruppe, statistikk, innstillinger, kalender osv.) — de leser ikke x-user-id/x-user-email-headeren proxy.ts nå setter."
+    },
+    {
+      "id": "oppstart-pwa-splash",
+      "title": "Treg oppstart (hvit skjerm → spinner → sort → hjem) er trolig delvis PWA-splashskjermen — sjekk manifest.json background_color. Ikke undersøkt eller fikset ennå, kun nevnt av bruker."
+    },
+    {
+      "id": "oppstart-cold-start",
+      "title": "Treg oppstart kan også skyldes kald start i Vercel sin serverless-infrastruktur (ikke Fluid Compute-relatert kodefiks, men verdt å sjekke funksjonskonfig/region hvis det fortsatt oppleves tregt etter getuser-dedup-resten)."
     }
   ],
   "completedTasks": [
