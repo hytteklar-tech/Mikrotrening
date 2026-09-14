@@ -6,6 +6,7 @@ import StatsView from './StatsView'
 import TestStatsView from './TestStatsView'
 import TrendView from './TrendView'
 import type { TestType, TestResult } from './TestClient'
+import { calculateStreak } from '@/lib/streak'
 
 export type StatLog = {
   logged_date: string
@@ -66,20 +67,6 @@ function calcTopStreaks(dates: string[]): { days: number; start: string; end: st
   return streaks.sort((a, b) => b.days - a.days).slice(0, 3)
 }
 
-function calcCurrentStreak(dates: string[]): number {
-  const d = new Date()
-  d.setHours(12, 0, 0, 0)
-  const toStr = (dt: Date) =>
-    `${dt.getFullYear()}-${String(dt.getMonth() + 1).padStart(2, '0')}-${String(dt.getDate()).padStart(2, '0')}`
-  if (!dates.includes(toStr(d))) d.setDate(d.getDate() - 1)
-  let streak = 0
-  while (dates.includes(toStr(d))) {
-    streak++
-    d.setDate(d.getDate() - 1)
-  }
-  return streak
-}
-
 export default function StatistikkClient({ logs, testTypes, testResults }: Props) {
   const searchParams = useSearchParams()
   const [mainTab, setMainTab] = useState<MainTab>(
@@ -87,7 +74,9 @@ export default function StatistikkClient({ logs, testTypes, testResults }: Props
   )
 
   const dates = [...new Set(logs.map(l => l.logged_date))]
-  const currentStreak = calcCurrentStreak(dates)
+  const today = new Date()
+  const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
+  const currentStreak = calculateStreak(dates, todayStr).streak
   const longestStreak = calcLongestStreak(dates)
   const topStreaks = calcTopStreaks(dates)
 

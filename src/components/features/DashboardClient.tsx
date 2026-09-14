@@ -6,6 +6,7 @@ import { autoFillDurations, setPwaFlag } from '@/app/(app)/actions'
 import Link from 'next/link'
 import StreakCard from './StreakCard'
 import TrainTodayButton from './TrainTodayButton'
+import { calculateStreak } from '@/lib/streak'
 
 const ONELINERS = [
   'Tre korte økter om dagen halverer risikoen for hjertesykdom. Du er på god vei.',
@@ -50,23 +51,6 @@ function toLocalDateStr(date: Date) {
   return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
 }
 
-function calcStreak(uniqueDates: string[]): number {
-  const d = new Date()
-  d.setHours(12, 0, 0, 0)
-  if (!uniqueDates.includes(toLocalDateStr(d))) {
-    d.setDate(d.getDate() - 1)
-  }
-  let streak = 0
-  while (true) {
-    if (uniqueDates.includes(toLocalDateStr(d))) {
-      streak++
-      d.setDate(d.getDate() - 1)
-    } else {
-      break
-    }
-  }
-  return streak
-}
 
 export default function DashboardClient({ initialDayLogs, packages, categories, userId, notificationsEnabled, autoFillDuration, repsByDate, repsByPackageId }: Props) {
   const [dayLogs, setDayLogs] = useState<DayLog[]>(initialDayLogs)
@@ -102,7 +86,7 @@ export default function DashboardClient({ initialDayLogs, packages, categories, 
   const uniqueDates = [...new Set(dayLogs.map(l => l.date))]
   const uniqueDatesThisYear = uniqueDates.filter(d => d.startsWith(`${thisYear}-`))
   const hasTrained = uniqueDates.includes(today)
-  const streak = calcStreak(uniqueDates)
+  const { streak, pauseTokens } = calculateStreak(uniqueDates, today)
 
   // dayCounts: date → number of sessions that day
   const dayCounts: Record<string, number> = {}
@@ -148,6 +132,7 @@ export default function DashboardClient({ initialDayLogs, packages, categories, 
     <>
       <StreakCard
         streak={streak}
+        pauseTokens={pauseTokens}
         hasTrained={hasTrained}
         totalSessions={uniqueDatesThisYear.length}
         isNewUser={isNewUser}

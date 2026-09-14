@@ -36,10 +36,6 @@
 
   "pendingTasks": [
     {
-      "id": "leaderboardclient-shadcn",
-      "title": "Migrer LeaderboardClient til shadcn/ui (cards/buttons) — siste komponent i design system-runden"
-    },
-    {
       "id": "cron-job-org-4-jobber",
       "title": "Sett opp 4 cron-jobber på cron-job.org: 08/11/15/19 Oslo. Én er satt (18:00 test). Resten settes senere."
     },
@@ -53,6 +49,16 @@
     }
   ],
   "completedTasks": [
+    {
+      "id": "pausemerker",
+      "title": "Ny milepæl-rekke (7/14/30/50/75/100, deretter hver 25. dag) + pausemerker: ett merke per milepæl, brokobler ett helt opphold (uansett lengde) uten å nullstille streaken. Stateless algoritme i src/lib/streak.ts (ingen ny DB-kolonne), konsoliderer 5 dupliserte streak-beregninger. StreakCard: vindu-filtrerte milepæl-piller + pausemerke-rad. Toast/push ved ny milepæl og ved bruk av merke.",
+      "completedAt": "2026-09-14"
+    },
+    {
+      "id": "leaderboardclient-shadcn",
+      "title": "LeaderboardClient migrert til shadcn/ui (Card, Badge, Button-varianter, design tokens) — commit 0680d94, DEPLOYET",
+      "completedAt": "2026-08-26"
+    },
     {
       "id": "posthog-identify-fix",
       "title": "PostHog: identify() kalles ubetinget ved mount (email som person-property) + reset() ved signOut/deleteAccount — commit 9f6320c",
@@ -117,10 +123,10 @@
 
   "session": {
     "status": "active",
-    "startedAt": "2026-08-26T00:00:00Z",
-    "completedAt": "2026-08-20T15:59:10Z",
-    "sessionId": "sess-sommerkropp-056",
-    "lastSignificantAction": "SettingsClient + GroupManager migrert til shadcn/ui, PostHog-identifisering fikset (email som person-property + reset ved utlogging). LeaderboardClient gjenstår i design system-migreringen."
+    "startedAt": "2026-09-14T00:00:00Z",
+    "completedAt": null,
+    "sessionId": "sess-sommerkropp-057",
+    "lastSignificantAction": "Pausemerker-funksjonalitet bygget: ny uendelig milepæl-rekke (7/14/30/50/75/100/125...), stateless pausemerke-algoritme i src/lib/streak.ts, konsoliderer 5 dupliserte streak-beregninger. Committer og deployer nå."
   },
 
   "dataTypes": {

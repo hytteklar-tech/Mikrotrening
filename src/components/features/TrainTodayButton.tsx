@@ -8,6 +8,7 @@ import CalendarView from './CalendarView'
 import type { DayLog } from './DashboardClient'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
+import { calculateStreak, isMilestone, milestoneMessage, pauseTokenUsedMessage, addDays } from '@/lib/streak'
 
 function formatDuration(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -107,7 +108,7 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
   const [averageSeconds, setAverageSeconds] = useState<number | null>(null)
   const [repsByDate] = useState<Record<string, number>>(initialRepsByDate)
   const [packageExercises, setPackageExercises] = useState<{ name: string; reps: number }[]>([])
-  const [milestoneToast, setMilestoneToast] = useState<string | null>(null)
+  const [toastQueue, setToastQueue] = useState<{ id: number; label: string; body: string }[]>([])
   const [activeCat, setActiveCat] = useState<string | null>(null)
   const [repsByPackageId] = useState<Record<string, number>>(initialRepsByPackageId)
   const [logsExpanded, setLogsExpanded] = useState(false)
@@ -182,18 +183,16 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       })
   }, [activePackage?.id])
 
-  function calcStreakAfterLog(logsIncludingToday: DayLog[], today: string): number {
-    const uniqueDates = [...new Set(logsIncludingToday.map(l => l.date))]
-    const sorted = uniqueDates.sort().reverse()
-    let streak = 0
-    let d = new Date(today + 'T12:00:00')
-    while (true) {
-      const ds = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
-      if (sorted.includes(ds)) { streak++; d.setDate(d.getDate() - 1) }
-      else break
-    }
-    return streak
+  function queueToast(label: string, body: string) {
+    setToastQueue(q => [...q, { id: Date.now() + Math.random(), label, body }])
   }
+
+  // Viser ett varsel om gangen fra køen, i tilfelle flere milepæler treffer samme dag.
+  useEffect(() => {
+    if (toastQueue.length === 0) return
+    const timer = setTimeout(() => setToastQueue(q => q.slice(1)), 5000)
+    return () => clearTimeout(timer)
+  }, [toastQueue])
 
   async function startTimer() {
     startTimeRef.current = Date.now()
@@ -272,16 +271,39 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
       const newLogs = [...dayLogs, { ...optimisticLog, id: data.id as string }]
       onLogChange(newLogs)
 
+      const newDates = [...new Set(newLogs.map(l => l.date))]
+      const { streak: newStreak, pauseTokens } = calculateStreak(newDates, selectedDate)
+
       posthog.capture('okt_fullfort', {
         pakke_navn: activePackage?.name,
         varighet_sekunder: duration ?? null,
-        dag_i_streak: calcStreakAfterLog(newLogs, selectedDate),
+        dag_i_streak: newStreak,
         tidspunkt: new Date().toTimeString().slice(0, 5),
       })
 
       const colors = ['#e85c00', '#f97316', '#ffffff', '#fbbf24', '#facc15']
+      const fireBigConfetti = () => {
+        confetti({ particleCount: 80, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors })
+        confetti({ particleCount: 80, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors })
+        setTimeout(() => confetti({ particleCount: 60, spread: 90, origin: { y: 0.5 }, colors }), 300)
+      }
       confetti({ particleCount: 40, angle: 60, spread: 60, origin: { x: 0, y: 0.7 }, colors })
       confetti({ particleCount: 40, angle: 120, spread: 60, origin: { x: 1, y: 0.7 }, colors })
+
+      // Ble et opphold nettopp brokoblet av et pausemerke ved denne loggingen?
+      const prevDates = new Set(dayLogs.map(l => l.date))
+      const yesterday = addDays(selectedDate, -1)
+      const hadPriorHistory = [...prevDates].some(d => d !== selectedDate)
+      const gapBridged = hadPriorHistory && !prevDates.has(yesterday) && newStreak > 1
+
+      if (gapBridged) {
+        queueToast('Pausemerke brukt 🛡️', pauseTokenUsedMessage(newStreak, pauseTokens))
+        fireBigConfetti()
+      } else if (isMilestone(newStreak)) {
+        queueToast('Ny milepæl!', milestoneMessage(newStreak))
+        fireBigConfetti()
+      }
+
       fetch('/api/milestones/check', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -295,11 +317,8 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
             50:  '50 treninger! Halvveis til 100 — sterk innsats 🌟',
             100: '100 treninger! Legenden er bekreftet 🏆',
           }
-          setMilestoneToast(messages[data.milestone] ?? `${data.milestone} treninger! 🎉`)
-          setTimeout(() => setMilestoneToast(null), 5000)
-          confetti({ particleCount: 80, angle: 60, spread: 70, origin: { x: 0, y: 0.7 }, colors })
-          confetti({ particleCount: 80, angle: 120, spread: 70, origin: { x: 1, y: 0.7 }, colors })
-          setTimeout(() => confetti({ particleCount: 60, spread: 90, origin: { y: 0.5 }, colors }), 300)
+          queueToast('Milepæl nådd!', messages[data.milestone] ?? `${data.milestone} treninger! 🎉`)
+          fireBigConfetti()
         }
       })
     }
@@ -333,16 +352,16 @@ export default function TrainTodayButton({ dayLogs, onLogChange, dayCounts, pack
 
   return (
     <div className="space-y-3">
-      {milestoneToast && (
+      {toastQueue[0] && (
         <div
           className="fixed top-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-2xl shadow-lg flex items-center gap-3 animate-in fade-in slide-in-from-top-4 duration-300"
           style={{ background: '#1a1a1a', border: '1.5px solid #e85c00', maxWidth: '90vw' }}
         >
           <div>
-            <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide mb-0.5">Milepæl nådd!</p>
-            <p className="text-white text-sm font-medium">{milestoneToast}</p>
+            <p className="text-xs text-orange-400 font-semibold uppercase tracking-wide mb-0.5">{toastQueue[0].label}</p>
+            <p className="text-white text-sm font-medium">{toastQueue[0].body}</p>
           </div>
-          <Button variant="ghost" size="icon-sm" onClick={() => setMilestoneToast(null)} className="text-gray-500 hover:text-gray-300 ml-2 shrink-0">×</Button>
+          <Button variant="ghost" size="icon-sm" onClick={() => setToastQueue(q => q.slice(1))} className="text-gray-500 hover:text-gray-300 ml-2 shrink-0">×</Button>
         </div>
       )}
       <CalendarView

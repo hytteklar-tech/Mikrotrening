@@ -2,11 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-
-const MILESTONES = [7, 14, 30, 50, 100]
-
-
-const MILESTONES_LIST = [0, ...MILESTONES]
+import { milestoneWindow, nextMilestones, lastMilestoneAtOrBelow } from '@/lib/streak'
 
 function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
   const r = 42
@@ -14,9 +10,9 @@ function ProgressRing({ streak, alive }: { streak: number; alive: boolean }) {
   const size = 104
   const circumference = 2 * Math.PI * r
 
-  const prevMilestone = [...MILESTONES_LIST].reverse().find(m => streak >= m) ?? 0
-  const nextMilestone = MILESTONES.find(m => m > streak) ?? MILESTONES[MILESTONES.length - 1]
-  const passedAny = streak >= MILESTONES[0]
+  const prevMilestone = lastMilestoneAtOrBelow(streak) ?? 0
+  const nextMilestone = nextMilestones(streak, 1)[0]
+  const passedAny = prevMilestone > 0
 
   const progress = alive
     ? Math.min((streak - prevMilestone) / (nextMilestone - prevMilestone), 1)
@@ -167,8 +163,9 @@ function WeekTrend({ dates }: { dates: string[] }) {
   )
 }
 
-export default function StreakCard({ streak, totalSessions, isNewUser, dates, onScrollToToday }: {
+export default function StreakCard({ streak, pauseTokens, totalSessions, isNewUser, dates, onScrollToToday }: {
   streak: number
+  pauseTokens: number
   hasTrained: boolean
   totalSessions: number
   isNewUser?: boolean
@@ -178,8 +175,8 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
   const [tab, setTab] = useState<'trend'>('trend')
 
   const alive = streak > 0
-  const nextMilestone = MILESTONES.find(m => m > streak) ?? MILESTONES[MILESTONES.length - 1]
-  const nextMilestoneIdx = MILESTONES.findIndex(m => m > streak)
+  const pillMilestones = milestoneWindow(streak)
+  const nextMilestoneIdx = pillMilestones.findIndex(m => m > streak)
 
   return (
     <div className="rounded-2xl p-4 space-y-3 bg-gray-900">
@@ -206,11 +203,11 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
         )}
       </div>
 
-      {/* Milepæl-piller + stats-lenke */}
+      {/* Milepæl-piller (vindu: siste nådde + neste to) + pausemerker + stats-lenke */}
       {!isNewUser && (
         <>
           <div className="flex gap-1.5 flex-wrap">
-            {MILESTONES.map((m, i) => {
+            {pillMilestones.map((m, i) => {
               const reached = streak >= m
               const isNext = i === nextMilestoneIdx
               return (
@@ -228,6 +225,35 @@ export default function StreakCard({ streak, totalSessions, isNewUser, dates, on
               )
             })}
           </div>
+
+          {pauseTokens > 0 && (
+            <div className="flex items-center gap-2">
+              {pauseTokens <= 5 ? (
+                <div className="flex -space-x-1.5">
+                  {Array.from({ length: pauseTokens }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="w-6 h-6 rounded-full flex items-center justify-center text-xs border-2 border-gray-900"
+                      style={{ background: '#1e3a5f', color: '#60a5fa' }}
+                    >
+                      🛡️
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div
+                  className="flex items-center gap-1 rounded-full px-3 py-1 text-sm"
+                  style={{ background: '#1e3a5f', color: '#60a5fa' }}
+                >
+                  🛡️ {pauseTokens}
+                </div>
+              )}
+              <span style={{ fontSize: 12, color: '#9ca3af' }}>
+                {pauseTokens === 1 ? 'pausemerke i banken' : 'pausemerker i banken'}
+              </span>
+            </div>
+          )}
+
           <div className="flex justify-end">
             <Link href="/statistikk" style={{ fontSize: 12, color: '#9ca3af' }} className="hover:text-gray-300 transition-colors">
               Se statistikk →

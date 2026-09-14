@@ -1,5 +1,11 @@
 # PROGRESS-LOG — Sommerkropp
 
+## 2026-09-14 | P7 | SESSION_START (057)
+Fokus: gjenopptar post-launch-arbeid. Kit CC-agentrammeverket er fortsatt ikke installert på riktige stier (bekreftet på nytt: `Kit CC/Agenter/` finnes ikke, kun `Kit CC/4.6 - New project - Kit CC/...`) — jobber som vanlig ingeniørarbeid, ikke via formell agent-sekvens/Monitor.
+
+## 2026-09-14 | P7 | DONE — Pausemerker (streak-milepæler + "liv" ved opphold)
+Ny milepæl-rekke for dager-på-rad: 7, 14, 30, 50, 75, 100, deretter hver 25. dag i det uendelige (var 7/14/30/50/100, hardkodet og ulik mellom filer). Ny funksjonalitet "pausemerker": hver milepæl gir ett merke; ett merke brokobler ett helt opphold (uansett lengde, ikke per tapt dag) uten å nullstille streaken — merket forbrukes først når du faktisk logger igjen. Ingen tak på antall merker. Ren, stateless algoritme i ny `src/lib/streak.ts` — ingen ny DB-kolonne, alt utledes fra `daily_logs` hver gang. Konsoliderte 5 dupliserte streak-beregninger (log.ts, DashboardClient, StatistikkClient, TrainTodayButton, delvis StatsView via StatistikkClient) til denne ene delte funksjonen. StreakCard: milepæl-pillene viser nå et vindu (siste nådde + neste to) i stedet for hele den uendelige rekken; ny rad med skjold-ikoner for pausemerker. Toast + push + konfetti ved ny milepæl ("tjent pausemerke", med kort forklaring) og ved faktisk bruk av et merke ("pausemerke brukt"). TrainTodayButtons milepæl-toast er nå en kø (flere milepæler kan treffe samme dag). Bifangst: fikset en divide-by-zero i ProgressRing for brukere med streak ≥ 100 (nextMilestone/prevMilestone ble likt, ring-progresjon ble NaN) — løst automatisk av at milepæl-rekken nå er uendelig. `tsc --noEmit` og `npm run build` grønt. Algoritme sanity-testet mot 5 scenarioer (midt-i-pause, resume, ingen-merker-bryter, to-brokoblinger-etter-hverandre, lang rett streak) i scratchpad — alle stemte. Ikke committet ennå.
+
 ---
 
 ## 2026-08-19 | P7 | SESSION_END (053)
@@ -634,4 +640,10 @@ Fant `session.status="active"` i PROJECT-STATE.json med `startedAt=2026-08-20`, 
 
 ## 2026-08-26 | P7 | SESSION_START (056)
 Fokus: fortsette der 055 slapp — LeaderboardClient gjenstår i design system-migreringen. Untracked i arbeidstreet: `musikk/` og `scripts/upload-musikk.mjs` (uklart om dette er pågående arbeid eller kan ignoreres — sjekk med bruker før noe røres).
+
+## 2026-08-26 | P7 | DONE — LeaderboardClient migrert til shadcn/ui
+Card, Badge og Button-varianter erstatter hardkodede Tailwind-klasser i toppliste-rader og fane-veksler. Design tokens (primary, muted, muted-foreground) i stedet for oransje/grå hardkoding. Siste komponent i design system-runden (etter TrainTodayButton, SettingsClient, GroupManager). `tsc --noEmit` og `npm run build` grønt. Commit 0680d94, pushet til origin/main, GitHub-integrasjonen trigget automatisk prod-deploy (dpl_4rdXDtcH92Uu4t53NsJdMyedeFML, READY 30s). Ingen feil i post-deploy logg-scan.
+
+## 2026-08-26 | P7 | SESSION_END (056)
+Design system-runden fullført og deployet. Gjenstår: cron-jobber (11/15/19 Oslo), event-drevet push for iOS-brukere uten onesignal_id, markedsside på mikrotrening.no. Uavklart: `musikk/` og `scripts/upload-musikk.mjs` (untracked, formål ikke bekreftet med bruker).
 shadcn/ui-økt: (1) Init med Base UI og Tailwind v4 — fiks sirkulær font-referanse, mørkt tema som default i :root, oransje (#e85c00) som --primary. (2) Komponentar installert: button (+ xl-storleik), card, badge, input, label, separator, utils/cn. (3) TrainTodayButton: alle 8 raw <button> migrert til shadcn Button med riktige variant/size. (4) Deploy til prod — READY 41s, commit 5051d2c. Neste: migrer SettingsClient, GroupManager, LeaderboardClient.

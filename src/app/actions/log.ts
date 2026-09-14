@@ -4,37 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import { createClient as createAdmin } from '@supabase/supabase-js'
 import { sendPushNotification } from '@/lib/onesignal'
-
-const STREAK_MILESTONES: Record<number, string> = {
-  7:   '7 dager på rad! Du bygger en vane. 🔥',
-  14:  '14 dager! To uker uten å gi opp. 💪',
-  30:  '30 dager! Forskning viser at vanen nå sitter. 🥈',
-  45:  '45 dager! Halvveis til to måneder. 🔥',
-  60:  '60 dager! To måneder på rad. Du er ikke til å stoppe. 💥',
-  90:  '90 dager! Du er Maskinen. 🥇',
-  120: '120 dager! Fire måneder. Jernvilje. 💎',
-  180: '180 dager! Et halvt år! Ustoppelig. 🏆',
-  270: '270 dager! Tre av fire. Nesten der. 🔥',
-  365: 'Et helt år! Du er Legenden. 👑',
-}
-
-function calculateStreak(dates: string[], today: string): number {
-  const sorted = [...new Set(dates)].sort().reverse()
-  if (!sorted.length || sorted[0] < today) return 0
-
-  let streak = 0
-  let current = new Date(today)
-  for (const d of sorted) {
-    const diff = Math.round((current.getTime() - new Date(d).getTime()) / 86400000)
-    if (diff === 0 || diff === 1) {
-      streak++
-      current = new Date(d)
-    } else {
-      break
-    }
-  }
-  return streak
-}
+import { calculateStreak, isMilestone, milestoneMessage, pauseTokenUsedMessage, addDays } from '@/lib/streak'
 
 export async function logWorkout(packageId: string, date: string) {
   const supabase = await createClient()
@@ -90,14 +60,22 @@ async function notifyAfterLog(userId: string, today: string) {
       .eq('user_id', userId)
 
     const dates = logs?.map(l => l.logged_date as string) ?? []
-    const streak = calculateStreak(dates, today)
-    const milestoneMsg = STREAK_MILESTONES[streak]
+    const { streak, pauseTokens } = calculateStreak(dates, today)
+
+    // Ble et opphold nettopp brokoblet av et pausemerke ved denne loggingen?
+    const yesterday = addDays(today, -1)
+    const hadPriorHistory = dates.some(d => d !== today)
+    const gapBridged = hadPriorHistory && !dates.includes(yesterday) && streak > 1
+
+    const milestoneMsg = gapBridged
+      ? pauseTokenUsedMessage(streak, pauseTokens)
+      : isMilestone(streak) ? milestoneMessage(streak) : null
 
     if (milestoneMsg) {
       await sendAndCount(() => sendPushNotification({
         playerIds: user.onesignal_id ? [user.onesignal_id] : [],
         nativeSubscriptions: user.push_subscription ? [user.push_subscription] : [],
-        title: 'Ny milepæl! 🎉',
+        title: gapBridged ? 'Pausemerke brukt 🛡️' : 'Ny milepæl! 🎉',
         body: milestoneMsg,
       }))
     }
