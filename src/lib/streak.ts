@@ -84,6 +84,13 @@ export function addDays(dateStr: string, n: number): string {
 
 export type StreakState = { streak: number; pauseTokens: number }
 
+// Pausemerker gjelder fra og med lanseringsdagen og fremover — ikke retroaktivt.
+// Uten denne grensen ville funksjonen brokoblet gamle opphold fra langt tilbake i
+// loggen (fra før pausemerker fantes) og blåst opp streaken kunstig. Et opphold kan
+// derfor kun brokobles hvis dagen du logger igjen (`d`) er på eller etter denne datoen;
+// eldre opphold brytes som før (rent kalender-sammenhengende).
+const PAUSE_TOKENS_LAUNCH_DATE = '2026-09-14'
+
 export function calculateStreak(dates: string[], todayStr: string): StreakState {
   const sortedAsc = [...new Set(dates)].sort()
   if (!sortedAsc.length) return { streak: 0, pauseTokens: 0 }
@@ -100,8 +107,9 @@ export function calculateStreak(dates: string[], todayStr: string): StreakState 
       if (gap === 0) {
         streak += 1
       } else {
+        const canBridge = d >= PAUSE_TOKENS_LAUNCH_DATE
         const available = countMilestonesUpTo(streak) - tokensUsed
-        if (available > 0) {
+        if (canBridge && available > 0) {
           tokensUsed += 1
           streak += 1
         } else {
