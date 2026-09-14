@@ -1,6 +1,7 @@
 export const dynamic = 'force-dynamic'
 
 import { Suspense } from 'react'
+import { headers } from 'next/headers'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import DashboardClient from '@/components/features/DashboardClient'
@@ -11,8 +12,10 @@ import type { DayLog } from '@/components/features/DashboardClient'
 
 export default async function DashboardPage() {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  // proxy.ts har allerede verifisert brukeren for denne requesten — unngår et
+  // nytt getUser()-nettverkskall (dette er inngangssiden ved app-oppstart).
+  const userId = (await headers()).get('x-user-id')
+  if (!userId) redirect('/login')
 
   const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Oslo' })
 
@@ -20,28 +23,28 @@ export default async function DashboardPage() {
     supabase
       .from('users')
       .select('display_name, notifications_enabled, primary_group_id, auto_fill_duration')
-      .eq('id', user.id)
+      .eq('id', userId)
       .single(),
     supabase
       .from('daily_logs')
       .select('id, logged_date, package_id, duration_seconds, workout_packages(name, exercises(reps))')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('logged_date', { ascending: false }),
     supabase
       .from('workout_packages')
       .select('id, name, workout_package_categories(category_id)')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('is_active', true)
       .order('created_at', { ascending: false }),
     supabase
       .from('package_categories')
       .select('id, name')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .order('created_at', { ascending: true }),
     supabase
       .from('feedback')
       .select('id, feedback_replies(id)')
-      .eq('user_id', user.id)
+      .eq('user_id', userId)
       .eq('is_read', false),
   ])
 
@@ -84,7 +87,7 @@ export default async function DashboardPage() {
 
       <Suspense fallback={<div className="h-10 bg-gray-800/50 rounded-2xl animate-pulse" />}>
         <GroupBannerLoader
-          userId={user.id}
+          userId={userId}
           primaryGroupId={profile.primary_group_id ?? null}
           today={today}
         />
@@ -94,7 +97,7 @@ export default async function DashboardPage() {
         initialDayLogs={initialDayLogs}
         packages={packages}
         categories={categories ?? []}
-        userId={user.id}
+        userId={userId}
         notificationsEnabled={profile.notifications_enabled ?? true}
         autoFillDuration={profile.auto_fill_duration ?? false}
         repsByDate={repsByDate}

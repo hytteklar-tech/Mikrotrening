@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import BottomNav from '@/components/ui/BottomNav'
 import Logo from '@/components/ui/Logo'
@@ -7,10 +7,13 @@ import PostHogBootstrap from '@/components/providers/PostHogBootstrap'
 import PostHogAppOpened from '@/components/providers/PostHogAppOpened'
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  // proxy.ts har allerede verifisert brukeren (og satt disse headerne) for enhver
+  // request som når hit — unngår et nytt getUser()-nettverkskall for samme request.
+  const headerList = await headers()
+  const userId = headerList.get('x-user-id')
+  const userEmail = headerList.get('x-user-email')
 
-  if (!user) redirect('/login')
+  if (!userId) redirect('/login')
 
   return (
     <div className="h-dvh flex flex-col bg-gray-950 text-white">
@@ -24,7 +27,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       </main>
       <BottomNav />
       <OneSignalProvider />
-      <PostHogBootstrap userId={user.id} email={user.email} />
+      <PostHogBootstrap userId={userId} email={userEmail ?? undefined} />
       <PostHogAppOpened />
     </div>
   )
