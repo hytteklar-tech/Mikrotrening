@@ -127,11 +127,11 @@
   ],
 
   "session": {
-    "status": "active",
+    "status": "completed",
     "startedAt": "2026-09-14T00:00:00Z",
-    "completedAt": null,
+    "completedAt": "2026-09-14T17:49:06Z",
     "sessionId": "sess-sommerkropp-057",
-    "lastSignificantAction": "Auth-ytelsesfiks committet (79d703d), pushet og deployet (dpl_JC25vkRu6aZWSdsvhFmGcuiQk5rx, READY 28s), verifisert live på app.mikrotrening.no."
+    "lastSignificantAction": "Auth-ytelsesfiks committet (79d703d), pushet og deployet (dpl_JC25vkRu6aZWSdsvhFmGcuiQk5rx, READY 28s), verifisert live på app.mikrotrening.no. Sesjon avsluttet normalt, SESSION-HANDOFF.md skrevet."
   },
 
   "dataTypes": {

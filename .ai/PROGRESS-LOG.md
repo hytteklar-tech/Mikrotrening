@@ -1,5 +1,8 @@
 # PROGRESS-LOG — Sommerkropp
 
+## 2026-09-14 | P7 | SESSION_END (057)
+Ingen krasj — sjekket PROGRESS-LOG/PROJECT-STATE mot git-historikken ved oppstart. Auth-ytelsesfiksen var ferdig, testet og staget av forrige sesjon, men aldri committet (uferdig bokføring, ikke tapt arbeid). Committet (79d703d), pushet, deployet og smoke-testet denne sesjonen. Alle tre leveranser i dag (pausemerker, retroaktiv bugfiks, auth-ytelsesfiks) er nå committet, pushet og bekreftet live. SESSION-HANDOFF.md oppdatert.
+
 ## 2026-09-14 | P7 | DONE — Bekreftet deploy av auth-ytelsesfiksen
 Committet (79d703d) og pushet — GitHub-integrasjonen deployet automatisk (dpl_JC25vkRu6aZWSdsvhFmGcuiQk5rx, READY 28s), aliaset til app.mikrotrening.no. `tsc --noEmit` grønt før push. Post-deploy: uinnlogget `/` → 307 til `/login` (bekrefter at proxy.ts fjerner x-user-id-headeren og layout.tsx redirecter korrekt når den mangler), `/login` → 200. Ingen feil i build-logg.
 
